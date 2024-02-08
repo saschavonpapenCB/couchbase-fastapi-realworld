@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from .internal import admin
 from .routers import article, comment, profile, tag, user
 
+
 app = FastAPI()
 
 

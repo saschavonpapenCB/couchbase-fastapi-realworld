@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, root_validator
 from datetime import datetime
 from typing import List, Tuple
-from uuid import uuid4, UUID
+from uuid import uuid4
 
 from app.models.user import UserModel
 
@@ -10,14 +10,18 @@ def generate_random_str():
     return s.split("-")[0]
 
 
+def generate_uuid():
+    return str(uuid4())
+
+
 class CommentModel(BaseModel):
     """Comment embedded model with a unique id field"""
 
-    id: UUID = Field(default_factory=UUID)
+    id: str = Field(default_factory=generate_uuid, alias="_id")
     body: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    authorId: UUID
+    authorId: str
 
 
 class ArticleModel(BaseModel):
@@ -31,7 +35,7 @@ class ArticleModel(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     author: UserModel
-    favorited_user_ids: Tuple[UUID, ...] = ()
+    favorited_user_ids: Tuple[str, ...] = ()
     comments: Tuple[CommentModel, ...] = ()
 
     @root_validator(pre=True)
