@@ -1,18 +1,30 @@
 from fastapi import APIRouter
 
-router = APIRouter()
+router = APIRouter(
+    tags=["users"],
+    responses={404: {"description": "Not found"}},
+)
 
 
-@router.get("/users/", tags=["users"])
-async def read_users():
-    return [{"username": "Rick"}, {"username": "Morty"}]
+@router.post("/users/login", tags=["users"])
+async def user_auth():
+    #TBC
+    return {"POST user authentication" : "Returns a User"}
 
 
-@router.get("/users/me", tags=["users"])
-async def read_user_me():
-    return {"username": "fakecurrentuser"}
+@router.post("/users/", tags=["users"])
+async def user_reg():
+    #TBC
+    return {"POST user registration" : "Returns a User"}
 
 
-@router.get("/users/{username}", tags=["users"])
-async def read_user(username: str):
-    return {"username": username}
+@router.get("/user", tags=["users"])
+async def current_user():
+    #TBC
+    return {"GET current user " : "Returns a User that is the current user"}
+
+
+@router.put("/user", tags=["users"])
+async def update_user():
+    #TBC
+    return {"PUT update user" : "Returns a User"}

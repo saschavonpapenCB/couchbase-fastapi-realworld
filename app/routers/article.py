@@ -1,35 +1,55 @@
 from fastapi import APIRouter, Depends, HTTPException
 
 router = APIRouter(
-    prefix="/article",
-    tags=["article"],
+    prefix="/articles",
+    tags=["articles"],
     responses={404: {"description": "Not found"}},
 )
 
 
-fake_article_db = {"plumbus": {"name": "Plumbus"}, "gun": {"name": "Portal Gun"}}
-
-
 @router.get("/")
-async def read_article():
-    return fake_article_db
+async def list_articles():
+    #TBC
+    return {"GET list of articles" : "Returns multiple Articles"}
 
 
-@router.get("/{article_id}")
-async def read_article(article_id: str):
-    if article_id not in fake_article_db:
-        raise HTTPException(status_code=404, detail="Article not found")
-    return {"name": fake_article_db[article_id]["name"], "article_id": article_id}
+@router.get("/feed")
+async def list_feed_articles():
+    #TBC
+    return {"GET list of feed articles" : "Returns multiple Articles"}
 
 
-@router.put(
-    "/{article_id}",
-    tags=["custom"],
-    responses={403: {"description": "Operation forbidden"}},
-)
-async def update_article(article_id: str):
-    if article_id != "plumbus":
-        raise HTTPException(
-            status_code=403, detail="You can only update the article: plumbus"
-        )
-    return {"article_id": article_id, "name": "The great Plumbus"}
+@router.get("/{slug}")
+async def get_article():
+    #TBC
+    return {"GET article" : "Returns Article"}
+
+
+@router.post("/")
+async def create_article():
+    #TBC
+    return {"POST create article" : "Returns Article"}
+
+
+@router.put("/{slug}")
+async def update_article():
+    #TBC
+    return {"PUT update article" : "Returns Article"}
+
+
+@router.delete("/{slug}")
+async def delete_article():
+    #TBC
+    return {"DELETE article" : "Does not return"}
+
+
+@router.post("/{slug}/favorite")
+async def favorite_article():
+    #TBC
+    return {"POST favorite article" : "Returns Article"}
+
+
+@router.post("/{slug}/favorite")
+async def unfavorite_article():
+    #TBC
+    return {"POST unfavorite article" : "Returns Article"}
