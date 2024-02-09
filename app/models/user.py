@@ -16,3 +16,10 @@ class UserModel(BaseModel):
     bio: str | None = None
     image: str | None = None
     following_ids: Tuple[str, ...] = ()
+
+
+class ProfileModel(BaseModel):
+    username: str
+    bio: str | None = None
+    image: str | None = None
+    following: bool = False

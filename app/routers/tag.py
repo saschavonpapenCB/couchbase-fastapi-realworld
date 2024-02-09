@@ -7,7 +7,16 @@ router = APIRouter(
 )
 
 
-@router.get("/")
+@router.get(
+    "/",
+    response_model=list[str],
+    description="Get a list of tags. \n\n Method: `list_tags`",
+    responses={
+        500: {
+            "description": "Unexpected Error",
+        },
+    },
+)
 async def list_tags():
     #TBC
     return {"Get list of tags" : "Returns list of Tags"}
