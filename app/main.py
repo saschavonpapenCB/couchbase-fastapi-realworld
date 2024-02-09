@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
+from starlette.middleware.cors import CORSMiddleware
 
 from .internal import admin
 from .routers import article, comment, profile, tag, user
@@ -22,6 +23,15 @@ app = FastAPI(
     RealWorld backend built with FastAPI and Couchbase Capella.
     """,
     lifespan=lifespan,
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
