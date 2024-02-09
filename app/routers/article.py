@@ -110,7 +110,7 @@ async def delete_article() -> None:
         },
     },
 )
-async def favorite_article():
+async def favorite_article() -> ArticleModel:
     #TBC
     return {"POST favorite article" : "Returns Article"}
 
@@ -126,6 +126,6 @@ async def favorite_article():
         },
     },
 )
-async def unfavorite_article():
+async def unfavorite_article() -> ArticleModel:
     #TBC
     return {"DELETE unfavorite article" : "Returns Article"}
