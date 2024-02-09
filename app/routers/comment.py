@@ -20,15 +20,13 @@ router = APIRouter(
         },
     },
 )
-
-
 async def add_article_comment():
     #TBC
     return {"POST add article comment" : "Returns Comment"}
 
 
 @router.get(
-        "/{slug}/comments",
+    "/{slug}/comments",
     response_model=list[CommentModel],
     description="List multiple article comments. \n\n Method: `list_article_comments`",
     responses={
@@ -43,7 +41,7 @@ async def list_article_comments():
 
 
 @router.delete(
-        "/{slug}/comments/{id}",
+    "/{slug}/comments/{id}",
     status_code=status.HTTP_204_NO_CONTENT,
     description="Delete a single article comment. \n\n Method: `delete_comment`",
     responses={
