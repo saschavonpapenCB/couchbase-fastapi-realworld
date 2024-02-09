@@ -18,7 +18,7 @@ router = APIRouter(
         },
     },
 )
-async def user_auth():
+async def user_auth() -> UserModel:
     #TBC
     return {"POST user authentication" : "Returns a User"}
 
@@ -33,7 +33,7 @@ async def user_auth():
         },
     },
 )
-async def user_reg():
+async def user_reg() -> UserModel:
     #TBC
     return {"POST user registration" : "Returns a User"}
 
@@ -48,7 +48,7 @@ async def user_reg():
         },
     },
 )
-async def current_user():
+async def current_user() -> UserModel:
     #TBC
     return {"GET current user " : "Returns a User that is the current user"}
 
@@ -63,6 +63,6 @@ async def current_user():
         },
     },
 )
-async def update_user():
+async def update_user() -> UserModel:
     #TBC
     return {"PUT update user" : "Returns a User"}

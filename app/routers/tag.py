@@ -17,6 +17,6 @@ router = APIRouter(
         },
     },
 )
-async def list_tags():
+async def list_tags() -> list[str]:
     #TBC
     return {"Get list of tags" : "Returns list of Tags"}

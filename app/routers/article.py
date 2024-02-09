@@ -18,7 +18,7 @@ router = APIRouter(
         },
     },
 )
-async def list_articles():
+async def list_articles() -> list[ArticleModel]:
     #TBC
     return {"GET list of articles" : "Returns multiple Articles"}
 
@@ -33,7 +33,7 @@ async def list_articles():
         },
     },
 )
-async def list_feed_articles():
+async def list_feed_articles() -> list[ArticleModel]:
     #TBC
     return {"GET list of feed articles" : "Returns multiple Articles"}
 
@@ -48,7 +48,7 @@ async def list_feed_articles():
         },
     },
 )
-async def get_article():
+async def get_article() -> ArticleModel:
     #TBC
     return {"GET article" : "Returns Article"}
 
@@ -64,7 +64,7 @@ async def get_article():
         },
     },
 )
-async def create_article():
+async def create_article() -> ArticleModel:
     #TBC
     return {"POST create article" : "Returns Article"}
 
@@ -79,7 +79,7 @@ async def create_article():
         },
     },
 )
-async def update_article():
+async def update_article() -> ArticleModel:
     #TBC
     return {"PUT update article" : "Returns Article"}
 
@@ -94,7 +94,7 @@ async def update_article():
         },
     },
 )
-async def delete_article():
+async def delete_article() -> None:
     #TBC
     return {"DELETE article" : "Does not return"}
 

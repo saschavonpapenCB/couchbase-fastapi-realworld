@@ -18,7 +18,7 @@ router = APIRouter(
         },
     },
 )
-async def get_profile():
+async def get_profile() -> ProfileModel:
     #TBC
     return {"GET profile" : "Returns a Profile"}
 
@@ -34,7 +34,7 @@ async def get_profile():
         },
     },
 )
-async def follow_profile():
+async def follow_profile() -> ProfileModel:
     #TBC
     return {"POST follow profile" : "Returns a Profile"}
 
@@ -50,6 +50,6 @@ async def follow_profile():
         },
     },
 )
-async def unfollow_profile():
+async def unfollow_profile() -> ProfileModel:
     #TBC
     return {"DELETE unfollow profile" : "Returns a Profile"}
