@@ -1,11 +1,20 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import Annotated
+from fastapi import APIRouter, Depends, HTTPException, status, Path, Query
+
 from ..models.article import ArticleModel
+from ..database import get_db
+
 
 router = APIRouter(
     prefix="/articles",
     tags=["articles"],
     responses={404: {"description": "Not found"}},
 )
+
+
+EXAMPLE_AUTHOR = "J. K. Rowling"
+EXAMPLE_FAVORITE = "Favorited"
+EXAMPLE_TAG = "Review"
 
 
 @router.get(
@@ -18,7 +27,54 @@ router = APIRouter(
         },
     },
 )
-async def list_articles() -> list[ArticleModel]:
+async def list_articles(
+    author: Annotated[
+        str | None,
+        Query(
+            description="Author",
+            examples=[EXAMPLE_AUTHOR],
+            openapi_examples={
+                "All": {"value": ""},
+                "J. K. Rowling": {"value": "J. K. Rowling"},
+                "George Orwell": {"value": "George Orwell"},
+            },
+        )
+    ] = None,
+    favorited: Annotated[
+        str | None,
+        Query(
+            description="Favorited",
+            examples=[EXAMPLE_FAVORITE],
+            openapi_examples={
+                "All": {"value": ""},
+                "Favorited": {"value": "Favorited"},
+                "Not favorited": {"value": "Not favorited"},
+            },
+        )
+    ] = None,
+    tag: Annotated[
+        str | None,
+        Query(
+            description="Tag",
+            examples=[EXAMPLE_TAG],
+            openapi_examples={
+                "All": {"value": ""},
+                "Review": {"value": "Review"},
+                "Trendy": {"value": "Trendy"},
+            },
+        )
+    ] = None,
+    limit: Annotated[
+        int,
+        Query(description="Number of articles to return (page size)"),
+    ] = 20,
+    offset: Annotated[
+        int,
+        Query(description="Number of articles to to skip (for pagination)"),
+    ] = 0,
+    # Need to implement user instance,
+    db=get_db,
+) -> list[ArticleModel]:
     #TBC
     return {"GET list of articles" : "Returns multiple Articles"}
 
@@ -48,7 +104,11 @@ async def list_feed_articles() -> list[ArticleModel]:
         },
     },
 )
-async def get_article() -> ArticleModel:
+async def get_article(
+    slug: str,
+    # Need to add user instance,
+    db=Depends(get_db),
+) -> ArticleModel:
     #TBC
     return {"GET article" : "Returns Article"}
 
