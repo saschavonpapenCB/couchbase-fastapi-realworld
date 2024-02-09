@@ -21,7 +21,7 @@ router = APIRouter(
     },
 )
 async def add_article_comment() -> CommentModel:
-    #TBC
+    # Need to implement response return
     return {"POST add article comment" : "Returns Comment"}
 
 
@@ -36,7 +36,7 @@ async def add_article_comment() -> CommentModel:
     },
 )
 async def list_article_comments() -> list[CommentModel]:
-    #TBC
+    # Need to implement response return
     return {"GET list article comments" : "Returns multiple Comments"}
 
 
@@ -51,5 +51,5 @@ async def list_article_comments() -> list[CommentModel]:
     },
 )
 async def delete_comment() -> None:
-    #TBC
+    # Need to implement response return
     return {"DELETE article comment" : "Does not return anything"}

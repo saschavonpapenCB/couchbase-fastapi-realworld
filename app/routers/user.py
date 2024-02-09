@@ -19,7 +19,7 @@ router = APIRouter(
     },
 )
 async def user_auth() -> UserModel:
-    #TBC
+    # Need to implement response return
     return {"POST user authentication" : "Returns a User"}
 
 
@@ -34,7 +34,7 @@ async def user_auth() -> UserModel:
     },
 )
 async def user_reg() -> UserModel:
-    #TBC
+    # Need to implement response return
     return {"POST user registration" : "Returns a User"}
 
 
@@ -49,7 +49,7 @@ async def user_reg() -> UserModel:
     },
 )
 async def current_user() -> UserModel:
-    #TBC
+    # Need to implement response return
     return {"GET current user " : "Returns a User that is the current user"}
 
 
@@ -64,5 +64,5 @@ async def current_user() -> UserModel:
     },
 )
 async def update_user() -> UserModel:
-    #TBC
+    # Need to implement response return
     return {"PUT update user" : "Returns a User"}

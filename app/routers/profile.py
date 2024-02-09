@@ -19,7 +19,7 @@ router = APIRouter(
     },
 )
 async def get_profile() -> ProfileModel:
-    #TBC
+    # Need to implement response return
     return {"GET profile" : "Returns a Profile"}
 
 
@@ -35,7 +35,7 @@ async def get_profile() -> ProfileModel:
     },
 )
 async def follow_profile() -> ProfileModel:
-    #TBC
+    # Need to implement response return
     return {"POST follow profile" : "Returns a Profile"}
 
 
@@ -51,5 +51,5 @@ async def follow_profile() -> ProfileModel:
     },
 )
 async def unfollow_profile() -> ProfileModel:
-    #TBC
+    # Need to implement response return
     return {"DELETE unfollow profile" : "Returns a Profile"}
