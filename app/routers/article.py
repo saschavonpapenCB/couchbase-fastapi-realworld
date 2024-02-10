@@ -21,7 +21,7 @@ router = APIRouter(
 
 @router.get(
     "/",
-    response_model=list[ArticleModel],
+    response_model=MultipleArticlesResponse,
     description="Get a list of article. Optionally, you can filter by tag, author & favorited user. The list can also be limited and offset. \n\n Method: `list_articles`",
     responses={
         500: {
@@ -43,7 +43,7 @@ async def list_articles(
 
 @router.get(
     "/feed",
-    response_model=list[ArticleModel],
+    response_model=MultipleArticlesResponse,
     description="Get a list of feed article. Ordered by most recent first. The list can also be limited and offset. \n\n Method: `list_feed_articles`",
     responses={
         500: {
@@ -62,7 +62,7 @@ async def list_feed_articles(
 
 @router.get(
     "/{slug}",
-    response_model=ArticleModel,
+    response_model=SingleArticleResponse,
     description="Get a single article. \n\n Method: `get_article`",
     responses={
         500: {
@@ -80,7 +80,7 @@ async def get_article(
 
 @router.post(
     "/",
-    response_model=ArticleModel,
+    response_model=SingleArticleResponse,
     description="Create a single article. \n\n Method: `create_article`",
     status_code=status.HTTP_201_CREATED,
     responses={
@@ -99,7 +99,7 @@ async def create_article(
 
 @router.put(
     "/{slug}",
-    response_model=ArticleModel,
+    response_model=SingleArticleResponse,
     description="Update a single article. \n\n Method: `update_article`",
     responses={
         500: {
@@ -136,7 +136,7 @@ async def delete_article(
 
 @router.post(
     "/{slug}/favorite",
-    response_model=ArticleModel,
+    response_model=SingleArticleResponse,
     description="Favorite a single article. \n\n Method: `favorite_article`",
     status_code=status.HTTP_201_CREATED,
     responses={
@@ -156,7 +156,7 @@ async def favorite_article(
 @router.delete(
     "/{slug}/favorite",
     status_code=status.HTTP_200_OK,
-    response_model=ArticleModel,
+    response_model=SingleArticleResponse,
     description="Unfavorite a single article. \n\n Method: `unfavorite_article`",
     responses={
         500: {
