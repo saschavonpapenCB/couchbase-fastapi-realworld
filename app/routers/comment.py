@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Depends, Body, status
 
-from ..models.article import CommentModel
-from ..models.article import CommentModel
 from ..models.user import UserModel
 from ..schemas.comment import MultipleCommentsResponse, NewComment, SingleCommentResponse
 from ..schemas.user import User
@@ -17,7 +15,7 @@ router = APIRouter(
 
 @router.post(
     "/{slug}/comments",
-    response_model=CommentModel,
+    response_model=SingleCommentResponse,
     description="Create a single article comment. \n\n Method: `add_article_comment`",
     status_code=status.HTTP_201_CREATED,
     responses={
@@ -37,7 +35,7 @@ async def add_article_comment(
 
 @router.get(
     "/{slug}/comments",
-    response_model=list[CommentModel],
+    response_model=MultipleCommentsResponse,
     description="List multiple article comments. \n\n Method: `list_article_comments`",
     responses={
         500: {
