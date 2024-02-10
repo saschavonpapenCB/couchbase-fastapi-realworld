@@ -1,5 +1,11 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, Body, status
+
 from ..models.article import CommentModel
+from ..models.article import CommentModel
+from ..models.user import UserModel
+from ..schemas.comment import MultipleCommentsResponse, NewComment, SingleCommentResponse
+from ..schemas.user import User
+from ..utils.security import get_current_user_instance
 
 
 router = APIRouter(
@@ -20,7 +26,11 @@ router = APIRouter(
         },
     },
 )
-async def add_article_comment() -> CommentModel:
+async def add_article_comment(
+    slug: str,
+    new_comment: NewComment = Body(..., embed=True, alias="comment"),
+    user_instance: UserModel = Depends(get_current_user_instance),
+):
     # Need to implement response return
     return {"POST add article comment" : "Returns Comment"}
 
@@ -35,7 +45,9 @@ async def add_article_comment() -> CommentModel:
         },
     },
 )
-async def list_article_comments() -> list[CommentModel]:
+async def list_article_comments(
+    slug: str,
+):
     # Need to implement response return
     return {"GET list article comments" : "Returns multiple Comments"}
 
@@ -50,6 +62,10 @@ async def list_article_comments() -> list[CommentModel]:
         },
     },
 )
-async def delete_comment() -> None:
+async def delete_comment(
+    slug: str,
+    id: str, # Might need replacing
+    user_instance: User = Depends(get_current_user_instance),
+):
     # Need to implement response return
     return {"DELETE article comment" : "Does not return anything"}
