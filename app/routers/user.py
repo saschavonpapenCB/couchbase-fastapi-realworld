@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
-from couchbase.exceptions import DocumentExistsException
+from couchbase.exceptions import DocumentExistsException, CouchbaseException
 
 from ..schemas.user import LoginUser, NewUser, UpdateUser, User, UserResponse
 from ..models.user import UserModel
@@ -61,6 +61,10 @@ async def user_reg(
         db.insert_document(USER_COLLECTION, instance.username, instance.model_dump())
     except DocumentExistsException:
         raise HTTPException(status_code=409, detail="Article already exists")
+    except TimeoutError:
+        raise HTTPException(status_code=408, detail="Request timeout")
+    except CouchbaseException:
+        raise HTTPException()
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
     token = create_access_token(instance)
