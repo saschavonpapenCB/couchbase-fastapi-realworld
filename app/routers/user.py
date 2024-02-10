@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Body, Depends
+from fastapi import APIRouter, Body, Depends, HTTPException
+from couchbase.exceptions import DocumentExistsException
 
 from ..schemas.user import LoginUser, NewUser, UpdateUser, User, UserResponse
+from ..models.user import UserModel
+from ..database import get_db
 from ..utils.security import (
     OAUTH2_SCHEME,
     authenticate_user,
@@ -15,6 +18,9 @@ router = APIRouter(
     tags=["users"],
     responses={404: {"description": "Not found"}},
 )
+
+
+USER_COLLECTION = "user"
 
 
 @router.post(
@@ -46,9 +52,19 @@ async def user_auth(
 )
 async def user_reg(
     user: NewUser = Body(..., embed=True),
+    db=Depends(get_db),
 ):
-    # Need to implement response return
-    return {"POST user registration" : "Returns a User"}
+    instance = UserModel(
+        **user.model_dump(), hashed_password=get_password_hash(user.password)
+    )
+    try:
+        db.insert_document(USER_COLLECTION, instance.username, instance.model_dump())
+    except DocumentExistsException:
+        raise HTTPException(status_code=409, detail="Article already exists")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    token = create_access_token(instance)
+    return UserResponse(user=User(token=token, **user.model_dump()))
 
 
 @router.get(
