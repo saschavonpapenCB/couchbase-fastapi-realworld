@@ -4,9 +4,9 @@ from uuid import uuid4
 
 from pydantic import Field
 
-from models.article import CommentModel
-from models.user import UserModel
-from schemas.user import Profile
+from ..models.article import CommentModel
+from ..models.user import UserModel
+from .user import Profile
 
 from .base import BaseSchema
 

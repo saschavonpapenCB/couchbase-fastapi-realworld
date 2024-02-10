@@ -10,11 +10,11 @@ from fastapi.security.utils import get_authorization_scheme_param
 from starlette.requests import Request
 from jose import JWTError, jwt
 
-from core.exceptions import CredentialsException, NotAuthenticatedException
+from ..core.exceptions import CredentialsException, NotAuthenticatedException
 from ..models.user import UserModel
 from ..database import get_db
 from ..settings import SETTINGS
-from ..schemas import User
+from ..schemas.user import User
 
 
 class Token(BaseModel):

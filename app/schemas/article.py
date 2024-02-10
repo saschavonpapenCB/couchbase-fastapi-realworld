@@ -3,9 +3,9 @@ from typing import List, Sequence
 
 from pydantic import Field
 
-from models.article import ArticleModel
-from models.user import UserModel
-from schemas.user import Profile
+from ..models.article import ArticleModel
+from ..models.user import UserModel
+from .user import Profile
 
 from .base import BaseSchema
 

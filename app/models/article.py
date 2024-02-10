@@ -5,6 +5,7 @@ from uuid import uuid4
 
 from app.models.user import UserModel
 
+
 def generate_random_str():
     s = str(uuid4())
     return s.split("-")[0]
