@@ -1,7 +1,7 @@
 from fastapi import APIRouter, status, Depends
 
 from ..models.user import UserModel
-from ..schemas.user import Profile, ProfileResponse
+from ..schemas.user import ProfileResponse
 from ..utils.security import get_current_user_instance, get_current_user_optional_instance
 
 
