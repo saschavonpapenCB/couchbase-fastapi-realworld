@@ -4,6 +4,7 @@ from typing import List, Tuple
 from uuid import uuid4
 
 from app.models.user import UserModel
+from .ObjectId import ObjectId
 
 
 def generate_random_str():
@@ -18,11 +19,11 @@ def generate_uuid():
 class CommentModel(BaseModel):
     """Comment embedded model with a unique id field"""
 
-    id: str = Field(default_factory=generate_uuid, alias="_id")
+    id: ObjectId = Field(default_factory=ObjectId)
     body: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
-    authorId: str
+    authorId: ObjectId
 
 
 class ArticleModel(BaseModel):
@@ -36,7 +37,7 @@ class ArticleModel(BaseModel):
     created_at: datetime = Field(default_factory=datetime.utcnow)
     updated_at: datetime = Field(default_factory=datetime.utcnow)
     author: UserModel
-    favorited_user_ids: Tuple[str, ...] = ()
+    favorited_user_ids: Tuple[ObjectId, ...] = ()
     comments: Tuple[CommentModel, ...] = ()
 
     @root_validator(pre=True)
