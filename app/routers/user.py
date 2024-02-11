@@ -84,8 +84,7 @@ async def user_reg(
 async def current_user(
     current_user: User = Depends(get_current_user),
 ):
-    # Need to implement response return
-    return {"GET current user " : "Returns a User that is the current user"}
+    return UserResponse(user=current_user)
 
 
 @router.put(
