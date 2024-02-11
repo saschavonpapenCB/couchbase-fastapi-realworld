@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
 from couchbase.exceptions import DocumentExistsException, CouchbaseException
 
+from ..core.exceptions import InvalidCredentialsException
 from ..schemas.user import LoginUser, NewUser, UpdateUser, User, UserResponse
 from ..models.user import UserModel
 from ..database import get_db
@@ -20,7 +21,7 @@ router = APIRouter(
 )
 
 
-USER_COLLECTION = "user"
+USER_COLLECTION = "client"
 
 
 @router.post(
@@ -35,9 +36,16 @@ USER_COLLECTION = "user"
 )
 async def user_auth(
     user_input: LoginUser = Body(..., embed=True, alias="user"),
+    db=Depends(get_db)
 ):
-    # Need to implement response return
-    return {"POST user authentication" : "Returns a User"}
+    user = await authenticate_user(
+        db, user_input.email, user_input.password.get_secret_value()
+    )
+    if user is None:
+        raise InvalidCredentialsException()
+
+    token = create_access_token(user)
+    return UserResponse(user=User(token=token, **user.model_dump()))
 
 
 @router.post(

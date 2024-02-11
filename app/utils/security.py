@@ -12,7 +12,7 @@ from jose import JWTError, jwt
 
 from ..core.exceptions import CredentialsException, NotAuthenticatedException
 from ..models.user import UserModel
-from ..database import get_db
+from ..database import get_db, CouchbaseClient
 from ..settings import SETTINGS
 from ..schemas.user import User
 
@@ -64,34 +64,52 @@ def get_password_hash(password):
 
 
 async def get_user_instance(
+    db: CouchbaseClient,
     username: str | None = None,
     email: str | None = None,
-    db=Depends(get_db)
-) -> UserModel | None:
+):
     """Get a user instance from its username"""
-    if username is not None and email is not None:
+    if username is not None:
         query = """
-            SELECT user.email,
-                user.token,
-                user.username,
-                user.bio,
-                user.image
-            FROM user as user 
-            WHERE user.username=$username
-            AND user.email=$email;
+            SELECT client.email,
+                client.token,
+                client.username,
+                client.bio,
+                client.image,
+                client.hashed_password
+            FROM client as client 
+            WHERE client.username=$username;
+        """
+    elif email is not None:
+        query = """
+            SELECT client.email,
+                client.token,
+                client.username,
+                client.bio,
+                client.image,
+                client.hashed_password
+            FROM client as client 
+            WHERE client.email=$email;
         """
     else:
         return None
-    user = await db.query(query, username=username, email=email)
-    return user
+    
+    try:
+        queryResult = db.query(query, username=username, email=email)
+        user_data = [r for r in queryResult][0]
+        user = UserModel(**user_data)
+        return user
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
 async def authenticate_user(
+    db: CouchbaseClient,
     email: str,
     password: str
-) -> UserModel | None:
+):
     """Verify the User/Password pair against the DB content"""
-    user = await get_user_instance(email=email)
+    user = await get_user_instance(db, email=email)
     if user is None:
         return None
     if not verify_password(password, user.hashed_password):
@@ -99,7 +117,7 @@ async def authenticate_user(
     return user
 
 
-def create_access_token(user: UserModel) -> str:
+def create_access_token(user: UserModel):
     token_content = TokenContent(username=user.username)
     expire = datetime.utcnow() + timedelta(minutes=SETTINGS.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = {"exp": expire, "sub": token_content.model_dump_json()}
@@ -111,7 +129,7 @@ def create_access_token(user: UserModel) -> str:
 
 async def get_current_user_instance(
     token: str | None = Depends(OAUTH2_SCHEME),
-) -> UserModel:
+):
     """Decode the JWT and return the associated User"""
     if token is None:
         raise NotAuthenticatedException()
@@ -137,7 +155,7 @@ async def get_current_user_instance(
 
 async def get_current_user_optional_instance(
     token: str = Depends(OAUTH2_SCHEME),
-) -> UserModel | None:
+):
     try:
         user = await get_current_user_instance(token)
         return user
@@ -148,5 +166,5 @@ async def get_current_user_optional_instance(
 async def get_current_user(
     user_instance: UserModel = Depends(get_current_user_instance),
     token: str = Depends(OAUTH2_SCHEME),
-) -> User:
+):
     return User(token=token, **user_instance.model_dump())
