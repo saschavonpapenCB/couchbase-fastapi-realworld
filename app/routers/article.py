@@ -9,7 +9,7 @@ from ..schemas.article import (
     SingleArticleResponse,
     UpdateArticle,
 )
-from ..utils.security import get_current_user_instance, get_current_user_optional_instance
+from ..utils.security import get_current_user, get_current_user_optional
 
 
 router = APIRouter(
@@ -35,7 +35,7 @@ async def list_articles(
     tag: str | None = None,
     limit: int = 20,
     offset: int = 0,
-    user_instance: UserModel | None = Depends(get_current_user_optional_instance),
+    user_instance: UserModel | None = Depends(get_current_user_optional),
 ):
     # Need to implement response return
     return {"GET list of articles" : "Returns multiple Articles"}
@@ -54,7 +54,7 @@ async def list_articles(
 async def list_feed_articles(
     limit: int = 20,
     offset: int = 0,
-    user_instance: UserModel = Depends(get_current_user_instance),
+    user_instance: UserModel = Depends(get_current_user),
 ):
     # Need to implement response return
     return {"GET list of feed articles" : "Returns multiple Articles"}
@@ -72,7 +72,7 @@ async def list_feed_articles(
 )
 async def get_article(
     slug: str,
-    user_instance: UserModel | None = Depends(get_current_user_optional_instance),
+    user_instance: UserModel | None = Depends(get_current_user_optional),
 ):
     # Need to implement response return
     return {"GET article" : "Returns Article"}
@@ -91,7 +91,7 @@ async def get_article(
 )
 async def create_article(
     new_article: NewArticle = Body(..., embed=True, alias="article"),
-    user_instance: UserModel = Depends(get_current_user_instance),
+    user_instance: UserModel = Depends(get_current_user),
 ):
     # Need to implement response return
     return {"POST create article" : "Returns Article"}
@@ -110,7 +110,7 @@ async def create_article(
 async def update_article(
     slug: str,
     update_data: UpdateArticle = Body(..., embed=True, alias="article"),
-    current_user: UserModel = Depends(get_current_user_instance),
+    current_user: UserModel = Depends(get_current_user),
 ):
     # Need to implement response return
     return {"PUT update article" : "Returns Article"}
@@ -128,7 +128,7 @@ async def update_article(
 )
 async def delete_article(
     slug: str,
-    current_user: UserModel = Depends(get_current_user_instance),
+    current_user: UserModel = Depends(get_current_user),
 ):
     # Need to implement response return
     return {"DELETE article" : "Does not return"}
@@ -147,7 +147,7 @@ async def delete_article(
 )
 async def favorite_article(
     slug: str,
-    current_user: UserModel = Depends(get_current_user_instance),
+    current_user: UserModel = Depends(get_current_user),
 ):
     # Need to implement response return
     return {"POST favorite article" : "Returns Article"}
@@ -166,7 +166,7 @@ async def favorite_article(
 )
 async def unfavorite_article(
     slug: str,
-    current_user: UserModel = Depends(get_current_user_instance),
+    current_user: UserModel = Depends(get_current_user),
 ):
     # Need to implement response return
     return {"DELETE unfavorite article" : "Returns Article"}

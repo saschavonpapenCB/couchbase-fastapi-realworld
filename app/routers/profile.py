@@ -2,7 +2,7 @@ from fastapi import APIRouter, status, Depends
 
 from ..models.user import UserModel
 from ..schemas.user import ProfileResponse
-from ..utils.security import get_current_user_instance, get_current_user_optional_instance
+from ..utils.security import get_current_user, get_current_user_optional
 
 
 router = APIRouter(
@@ -24,7 +24,7 @@ router = APIRouter(
 )
 async def get_profile(
     username: str,
-    logged_user: UserModel | None = Depends(get_current_user_optional_instance),
+    logged_user: UserModel | None = Depends(get_current_user_optional),
 ):
     # Need to implement response return
     return {"GET profile" : "Returns a Profile"}
@@ -43,7 +43,7 @@ async def get_profile(
 )
 async def follow_profile(
     username: str,
-    user_instance: UserModel = Depends(get_current_user_instance),
+    user_instance: UserModel = Depends(get_current_user),
 ):
     # Need to implement response return
     return {"POST follow profile" : "Returns a Profile"}
@@ -62,7 +62,7 @@ async def follow_profile(
 )
 async def unfollow_profile(
     username: str,
-    user_instance: UserModel = Depends(get_current_user_instance),
+    user_instance: UserModel = Depends(get_current_user),
 ):
     # Need to implement response return
     return {"DELETE unfollow profile" : "Returns a Profile"}

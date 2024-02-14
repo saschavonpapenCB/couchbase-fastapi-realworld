@@ -1,17 +1,17 @@
 from fastapi import APIRouter, Body, Depends, HTTPException
 from couchbase.exceptions import DocumentExistsException, CouchbaseException
+from typing import Annotated
 
 from ..core.exceptions import InvalidCredentialsException
 from ..schemas.user import LoginUser, NewUser, UpdateUser, User, UserResponse
 from ..models.user import UserModel
 from ..database import get_db
 from ..utils.security import (
-    OAUTH2_SCHEME,
+    get_current_user,
     authenticate_user,
     create_access_token,
-    get_current_user,
-    get_current_user_instance,
     get_password_hash,
+
 )
 
 
@@ -89,12 +89,10 @@ async def user_reg(
         },
     },
 )
-async def current_user(
-    current_user: User = Depends(get_current_user),
-):
-    return UserResponse(user=current_user)
+def current_user(user: Annotated[User, Depends(get_current_user)]):
+    return UserResponse(user=user)
 
-
+"""
 @router.put(
     "/user",
     response_model=UserResponse,
@@ -112,3 +110,4 @@ async def update_user(
 ):
     # Need to implement response return
     return {"PUT update user" : "Returns a User"}
+"""

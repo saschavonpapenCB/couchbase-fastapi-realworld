@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Body, status
 from ..models.user import UserModel
 from ..schemas.comment import MultipleCommentsResponse, NewComment, SingleCommentResponse
 from ..schemas.user import User
-from ..utils.security import get_current_user_instance
+from ..utils.security import get_current_user
 
 
 router = APIRouter(
@@ -27,7 +27,7 @@ router = APIRouter(
 async def add_article_comment(
     slug: str,
     new_comment: NewComment = Body(..., embed=True, alias="comment"),
-    user_instance: UserModel = Depends(get_current_user_instance),
+    user_instance: UserModel = Depends(get_current_user),
 ):
     # Need to implement response return
     return {"POST add article comment" : "Returns Comment"}
@@ -63,7 +63,7 @@ async def list_article_comments(
 async def delete_comment(
     slug: str,
     id: str, # Might need replacing
-    user_instance: User = Depends(get_current_user_instance),
+    user_instance: User = Depends(get_current_user),
 ):
     # Need to implement response return
     return {"DELETE article comment" : "Does not return anything"}

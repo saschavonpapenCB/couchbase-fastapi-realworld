@@ -1,17 +1,23 @@
 from datetime import datetime, timedelta
-from typing import Annotated
+from typing import cast
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from pydantic import BaseModel, ValidationError
 from passlib.context import CryptContext
-from pydantic import BaseModel
+from starlette.requests import Request
 from jose import JWTError, jwt
 
-from ..models.user import UserModel
-from ..schemas.user import User
 from ..core.exceptions import CredentialsException, NotAuthenticatedException
+from ..models.user import UserModel
 from ..database import get_db, CouchbaseClient
 from ..settings import SETTINGS
+from ..schemas.user import User
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
 class TokenContent(BaseModel):
@@ -20,13 +26,17 @@ class TokenContent(BaseModel):
 
 PWD_CONTEXT = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 app = FastAPI()
 
+
+# Define HTTP Basic Authentication
 security = HTTPBasic()
 
 
 def verify_password(plain_password, hashed_password):
     return PWD_CONTEXT.verify(plain_password, hashed_password)
+
 
 def get_password_hash(password):
     return PWD_CONTEXT.hash(password)
@@ -69,7 +79,7 @@ async def get_user_instance(
         return user
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
-    
+
 
 async def authenticate_user(
     db: CouchbaseClient,
@@ -84,6 +94,7 @@ async def authenticate_user(
         return None
     return user
 
+
 def create_access_token(user: UserModel):
     token_content = TokenContent(username=user.username)
     expire = datetime.utcnow() + timedelta(minutes=SETTINGS.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -94,23 +105,44 @@ def create_access_token(user: UserModel):
     return str(encoded_jwt)
 
 
-async def get_current_user(
-    credentials: Annotated[HTTPBasicCredentials, Depends(security)],
-    db=Depends(get_db),
+async def get_current_user_instance(
+    token: str | None = Depends(OAUTH2_SCHEME),
 ):
-    input_email = credentials.username.encode("utf8") #input is email even though says username (might fix later)
-    input_password = credentials.password.encode("utf8")
-
-    current_user = await authenticate_user(db, input_email, input_password)
-
-    if current_user is None:
-        raise CredentialsException()
-    return User(**current_user.model_dump())
-
-
-async def get_current_user_optional():
+    """Decode the JWT and return the associated User"""
+    if token is None:
+        raise NotAuthenticatedException()
     try:
-        user = await get_current_user()
+        payload = jwt.decode(
+            token,
+            SETTINGS.SECRET_KEY.get_secret_value(),
+            algorithms=[SETTINGS.ALGORITHM],
+        )
+    except JWTError:
+        raise CredentialsException()
+
+    try:
+        token_content = TokenContent.model_validate_json(payload.get("sub")) #model_validate_json might not work (migrated).
+    except ValidationError:
+        raise CredentialsException()
+
+    user = await get_user_instance(username=token_content.username)
+    if user is None:
+        raise CredentialsException()
+    return user
+
+
+async def get_current_user_optional_instance(
+    token: str = Depends(OAUTH2_SCHEME),
+):
+    try:
+        user = await get_current_user_instance(token)
         return user
     except HTTPException:
         return None
+
+
+async def get_current_user(
+    user_instance: UserModel = Depends(get_current_user_instance),
+    token: str = Depends(OAUTH2_SCHEME),
+):
+    return User(token=token, **user_instance.model_dump())
