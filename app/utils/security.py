@@ -62,7 +62,11 @@ async def get_user_instance(
         """
     else:
         return None
+    
     try:
+        print(query)
+        print(username)
+        print(email)
         queryResult = db.query(query, username=username, email=email)
         user_data = [r for r in queryResult][0]
         user = UserModel(**user_data)
@@ -98,8 +102,8 @@ async def get_current_user(
     credentials: Annotated[HTTPBasicCredentials, Depends(security)],
     db=Depends(get_db),
 ):
-    input_email = credentials.username.encode("utf8") #input is email even though says username (might fix later)
-    input_password = credentials.password.encode("utf8")
+    input_email = credentials.username #input is email even though says username (might fix later)
+    input_password = credentials.password
 
     current_user = await authenticate_user(db, input_email, input_password)
 
