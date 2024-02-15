@@ -35,17 +35,17 @@ USER_COLLECTION = "client"
     },
 )
 async def user_auth(
-    user_input: LoginUser = Body(..., embed=True, alias="user"),
+    user: LoginUser = Body(..., embed=True, alias="user"),
     db=Depends(get_db)
 ):
-    user = await authenticate_user(
-        db, user_input.email, user_input.password.get_secret_value()
+    instance = await authenticate_user(
+        db, user.email, user.password.get_secret_value()
     )
-    if user is None:
+    if instance is None:
         raise InvalidCredentialsException()
 
-    token = create_access_token(user)
-    return UserResponse(user=User(token=token, **user.model_dump()))
+    token = create_access_token(instance)
+    return UserResponse(user=User(token=token, **instance.model_dump()))
 
 
 @router.post(
@@ -104,7 +104,7 @@ def current_user(user: Annotated[User, Depends(get_current_user)]):
     },
 )
 async def update_user(
-    user: UpdateUser = Body(..., embed=True, alias="user"), #fix alias later
+    user: UpdateUser = Body(..., embed=True, alias="user"),
     current_user: User = Depends(get_current_user),
     db = Depends(get_db),
 ):
