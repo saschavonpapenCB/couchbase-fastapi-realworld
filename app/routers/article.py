@@ -30,15 +30,64 @@ router = APIRouter(
     },
 )
 async def list_articles(
-    author: str | None = None,
+    author: str | None = None, # Consider adding query example metadata
     favorited: str | None = None,
     tag: str | None = None,
     limit: int = 20,
     offset: int = 0,
     user_instance: UserModel | None = Depends(get_current_user_optional),
+    db = Depends(get_db),
 ):
-    # Need to implement response return
-    return {"GET list of articles" : "Returns multiple Articles"}
+    if author: # might change ORDER BY
+        query = """
+            SELECT article.slug,
+                article.title,
+                article.description,
+                article.body,
+                article.tagList,
+                article.createdAt,
+                article.updatedAt,
+                article.favorited,
+                article.favoritesCount,
+                article.author
+            FROM article as article 
+            WHERE article.author=$author 
+            ORDER BY airline.createdAt
+            LIMIT $limit 
+            OFFSET $offset;
+        """
+    elif favorited:
+        # Implement way to search favorited by particular user.
+        pass
+    elif tag:
+        # Implement way to search tagList for tag.
+        pass
+    else:
+        query = """
+            SELECT article.slug,
+                article.title,
+                article.description,
+                article.body,
+                article.tagList,
+                article.createdAt,
+                article.updatedAt,
+                article.favorited,
+                article.favoritesCount,
+                article.author
+            FROM article as article 
+            ORDER BY airline.createdAt
+            LIMIT $limit
+            OFFSET $offset;
+        """
+    try:
+        queryResult = db.query(query, author=author, favorited=favorited, tag=tag, limit=limit, offset=offset)
+        article_list = [r for r in queryResult]
+    except Exception as e:
+        return f"Unexpected error: {e}", 500
+    if article_list is None:
+        return MultipleArticlesResponse(articles=[], articles_count=0)
+    response = MultipleArticlesResponse(articles=article_list, articlesCount=len(article_list))
+    return response
 
 
 @router.get(

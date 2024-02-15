@@ -21,3 +21,10 @@ For more information on how to this works with other frontends/backends, head ov
 
 > npm install, npm start, etc.
 
+
+
+
+
+
+IMPLEMENT COUCHBASE PRIMARY INDEXES:
+CREATE PRIMARY INDEX ON `default`:`travel-sample`.`inventory`.`COLLECTION_NAME`;

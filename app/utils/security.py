@@ -37,7 +37,6 @@ async def get_user_instance(
     username: str | None = None,
     email: str | None = None,
 ):
-    print(username)
     """Get a user instance from its username or email"""
     if username is not None:
         query = """
@@ -62,7 +61,6 @@ async def get_user_instance(
             WHERE client.email=$email;
         """
     else:
-        print("oh no")
         return None
     
     try:
@@ -114,9 +112,11 @@ async def get_current_user(
     return User(token=token, **current_user.model_dump())
 
 
-async def get_current_user_optional():
+async def get_current_user_optional(
+        db=Depends(get_db),
+):
     try:
-        user = await get_current_user()
+        user = await get_user_instance(db=db)
         return user
     except HTTPException:
         return None
