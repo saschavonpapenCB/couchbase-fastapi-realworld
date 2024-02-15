@@ -16,7 +16,7 @@ class NewUser(BaseSchema):
     password: str
 
 
-class User(BaseSchema):
+class User(BaseSchema): # Refer to API response format docs
     email: str
     token: str
     username: str
@@ -30,7 +30,15 @@ class UserResponse(BaseSchema):
 
 class UpdateUser(BaseSchema):
     email: Optional[str] = None
-    token: Optional[str] = None
+    password: Optional[str] = None
+    username: Optional[str] = None
+    bio: Optional[str] = None
+    image: Optional[str] = None
+
+
+class UpdateUserHashed(BaseSchema):
+    email: Optional[str] = None
+    hashed_password: Optional[str] = None
     username: Optional[str] = None
     bio: Optional[str] = None
     image: Optional[str] = None

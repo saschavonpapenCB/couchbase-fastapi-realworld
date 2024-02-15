@@ -37,7 +37,8 @@ async def get_user_instance(
     username: str | None = None,
     email: str | None = None,
 ):
-    """Get a user instance from its username"""
+    print(username)
+    """Get a user instance from its username or email"""
     if username is not None:
         query = """
             SELECT client.email,
@@ -61,6 +62,7 @@ async def get_user_instance(
             WHERE client.email=$email;
         """
     else:
+        print("oh no")
         return None
     
     try:

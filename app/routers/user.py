@@ -3,7 +3,7 @@ from couchbase.exceptions import DocumentExistsException, CouchbaseException
 from typing import Annotated
 
 from ..core.exceptions import InvalidCredentialsException
-from ..schemas.user import LoginUser, NewUser, UpdateUser, User, UserResponse
+from ..schemas.user import LoginUser, NewUser, UpdateUser, UpdateUserHashed, User, UserResponse
 from ..models.user import UserModel
 from ..database import get_db
 from ..utils.security import (
@@ -11,7 +11,7 @@ from ..utils.security import (
     authenticate_user,
     create_access_token,
     get_password_hash,
-
+    get_user_instance
 )
 
 
@@ -92,7 +92,7 @@ async def user_reg(
 def current_user(user: Annotated[User, Depends(get_current_user)]):
     return UserResponse(user=user)
 
-"""
+
 @router.put(
     "/user",
     response_model=UserResponse,
@@ -104,10 +104,30 @@ def current_user(user: Annotated[User, Depends(get_current_user)]):
     },
 )
 async def update_user(
-    update_user: UpdateUser = Body(..., embed=True, alias="user"),
-    user_instance: User = Depends(get_current_user_instance),
-    token: str = Depends(OAUTH2_SCHEME),
+    user: UpdateUser = Body(..., embed=True, alias="user"), #fix alias later
+    current_user: User = Depends(get_current_user),
+    db = Depends(get_db),
 ):
-    # Need to implement response return
-    return {"PUT update user" : "Returns a User"}
-"""
+    instance = await get_user_instance(db, username=current_user.username)
+
+    if user.password is not None:
+        hashed_password=get_password_hash(user.password)
+    else:
+        hashed_password = user.password
+    update_user = UpdateUserHashed(**user.model_dump(), hashed_password=hashed_password)
+
+    patch_dict = update_user.model_dump(exclude_none=True)
+    for name, value in patch_dict.items():
+        setattr(instance, name, value)
+    
+    try: # Have to make ACID
+        db.delete_document(USER_COLLECTION, current_user.username)
+        db.insert_document(USER_COLLECTION, instance.username, instance.model_dump())
+    except TimeoutError:
+        raise HTTPException(status_code=408, detail="Request timeout")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    
+    token=create_access_token(instance)
+    return UserResponse(user=User(token=token, **instance.model_dump()))
+
