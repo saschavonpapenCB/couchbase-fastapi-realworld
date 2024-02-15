@@ -109,7 +109,7 @@ async def get_current_user(
 
     if current_user is None:
         raise CredentialsException()
-    return User(**current_user.model_dump())
+    return User(**current_user.model_dump()) # Need to have token
 
 
 async def get_current_user_optional():
