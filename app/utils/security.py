@@ -64,15 +64,12 @@ async def get_user_instance(
         return None
     
     try:
-        print(query)
-        print(username)
-        print(email)
         queryResult = db.query(query, username=username, email=email)
         user_data = [r for r in queryResult][0]
         user = UserModel(**user_data)
         return user
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    except Exception:
+        raise CredentialsException()
     
 
 async def authenticate_user(
