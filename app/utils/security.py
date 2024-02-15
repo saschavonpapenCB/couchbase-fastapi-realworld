@@ -88,6 +88,7 @@ async def authenticate_user(
         return None
     return user
 
+
 def create_access_token(user: UserModel):
     token_content = TokenContent(username=user.username)
     expire = datetime.utcnow() + timedelta(minutes=SETTINGS.ACCESS_TOKEN_EXPIRE_MINUTES)
@@ -109,7 +110,9 @@ async def get_current_user(
 
     if current_user is None:
         raise CredentialsException()
-    return User(**current_user.model_dump()) # Need to have token
+    
+    token = create_access_token(current_user)
+    return User(token=token, **current_user.model_dump())
 
 
 async def get_current_user_optional():
