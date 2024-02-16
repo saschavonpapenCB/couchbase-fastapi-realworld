@@ -67,7 +67,7 @@ class NewArticle(BaseSchema):
     title: str
     description: str
     body: str
-    tag_list: List[str] | None = Field(None, alias="tagList")
+    tagList: List[str] | None
 
 
 class UpdateArticle(BaseSchema):

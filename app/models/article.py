@@ -33,7 +33,7 @@ class ArticleModel(BaseModel):
     title: str
     description: str
     body: str
-    tag_list: List[str] = []
+    tag_list: List[str] = Field(default_factory=list, alias="tagList")
     created_at: datetime = Field(default_factory=datetime.utcnow, alias="createdAt")
     updated_at: datetime = Field(default_factory=datetime.utcnow, alias="updatedAt")
     author: UserModel

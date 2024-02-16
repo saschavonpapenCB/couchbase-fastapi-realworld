@@ -93,6 +93,7 @@ async def list_articles(
     try:
         queryResult = db.query(query, author=author, favorited=favorited, tag=tag, limit=limit, offset=offset)
         article_list = [r for r in queryResult]
+        print(article_list)
     except Exception as e:
         return f"Unexpected error: {e}", 500
     if article_list is None:
