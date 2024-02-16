@@ -134,9 +134,30 @@ async def list_feed_articles(
 async def get_article(
     slug: str,
     user_instance: UserModel | None = Depends(get_current_user_optional),
+    db = Depends(get_db),
 ):
-    # Need to implement response return
-    return {"GET article" : "Returns Article"}
+    query = """
+            SELECT article.slug,
+                article.title,
+                article.description,
+                article.body,
+                article.tagList,
+                article.createdAt,
+                article.updatedAt,
+                article.favorited,
+                article.favoritesCount,
+                article.author
+            FROM article as article
+            WHERE article.slug=$slug
+            ORDER BY airline.createdAt;
+        """
+    try:
+        queryResult = db.query(query, slug=slug)
+        article_data = [r for r in queryResult][0]
+        article = ArticleModel(**article_data)
+        return SingleArticleResponse.from_article_instance(article, user_instance)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
 @router.post(
