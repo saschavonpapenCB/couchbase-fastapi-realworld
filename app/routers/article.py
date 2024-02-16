@@ -4,6 +4,7 @@ from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
 from ..core.exceptions import ArticleNotFoundException, NotArticleAuthorException
 from datetime import datetime
+from typing import Optional
 
 from ..models.article import ArticleModel
 from ..models.user import UserModel
@@ -206,23 +207,25 @@ async def create_article(
 )
 async def update_article(
     slug: str,
-    update_data: UpdateArticle = Body(..., embed=True, alias="article"),
+    article: UpdateArticle = Body(..., embed=True),
     current_user: UserModel = Depends(get_current_user),
-    db=Depends(get_db),
+    db = Depends(get_db),
 ):
-    article = await get_article(slug=slug)
-    if current_user != article.author:
+    ("update_article started")
+    update_article = await get_article(db=db, slug=slug, user_instance=current_user)
+    if current_user != update_article.author:
         raise NotArticleAuthorException()
-
-    patch_dict = update_data.dict(exclude_none=True)
+    
+    patch_dict = article.model_dump(exclude_none=True)
     for name, value in patch_dict.items():
-        setattr(article, name, value)
-    article.updated_at = datetime.utcnow()
+        setattr(update_article, name, value)
+
+    update_article.updated_at = datetime.utcnow()
     try:
-        db.upsert_document(ARTICLE_COLLECTION,article.slug,jsonable_encoder(article))
+        db.upsert_document(ARTICLE_COLLECTION, update_article.slug, jsonable_encoder(update_article))
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
-    return SingleArticleResponse.from_article_instance(article, current_user)
+    return SingleArticleResponse.from_article_instance(update_article, current_user)
 
 
 @router.delete(

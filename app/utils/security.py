@@ -40,7 +40,8 @@ async def get_user_instance(
     """Get a user instance from its username or email"""
     if username is not None:
         query = """
-            SELECT client.email,
+            SELECT client.id,
+                client.email,
                 client.token,
                 client.username,
                 client.bio,
@@ -51,7 +52,8 @@ async def get_user_instance(
         """
     elif email is not None:
         query = """
-            SELECT client.email,
+            SELECT client.id, 
+                client.email,
                 client.token,
                 client.username,
                 client.bio,
@@ -66,8 +68,9 @@ async def get_user_instance(
     try:
         queryResult = db.query(query, username=username, email=email)
         user_data = [r for r in queryResult][0]
-        user = UserModel(**user_data)
-        return user
+        ehrick = UserModel(**user_data)
+        print(ehrick)
+        return ehrick
     except Exception:
         raise CredentialsException()
     
@@ -113,10 +116,11 @@ async def get_current_user(
 
 
 async def get_current_user_optional(
-        db=Depends(get_db),
+        db=(get_db),
 ):
     try:
         user = await get_user_instance(db=db)
+        print("what on earth")
         return user
     except HTTPException:
         return None

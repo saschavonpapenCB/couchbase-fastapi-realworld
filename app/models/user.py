@@ -11,7 +11,7 @@ def generate_uuid():
 
 
 class UserModel(BaseModel):
-    id: str = Field(default_factory=generate_uuid, alias="_id")
+    id: str = Field(default_factory=generate_uuid)
     username: str
     email: str
     hashed_password: str
