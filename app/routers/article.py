@@ -2,6 +2,8 @@ from fastapi import APIRouter, Depends, status, Body
 from couchbase.exceptions import DocumentExistsException, CouchbaseException
 from fastapi import HTTPException
 from fastapi.encoders import jsonable_encoder
+from ..core.exceptions import ArticleNotFoundException, NotArticleAuthorException
+from datetime import datetime
 
 from ..models.article import ArticleModel
 from ..models.user import UserModel
@@ -206,9 +208,21 @@ async def update_article(
     slug: str,
     update_data: UpdateArticle = Body(..., embed=True, alias="article"),
     current_user: UserModel = Depends(get_current_user),
+    db=Depends(get_db),
 ):
-    # Need to implement response return
-    return {"PUT update article" : "Returns Article"}
+    article = await get_article(slug=slug)
+    if current_user != article.author:
+        raise NotArticleAuthorException()
+
+    patch_dict = update_data.dict(exclude_none=True)
+    for name, value in patch_dict.items():
+        setattr(article, name, value)
+    article.updated_at = datetime.utcnow()
+    try:
+        db.upsert_document(ARTICLE_COLLECTION,article.slug,jsonable_encoder(article))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    return SingleArticleResponse.from_article_instance(article, current_user)
 
 
 @router.delete(
