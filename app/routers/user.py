@@ -103,7 +103,7 @@ def current_user(user: Annotated[User, Depends(get_current_user)]):
         },
     },
 )
-async def update_user(
+async def update_user( # CONSIDER, changing Key to USER ID, so that this can be replaced with UPSERT.
     user: UpdateUser = Body(..., embed=True, alias="user"),
     current_user: User = Depends(get_current_user),
     db = Depends(get_db),

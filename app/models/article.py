@@ -34,8 +34,8 @@ class ArticleModel(BaseModel):
     description: str
     body: str
     tag_list: List[str] = []
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.utcnow, alias="createdAt")
+    updated_at: datetime = Field(default_factory=datetime.utcnow, alias="updatedAt")
     author: UserModel
     favorited_user_ids: Tuple[ObjectId, ...] = ()
     comments: Tuple[CommentModel, ...] = ()

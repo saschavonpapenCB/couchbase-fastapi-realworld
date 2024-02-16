@@ -1,4 +1,7 @@
 from fastapi import APIRouter, Depends, status, Body
+from couchbase.exceptions import DocumentExistsException, CouchbaseException
+from fastapi import HTTPException
+from fastapi.encoders import jsonable_encoder
 
 from ..models.article import ArticleModel
 from ..models.user import UserModel
@@ -9,7 +12,11 @@ from ..schemas.article import (
     SingleArticleResponse,
     UpdateArticle,
 )
-from ..utils.security import get_current_user, get_current_user_optional
+from ..utils.security import (
+    get_current_user,
+    get_current_user_optional,
+    get_user_instance
+)
 
 
 router = APIRouter(
@@ -17,6 +24,9 @@ router = APIRouter(
     tags=["articles"],
     responses={404: {"description": "Not found"}},
 )
+
+
+ARTICLE_COLLECTION = "article"
 
 
 @router.get(
@@ -38,7 +48,7 @@ async def list_articles(
     user_instance: UserModel | None = Depends(get_current_user_optional),
     db = Depends(get_db),
 ):
-    if author: # might change ORDER BY
+    if author: # Haven't tested ORDER BY with datetimes
         query = """
             SELECT article.slug,
                 article.title,
@@ -52,12 +62,13 @@ async def list_articles(
                 article.author
             FROM article as article 
             WHERE article.author=$author 
-            ORDER BY airline.createdAt
+            ORDER BY article.createdAt
             LIMIT $limit 
             OFFSET $offset;
         """
     elif favorited:
-        # Implement way to search favorited by particular user.
+        instance = await get_user_instance(db, username=favorited)
+        # Need to implement search for favorited user
         pass
     elif tag:
         # Implement way to search tagList for tag.
@@ -139,11 +150,24 @@ async def get_article(
     },
 )
 async def create_article(
-    new_article: NewArticle = Body(..., embed=True, alias="article"),
-    user_instance: UserModel = Depends(get_current_user),
+    article: NewArticle = Body(..., embed=True, alias="article"),
+    user: UserModel = Depends(get_current_user),
+    db = Depends(get_db),
 ):
-    # Need to implement response return
-    return {"POST create article" : "Returns Article"}
+    user_instance = await get_user_instance(db, username=user.username)
+    new_article = ArticleModel(author=user_instance, **article.model_dump())
+    new_article.tag_list.sort()
+    try:
+        db.insert_document(ARTICLE_COLLECTION, new_article.slug, jsonable_encoder(new_article))
+    except DocumentExistsException:
+        raise HTTPException(status_code=409, detail="Article already exists")
+    except TimeoutError:
+        raise HTTPException(status_code=408, detail="Request timeout")
+    except CouchbaseException as ce:
+        raise HTTPException(status_code=500, detail=f"CouchbaseException: {ce}")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    return SingleArticleResponse.from_article_instance(new_article, user_instance)
 
 
 @router.put(
