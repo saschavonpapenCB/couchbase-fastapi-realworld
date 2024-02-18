@@ -14,6 +14,12 @@ class CreateArticleRequestSchema(BaseSchema):
     tagList: List[str] | None = None
 
 
+class UpdateArticleRequestSchema(BaseSchema):
+    title: str | None = None
+    description: str | None = None
+    body: str | None = None
+
+
 class ArticleResponseSchema(BaseSchema):
     slug: str
     title: str

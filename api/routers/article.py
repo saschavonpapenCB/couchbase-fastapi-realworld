@@ -1,14 +1,19 @@
+from datetime import datetime
+
 from couchbase.exceptions import DocumentExistsException
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 
+from ..core.article import query_articles_by_slug
+from ..core.exceptions import NotArticleAuthorException
 from ..database import get_db
 from ..models.article import ArticleModel
 from ..models.user import UserModel
 from ..schemas.article import (
     ArticleWrapperSchema,
     CreateArticleRequestSchema,
-    MultipleArticlesWrapperSchema
+    MultipleArticlesWrapperSchema,
+    UpdateArticleRequestSchema
 )
 from ..utils.security import (
     get_current_user_instance,
@@ -127,6 +132,44 @@ async def get_articles(
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+    
+
+@router.get("/articles/feed", response_model=MultipleArticlesWrapperSchema)
+async def get_feed_articles(
+    limit: int = 20,
+    offset: int = 0,
+    user_instance: UserModel = Depends(get_current_user_instance),
+    db=Depends(get_db)
+):
+    query = """
+            SELECT article.slug,
+                article.title,
+                article.description,
+                article.body,
+                article.tagList,
+                article.createdAt,
+                article.updatedAt,
+                article.author,
+                article.favoritedUserIds,
+                article.comments
+            FROM article as article 
+            WHERE $favoritedId IN article.favoritedUserIds
+            ORDER BY article.createdAt
+            LIMIT $limit
+            OFFSET $offset;
+        """
+    try:
+        queryResult = db.query(
+            query, favoritedId=user_instance.identifier, limit=limit, offset=offset)
+        article_list = [r for r in queryResult]
+        for article in article_list:
+            article = ArticleModel(**article)
+        response = MultipleArticlesWrapperSchema(articles=article_list, articlesCount=len(article_list))
+        return response
+    except TimeoutError:
+        raise HTTPException(status_code=408, detail="Request timeout")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
 @router.post(
@@ -162,26 +205,32 @@ async def get_single_article(
     user_instance: UserModel | None = Depends(get_current_user_optional_instance),
     db=Depends(get_db)
 ):
-    query = """
-            SELECT article.slug,
-                article.title,
-                article.description,
-                article.body,
-                article.tagList,
-                article.createdAt,
-                article.updatedAt,
-                article.favorited,
-                article.favoritesCount,
-                article.author
-            FROM article as article
-            WHERE article.slug=$slug
-            ORDER BY article.createdAt;
-        """
+    article_model = await query_articles_by_slug(slug, db)
+    return ArticleWrapperSchema.from_article_instance(article_model, user_instance)
+
+
+@router.put(
+    "/articles/{slug}",
+    response_model=ArticleWrapperSchema
+)
+async def update_article(
+    slug: str,
+    article: UpdateArticleRequestSchema = Body(..., embed=True),
+    current_user: UserModel = Depends(get_current_user_instance),
+    db=Depends(get_db)
+):
+    article_instance = await query_articles_by_slug(slug, db)
+    if current_user != article_instance.author:
+        raise NotArticleAuthorException()
+
+    patch_dict = article.model_dump(exclude_none=True)
+    for name, value in patch_dict.items():
+        setattr(article_instance, name, value)
+    article_instance.updatedAt = datetime.utcnow()
+
     try:
-        queryResult = db.query(query, slug=slug)
-        article_data = [r for r in queryResult][0]
-        article = ArticleModel(**article_data)
-        return ArticleWrapperSchema.from_article_instance(article, user_instance)
+        db.upsert_document(ARTICLE_COLLECTION, article_instance.slug, jsonable_encoder((article_instance)))
+        return ArticleWrapperSchema.from_article_instance(article_instance, current_user)
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:
