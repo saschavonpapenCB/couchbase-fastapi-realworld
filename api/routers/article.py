@@ -123,10 +123,8 @@ async def get_articles(
             query, author=author, favoritedId=favorited_identifier,
             tag=tag, limit=limit, offset=offset
         )
-        article_list = [r for r in queryResult]
-        for article in article_list:
-            article = ArticleModel(**article)
-        response = MultipleArticlesWrapperSchema(articles=article_list, articlesCount=len(article_list))
+        article_list = [ArticleModel(**r) for r in queryResult]
+        response = MultipleArticlesWrapperSchema.from_article_instances(article_list, len(article_list), user_instance)
         return response
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
@@ -231,6 +229,48 @@ async def update_article(
     try:
         db.upsert_document(ARTICLE_COLLECTION, article_instance.slug, jsonable_encoder((article_instance)))
         return ArticleWrapperSchema.from_article_instance(article_instance, current_user)
+    except TimeoutError:
+        raise HTTPException(status_code=408, detail="Request timeout")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+
+
+@router.post(
+    "/articles/{slug}/favorite",
+    response_model=ArticleWrapperSchema
+)
+async def favorite_article(
+    slug: str,
+    current_user: UserModel = Depends(get_current_user_instance),
+    db=Depends(get_db)
+):
+    article = await query_articles_by_slug(slug, db)
+    favorited_set = {*article.favoritedUserIds, current_user.identifier}
+    article.favoritedUserIds = tuple(favorited_set)
+    try:
+        db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
+        return ArticleWrapperSchema.from_article_instance(article, current_user)
+    except TimeoutError:
+        raise HTTPException(status_code=408, detail="Request timeout")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+
+
+@router.delete(
+    "/articles/{slug}/favorite", 
+    response_model=ArticleWrapperSchema
+)
+async def unfavorite_article(
+    slug: str,
+    current_user: UserModel = Depends(get_current_user_instance),
+    db=Depends(get_db)
+):
+    article = await query_articles_by_slug(slug, db)
+    favorited_set = {*article.favoritedUserIds} - {current_user.identifier}
+    article.favoritedUserIds = tuple(favorited_set)
+    try:
+        db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
+        return ArticleWrapperSchema.from_article_instance(article, current_user)
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:

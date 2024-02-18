@@ -43,7 +43,7 @@ class ArticleResponseSchema(BaseSchema):
 
         return cls(
             favorited=favorited,
-            favorites_count=len(article.favoritedUserIds),
+            favoritesCount=len(article.favoritedUserIds),
             **article.model_dump()
         )
 
@@ -61,3 +61,13 @@ class ArticleWrapperSchema(BaseSchema):
 class MultipleArticlesWrapperSchema(BaseSchema):
     articles: List[ArticleResponseSchema]
     articlesCount: int = 0
+
+    @classmethod
+    def from_article_instances(
+        cls,
+        articles: List[ArticleModel],
+        total_count: int,
+        user: UserModel | None = None,
+    ) -> "MultipleArticlesWrapperSchema":
+        articles = [ArticleResponseSchema.from_article_instance(a, user) for a in articles]
+        return cls(articles=articles, articlesCount=total_count)
