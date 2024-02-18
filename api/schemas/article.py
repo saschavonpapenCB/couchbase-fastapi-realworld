@@ -50,3 +50,8 @@ class ArticleWrapperSchema(BaseSchema):
         cls, article: ArticleModel, user: UserModel | None = None
     ) -> "ArticleWrapperSchema":
         return cls(article=ArticleResponseSchema.from_article_instance(article=article, user=user))
+
+
+class MultipleArticlesWrapperSchema(BaseSchema):
+    articles: List[ArticleResponseSchema]
+    articlesCount: int = 0

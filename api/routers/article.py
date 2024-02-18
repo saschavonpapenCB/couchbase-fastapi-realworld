@@ -7,11 +7,13 @@ from ..models.article import ArticleModel
 from ..models.user import UserModel
 from ..schemas.article import (
     ArticleWrapperSchema,
-    CreateArticleRequestSchema
+    CreateArticleRequestSchema,
+    MultipleArticlesWrapperSchema
 )
 from ..utils.security import (
     get_current_user_instance,
-    get_current_user_optional_instance
+    get_current_user_optional_instance,
+    query_db_for_user
 )
 
 
@@ -19,6 +21,112 @@ router = APIRouter()
 
 
 ARTICLE_COLLECTION = "article"
+
+
+@router.get("/articles", response_model=MultipleArticlesWrapperSchema)
+async def get_articles(
+    author: str | None = None,
+    favorited: str | None = None,
+    tag: str | None = None,
+    limit: int = 20,
+    offset: int = 0,
+    user_instance: UserModel | None = Depends(get_current_user_optional_instance),
+    db=Depends(get_db)
+):
+    
+    if author:
+        favorited_identifier = None
+        query = """
+            SELECT article.slug,
+                article.title,
+                article.description,
+                article.body,
+                article.tagList,
+                article.createdAt,
+                article.updatedAt,
+                article.author,
+                article.favoritedUserIds,
+                article.comments
+            FROM article as article 
+            WHERE article.author.username=$author
+            ORDER BY article.createdAt
+            LIMIT $limit
+            OFFSET $offset;
+        """
+    elif favorited:
+        favorited_user = await query_db_for_user(db, username=favorited)
+        favorited_identifier = favorited_user.identifier
+        query = """
+            SELECT article.slug,
+                article.title,
+                article.description,
+                article.body,
+                article.tagList,
+                article.createdAt,
+                article.updatedAt,
+                article.author,
+                article.favoritedUserIds,
+                article.comments
+            FROM article as article 
+            WHERE $favoritedId IN article.favoritedUserIds
+            ORDER BY article.createdAt
+            LIMIT $limit
+            OFFSET $offset;
+        """
+    elif tag:
+        favorited_identifier = None
+        query = """
+            SELECT article.slug,
+                article.title,
+                article.description,
+                article.body,
+                article.tagList,
+                article.createdAt,
+                article.updatedAt,
+                article.author,
+                article.favoritedUserIds,
+                article.comments
+            FROM article as article 
+            WHERE $tag IN article.tagList
+            ORDER BY article.createdAt
+            LIMIT $limit
+            OFFSET $offset;
+        """
+    else:
+        favorited_identifier = None
+        query = """
+            SELECT article.slug,
+                article.title,
+                article.description,
+                article.body,
+                article.tagList,
+                article.createdAt,
+                article.updatedAt,
+                article.author,
+                article.favoritedUserIds,
+                article.comments
+            FROM article as article 
+            ORDER BY article.createdAt
+            LIMIT $limit
+            OFFSET $offset;
+        """
+    if query is None:
+        return MultipleArticlesWrapperSchema(articles=[], articles_count=0)
+    
+    try:
+        queryResult = db.query(
+            query, author=author, favoritedId=favorited_identifier,
+            tag=tag, limit=limit, offset=offset
+        )
+        article_list = [r for r in queryResult]
+        for article in article_list:
+            article = ArticleModel(**article)
+        response = MultipleArticlesWrapperSchema(articles=article_list, articlesCount=len(article_list))
+        return response
+    except TimeoutError:
+        raise HTTPException(status_code=408, detail="Request timeout")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
 @router.post(
@@ -67,7 +175,7 @@ async def get_single_article(
                 article.author
             FROM article as article
             WHERE article.slug=$slug
-            ORDER BY airline.createdAt;
+            ORDER BY article.createdAt;
         """
     try:
         queryResult = db.query(query, slug=slug)

@@ -96,8 +96,7 @@ async def query_db_for_user(
 
     queryResult = db.query(query, email=email, username=username)
     user_data = [r for r in queryResult][0]
-    problem = UserModel(**user_data)
-    return problem
+    return UserModel(**user_data)
 
 
 async def authenticate_user(email: str, password: str, db):
