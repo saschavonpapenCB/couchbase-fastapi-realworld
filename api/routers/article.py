@@ -277,4 +277,18 @@ async def unfavorite_article(
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
-
+@router.delete("/articles/{slug}")
+async def delete_article(
+    slug: str,
+    current_user: UserModel = Depends(get_current_user_instance),
+    db=Depends(get_db)
+):
+    article = await query_articles_by_slug(slug, db)
+    if current_user != article.author:
+        raise NotArticleAuthorException()
+    try:
+        db.delete_document(ARTICLE_COLLECTION, article.slug)
+    except TimeoutError:
+        raise HTTPException(status_code=408, detail="Request timeout")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
