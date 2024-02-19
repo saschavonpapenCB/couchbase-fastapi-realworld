@@ -38,7 +38,6 @@ async def register(
     user: RegistrationRequestSchema = Body(..., embed=True),
     db=Depends(get_db)
 ):
-    print(user)
     user_model = UserModel(
         **user.model_dump(),
         hashed_password=get_password_hash(user.password))
