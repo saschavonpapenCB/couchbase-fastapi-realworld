@@ -40,7 +40,7 @@ async def get_articles(
 ):
     
     if author:
-        favorited_identifier = None
+        favorited_id = None
         query = """
             SELECT article.slug,
                 article.title,
@@ -60,7 +60,7 @@ async def get_articles(
         """
     elif favorited:
         favorited_user = await query_db_for_user(db, username=favorited)
-        favorited_identifier = favorited_user.identifier
+        favorited_id = favorited_user.id
         query = """
             SELECT article.slug,
                 article.title,
@@ -79,7 +79,7 @@ async def get_articles(
             OFFSET $offset;
         """
     elif tag:
-        favorited_identifier = None
+        favorited_id = None
         query = """
             SELECT article.slug,
                 article.title,
@@ -98,7 +98,7 @@ async def get_articles(
             OFFSET $offset;
         """
     else:
-        favorited_identifier = None
+        favorited_id = None
         query = """
             SELECT article.slug,
                 article.title,
@@ -120,7 +120,7 @@ async def get_articles(
     
     try:
         queryResult = db.query(
-            query, author=author, favoritedId=favorited_identifier,
+            query, author=author, favoritedId=favorited_id,
             tag=tag, limit=limit, offset=offset
         )
         article_list = [ArticleModel(**r) for r in queryResult]
@@ -158,7 +158,7 @@ async def get_feed_articles(
         """
     try:
         queryResult = db.query(
-            query, favoritedId=user_instance.identifier, limit=limit, offset=offset)
+            query, favoritedId=user_instance.id, limit=limit, offset=offset)
         article_list = [r for r in queryResult]
         for article in article_list:
             article = ArticleModel(**article)
@@ -245,7 +245,7 @@ async def favorite_article(
     db=Depends(get_db)
 ):
     article = await query_articles_by_slug(slug, db)
-    favorited_set = {*article.favoritedUserIds, current_user.identifier}
+    favorited_set = {*article.favoritedUserIds, current_user.id}
     article.favoritedUserIds = tuple(favorited_set)
     try:
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
@@ -266,7 +266,7 @@ async def unfavorite_article(
     db=Depends(get_db)
 ):
     article = await query_articles_by_slug(slug, db)
-    favorited_set = {*article.favoritedUserIds} - {current_user.identifier}
+    favorited_set = {*article.favoritedUserIds} - {current_user.id}
     article.favoritedUserIds = tuple(favorited_set)
     try:
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))

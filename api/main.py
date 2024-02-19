@@ -3,6 +3,7 @@ from fastapi import FastAPI
 
 from .database import get_db
 from .routers.article import router as article_router
+from .routers.comment import router as comment_router
 from .routers.user import router as user_router
 
 
@@ -28,3 +29,4 @@ api = FastAPI(
 
 api.include_router(user_router, tags=["users"], prefix="/api")
 api.include_router(article_router, tags=["articles"], prefix="/api")
+api.include_router(comment_router, tags=["comments"], prefix="/api")

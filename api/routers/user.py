@@ -44,7 +44,7 @@ async def register(
         hashed_password=get_password_hash(user.password))
 
     try:
-        db.insert_document(USER_COLLECTION, user_model.identifier, user_model.model_dump())
+        db.insert_document(USER_COLLECTION, user_model.id, user_model.model_dump())
     except DocumentExistsException:
         raise HTTPException(status_code=409, detail="User already exists")
     except TimeoutError:
@@ -102,7 +102,7 @@ async def update_user(
         setattr(user_instance, name, value)
 
     try:
-        db.upsert_document(USER_COLLECTION, user_instance.identifier, user_instance.model_dump())
+        db.upsert_document(USER_COLLECTION, user_instance.id, user_instance.model_dump())
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:

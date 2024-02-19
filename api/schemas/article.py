@@ -39,7 +39,7 @@ class ArticleResponseSchema(BaseSchema):
         if user is None:
             favorited = False
         else:
-            favorited = user.identifier in article.favoritedUserIds
+            favorited = user.id in article.favoritedUserIds
 
         return cls(
             favorited=favorited,

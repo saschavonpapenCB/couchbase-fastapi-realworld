@@ -15,10 +15,10 @@ def generate_random_str():
 class CommentModel(BaseModel):
     """Comment embedded model with a unique id field"""
 
-    identifier: str = Field(default_factory=generate_id)
+    id: str = Field(default_factory=generate_id)
     body: str
-    CreatedAt: datetime = Field(default_factory=datetime.utcnow)
-    UpdatedAt: datetime = Field(default_factory=datetime.utcnow)
+    createdAt: datetime = Field(default_factory=datetime.utcnow)
+    updatedAt: datetime = Field(default_factory=datetime.utcnow)
     authorId: str
 
 

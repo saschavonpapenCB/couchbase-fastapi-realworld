@@ -71,7 +71,7 @@ async def query_db_for_user(
 ):
     if username is not None:
         query = """
-            SELECT client.identifier,
+            SELECT client.id,
                 client.email,
                 client.username,
                 client.bio,
@@ -82,7 +82,7 @@ async def query_db_for_user(
         """
     elif email is not None:
         query = """
-            SELECT client.identifier, 
+            SELECT client.id, 
                 client.email,
                 client.username,
                 client.bio,

@@ -5,7 +5,7 @@ from .identifier import generate_id
 
 
 class UserModel(BaseModel):
-    identifier: str = Field(default_factory=generate_id)
+    id: str = Field(default_factory=generate_id)
     username: str
     email: str
     hashed_password: str
