@@ -1,9 +1,12 @@
+from typing import Tuple
+
 from couchbase.exceptions import DocumentExistsException
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 
 from ..core.article import query_articles_by_slug
 from ..core.user import query_users_by_id
+from ..core.exceptions import NotCommentAuthorException, CommentNotFoundException
 from ..database import get_db
 from ..models.article import CommentModel
 from ..models.user import UserModel
@@ -72,4 +75,33 @@ async def get_article_comments(
     return MultipleCommentsResponseSchema.from_comments_and_authors(data)
 
 
+@router.delete(
+    "/articles/{slug}/comments/{id}"
+)
+async def delete_article_comment(
+    slug: str,
+    id: str,
+    user_instance: UserModel = Depends(get_current_user_instance),
+    db=Depends(get_db)
+):
+    article = await query_articles_by_slug(slug, db)
+    comments = [CommentModel(**comment)for comment in article.comments]
+    if not comments:
+        raise CommentNotFoundException
+    for index, comment in enumerate(comments):
+        if comment.id == id:
+            comment_data =Tuple[comment, index]
+    
+    if comment.authorId != user_instance.id:
+        raise NotCommentAuthorException()
+    
+    article.comments = article.comments[:index] + article.comments[index + 1 :]
+    try:
+        db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
+    except DocumentExistsException:
+        raise HTTPException(status_code=409, detail="Article already exists")
+    except TimeoutError:
+        raise HTTPException(status_code=408, detail="Request timeout")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
