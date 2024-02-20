@@ -5,7 +5,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 
 from ..core.article import query_articles_by_slug
-from ..core.user import query_users_by_id
+from ..core.user import query_users_db
 from ..core.exceptions import NotCommentAuthorException, CommentNotFoundException
 from ..database import get_db
 from ..models.article import CommentModel
@@ -66,12 +66,14 @@ async def get_article_comments(
     db=Depends(get_db)
 ):
     article = await query_articles_by_slug(slug, db)
-    comments = [CommentModel(**comment)for comment in article.comments]
+    comments = [comment for comment in article.comments]
     comment_authorIds = [comment.authorId for comment in comments]
     comment_authors=[]
     for author_id in comment_authorIds:
-        comment_authors.append(await query_users_by_id(author_id, db))
-    data = list(zip(range(len(comments)), range(len(comment_authors))))
+        comment_authors.append(await query_users_db(db, id=author_id))
+    data = []
+    for index, comment in enumerate(comments):
+        data.append((comment, comment_authors[index]))
     return MultipleCommentsResponseSchema.from_comments_and_authors(data)
 
 
@@ -85,17 +87,13 @@ async def delete_article_comment(
     db=Depends(get_db)
 ):
     article = await query_articles_by_slug(slug, db)
-    comments = [CommentModel(**comment)for comment in article.comments]
+    comments = [comment for comment in article.comments]
     if not comments:
-        raise CommentNotFoundException
+        raise CommentNotFoundException()
     for index, comment in enumerate(comments):
         if comment.id == id:
-            comment_data =Tuple[comment, index]
-    
-    if comment.authorId != user_instance.id:
-        raise NotCommentAuthorException()
-    
-    article.comments = article.comments[:index] + article.comments[index + 1 :]
+            if comment.authorId == user_instance.id:
+                article.comments = article.comments[:index] + article.comments[index + 1 :] 
     try:
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
     except DocumentExistsException:

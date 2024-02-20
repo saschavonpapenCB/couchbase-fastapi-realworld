@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 
-from ..core.user import query_users_by_username
+from ..core.user import query_users_db
 from ..database import get_db
 from ..models.user import UserModel
 from ..schemas.user import ProfileWrapperSchema, ProfileResponseSchema
@@ -21,7 +21,7 @@ async def get_profile(
     logged_user: UserModel | None = Depends(get_current_user_optional_instance),
     db=Depends(get_db)
 ):
-    user = await query_users_by_username(username, db)
+    user = await query_users_db(db, username=username)
     following = False
     if logged_user is not None and user.id in logged_user.following_ids:
         following = True
@@ -37,7 +37,7 @@ async def follow_user(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db)
 ):
-    user_to_follow = await query_users_by_username(username, db)
+    user_to_follow = await query_users_db(db, username=username)
     following_set = set(user_instance.following_ids) | set((user_to_follow.id,))
     user_instance.following_ids = tuple(following_set)
     try:
@@ -59,7 +59,7 @@ async def unfollow_user(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db)
 ):
-    user_to_unfollow = await query_users_by_username(username, db)
+    user_to_unfollow = await query_users_db(db, username=username)
     following_set = set(user_instance.following_ids) - set((user_to_unfollow.id,))
     user_instance.following_ids = tuple(following_set)
     try:

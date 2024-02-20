@@ -18,7 +18,7 @@ from ..schemas.article import (
 from ..utils.security import (
     get_current_user_instance,
     get_current_user_optional_instance,
-    query_db_for_user
+    get_user_instance
 )
 
 
@@ -59,7 +59,7 @@ async def get_articles(
             OFFSET $offset;
         """
     elif favorited:
-        favorited_user = await query_db_for_user(db, username=favorited)
+        favorited_user = await get_user_instance(db, username=favorited)
         favorited_id = favorited_user.id
         query = """
             SELECT article.slug,
@@ -279,7 +279,7 @@ async def delete_article(
     db=Depends(get_db)
 ):
     article = await query_articles_by_slug(slug, db)
-    if current_user != article.author:
+    if current_user.id != article.author.id:
         raise NotArticleAuthorException()
     try:
         db.delete_document(ARTICLE_COLLECTION, article.slug)

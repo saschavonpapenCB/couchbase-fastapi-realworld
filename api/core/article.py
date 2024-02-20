@@ -18,7 +18,8 @@ async def query_articles_by_slug(
                 article.updatedAt,
                 article.favorited,
                 article.favoritesCount,
-                article.author
+                article.author,
+                article.comments
             FROM article as article
             WHERE article.slug=$slug
             ORDER BY article.createdAt;

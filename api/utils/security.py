@@ -64,10 +64,10 @@ def get_password_hash(password):
     return pwd_context.hash(password)
 
 
-async def query_db_for_user(
+async def get_user_instance(
     db,
     email: str | None = None,
-    username: str | None = None
+    username: str | None = None,
 ):
     if username is not None:
         query = """
@@ -102,7 +102,7 @@ async def query_db_for_user(
 
 
 async def authenticate_user(email: str, password: str, db):
-    user = await query_db_for_user(db, email=email)
+    user = await get_user_instance(db, email=email)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -140,7 +140,7 @@ async def get_current_user_instance(
         token_content = TokenContentModel(**payload_model)
     except ValidationError:
         raise CredentialsException()
-    user = await query_db_for_user(db, username=token_content.username)
+    user = await get_user_instance(db, username=token_content.username)
     if user is None:
         raise CredentialsException()
     return user
