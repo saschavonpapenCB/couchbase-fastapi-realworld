@@ -30,7 +30,8 @@ async def get_profile(
 
 @router.post(
     "/profiles/{username}/follow",
-    response_model=ProfileWrapperSchema)
+    response_model=ProfileWrapperSchema
+)
 async def follow_user(
     username: str,
     user_instance: UserModel = Depends(get_current_user_instance),
@@ -45,14 +46,14 @@ async def follow_user(
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
-    
     profile = ProfileResponseSchema(following=True, **user_to_follow.model_dump())
     return ProfileWrapperSchema(profile=profile)
 
 
 @router.delete(
     "/profiles/{username}/follow",
-    response_model=ProfileWrapperSchema)
+    response_model=ProfileWrapperSchema
+)
 async def unfollow_user(
     username: str,
     user_instance: UserModel = Depends(get_current_user_instance),

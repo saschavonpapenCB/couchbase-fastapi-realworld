@@ -9,7 +9,6 @@ class _Settings(BaseSettings):
     )
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-    MONGO_URI: str | None = None
 
 
 # Make this a singleton to avoid reloading it from the env everytime

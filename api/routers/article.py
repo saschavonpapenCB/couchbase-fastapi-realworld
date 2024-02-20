@@ -11,9 +11,9 @@ from ..models.article import ArticleModel
 from ..models.user import UserModel
 from ..schemas.article import (
     ArticleWrapperSchema,
-    CreateArticleRequestSchema,
+    CreateArticleSchema,
     MultipleArticlesWrapperSchema,
-    UpdateArticleRequestSchema
+    UpdateArticleSchema
 )
 from ..utils.security import (
     get_current_user_instance,
@@ -117,7 +117,6 @@ async def get_articles(
         """
     if query is None:
         return MultipleArticlesWrapperSchema(articles=[], articles_count=0)
-    
     try:
         queryResult = db.query(
             query, author=author, favoritedId=favorited_id,
@@ -157,8 +156,7 @@ async def get_feed_articles(
             OFFSET $offset;
         """
     try:
-        queryResult = db.query(
-            query, favoritedId=user_instance.id, limit=limit, offset=offset)
+        queryResult = db.query(query, favoritedId=user_instance.id, limit=limit, offset=offset)
         article_list = [r for r in queryResult]
         for article in article_list:
             article = ArticleModel(**article)
@@ -175,13 +173,12 @@ async def get_feed_articles(
     response_model=ArticleWrapperSchema
 )
 async def create_article(
-    article: CreateArticleRequestSchema = Body(..., embed=True),
+    article: CreateArticleSchema = Body(..., embed=True),
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db)
 ):
     response_article = ArticleModel(author=user_instance, **article.model_dump())
     response_article.tagList.sort()
-
     try:
         db.insert_document(ARTICLE_COLLECTION, response_article.slug, jsonable_encoder(response_article))
     except DocumentExistsException:
@@ -213,19 +210,17 @@ async def get_single_article(
 )
 async def update_article(
     slug: str,
-    article: UpdateArticleRequestSchema = Body(..., embed=True),
+    article: UpdateArticleSchema = Body(..., embed=True),
     current_user: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db)
 ):
     article_instance = await query_articles_by_slug(slug, db)
     if current_user != article_instance.author:
         raise NotArticleAuthorException()
-
     patch_dict = article.model_dump(exclude_none=True)
     for name, value in patch_dict.items():
         setattr(article_instance, name, value)
     article_instance.updatedAt = datetime.utcnow()
-
     try:
         db.upsert_document(ARTICLE_COLLECTION, article_instance.slug, jsonable_encoder((article_instance)))
         return ArticleWrapperSchema.from_article_instance(article_instance, current_user)

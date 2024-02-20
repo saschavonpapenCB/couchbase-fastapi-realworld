@@ -18,12 +18,12 @@ from ..schemas.user import UserResponseSchema
 from ..settings import SETTINGS
 
 
-class Token(BaseModel):
+class TokenModel(BaseModel):
     access_token: str
     token_type: str
 
 
-class TokenContent(BaseModel):
+class TokenContentModel(BaseModel):
     username: str
 
 
@@ -93,10 +93,12 @@ async def query_db_for_user(
         """
     else:
         return None
-
     queryResult = db.query(query, email=email, username=username)
     user_data = [r for r in queryResult][0]
-    return UserModel(**user_data)
+    if not user_data:
+            raise NotAuthenticatedException()
+    else:
+        return UserModel(**user_data)
 
 
 async def authenticate_user(email: str, password: str, db):
@@ -109,7 +111,7 @@ async def authenticate_user(email: str, password: str, db):
 
 
 async def create_access_token(user: UserModel) -> str:
-    token_content = TokenContent(username=user.username)
+    token_content = TokenContentModel(username=user.username)
     expire = datetime.utcnow() + timedelta(minutes=SETTINGS.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = {"exp": expire, "sub": token_content.model_dump_json()}
     encoded_jwt = jwt.encode(
@@ -133,15 +135,11 @@ async def get_current_user_instance(
         )
     except JWTError:
         raise CredentialsException()
-    
-    
     try:
         payload_model = json.loads(payload.get("sub"))
-        token_content = TokenContent(**payload_model)
-
+        token_content = TokenContentModel(**payload_model)
     except ValidationError:
         raise CredentialsException()
-
     user = await query_db_for_user(db, username=token_content.username)
     if user is None:
         raise CredentialsException()

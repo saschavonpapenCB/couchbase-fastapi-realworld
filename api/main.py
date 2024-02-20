@@ -18,8 +18,6 @@ async def lifespan(app: FastAPI):
     db.close()
 
 
-
-
 api = FastAPI(
     title="Couchbase FastAPI RealWorld",
     version="1.0.0",

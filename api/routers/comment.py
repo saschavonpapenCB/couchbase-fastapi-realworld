@@ -13,7 +13,7 @@ from ..models.user import UserModel
 from ..routers.article import ARTICLE_COLLECTION
 from ..schemas.comment import (
     CreateCommentSchema,
-    CommentSchema,
+    CommentResponseSchema,
     SingleCommentResponseSchema,
     MultipleCommentsResponseSchema
 )
@@ -53,7 +53,7 @@ async def add_article_comment(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
     response_profile = ProfileResponseSchema(**user_instance.model_dump())
-    response_comment = CommentSchema(author=response_profile, **comment_instance.model_dump())
+    response_comment = CommentResponseSchema(author=response_profile, **comment_instance.model_dump())
     return SingleCommentResponseSchema(comment=response_comment)
 
 

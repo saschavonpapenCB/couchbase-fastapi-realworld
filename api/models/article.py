@@ -1,20 +1,12 @@
 from pydantic import BaseModel, Field, root_validator
 from datetime import datetime
 from typing import List, Tuple
-from uuid import uuid4
 
-from .identifier import generate_id
+from .identifier import generate_id, generate_random_str
 from .user import UserModel
 
 
-def generate_random_str():
-    s = str(uuid4())
-    return s.split("-")[0]
-
-
 class CommentModel(BaseModel):
-    """Comment embedded model with a unique id field"""
-
     id: str = Field(default_factory=generate_id)
     body: str
     createdAt: datetime = Field(default_factory=datetime.utcnow)

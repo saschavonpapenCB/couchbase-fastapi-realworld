@@ -8,7 +8,6 @@ class BaseSchema(BaseModel):
         "populate_by_name": True,
         "json_encoders": {
             datetime: lambda d: d.strftime("%Y-%m-%dT%H:%M:%S.%fZ"),
-            #**BSON_TYPES_ENCODERS, TBD
         },
         "from_attributes": True,
     }

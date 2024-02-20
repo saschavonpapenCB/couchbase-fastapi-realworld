@@ -3,12 +3,12 @@ from pydantic import SecretStr
 from .base import BaseSchema
 
 
-class AuthenticationRequestSchema(BaseSchema):
+class AuthenticationSchema(BaseSchema):
     email: str
     password: SecretStr
 
 
-class RegistrationRequestSchema(BaseSchema):
+class RegistrationSchema(BaseSchema):
     username: str
     email: str
     password: str

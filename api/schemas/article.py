@@ -7,14 +7,14 @@ from ..models.user import UserModel
 from .user import ProfileResponseSchema
 
 
-class CreateArticleRequestSchema(BaseSchema):
+class CreateArticleSchema(BaseSchema):
     title: str
     description: str
     body: str
     tagList: List[str] | None = None
 
 
-class UpdateArticleRequestSchema(BaseSchema):
+class UpdateArticleSchema(BaseSchema):
     title: str | None = None
     description: str | None = None
     body: str | None = None

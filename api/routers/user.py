@@ -5,8 +5,8 @@ from ..core.exceptions import InvalidCredentialsException
 from ..database import get_db
 from ..models.user import UserModel
 from ..schemas.user import (
-    AuthenticationRequestSchema,
-    RegistrationRequestSchema,
+    AuthenticationSchema,
+    RegistrationSchema,
     UpdateUserSchema,
     UserResponseSchema,
     UserWrapperSchema
@@ -35,13 +35,12 @@ USER_COLLECTION = "client"
     response_model=UserWrapperSchema
 )
 async def register(
-    user: RegistrationRequestSchema = Body(..., embed=True),
+    user: RegistrationSchema = Body(..., embed=True),
     db=Depends(get_db)
 ):
     user_model = UserModel(
         **user.model_dump(),
         hashed_password=get_password_hash(user.password))
-
     try:
         db.insert_document(USER_COLLECTION, user_model.id, user_model.model_dump())
     except DocumentExistsException:
@@ -50,9 +49,7 @@ async def register(
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
-    
     token = await create_access_token(user_model)
-
     response_user = UserResponseSchema(token=token, **user_model.model_dump())
     return UserWrapperSchema(user=response_user)
 
@@ -62,7 +59,7 @@ async def register(
     response_model=UserWrapperSchema
 )
 async def login_user(
-    user: AuthenticationRequestSchema = Body(..., embed=True),
+    user: AuthenticationSchema = Body(..., embed=True),
     db=Depends(get_db)
 ):
     user = await authenticate_user(

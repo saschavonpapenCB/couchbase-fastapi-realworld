@@ -8,7 +8,7 @@ from ..schemas.user import ProfileResponseSchema
 from .base import BaseSchema
 
 
-class CommentSchema(BaseSchema):
+class CommentResponseSchema(BaseSchema):
     id: str
     createdAt: datetime
     updatedAt: datetime
@@ -17,11 +17,11 @@ class CommentSchema(BaseSchema):
 
 
 class SingleCommentResponseSchema(BaseSchema):
-    comment: CommentSchema
+    comment: CommentResponseSchema
 
 
 class MultipleCommentsResponseSchema(BaseSchema):
-    comments: List[CommentSchema]
+    comments: List[CommentResponseSchema]
 
     @classmethod
     def from_comments_and_authors(cls, data: List[Tuple[CommentModel, UserModel]]):
