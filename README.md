@@ -14,40 +14,86 @@ For more information on how to this works with other frontends/backends, head ov
 
 # How it works
 
-> TBC
+> COMING SOON
 
-# Prerequisites
+## Prerequisites
 
-> Create a Couchbase Capella cluster with bucket and scope loaded.
-Cluster details to be put in the .env file.
+To run this prebuilt project, you will need:
 
-> Create an 'article' and a 'client' collection in the loaded scope on the cluster ('client' because 'user' is a reserved Couchbase keyword).
+- [Couchbase Capella](https://www.couchbase.com/products/capella/) cluster with a bucket loaded.
+- [Python](https://www.python.org/downloads/) 3.9 or higher installed
+  - Ensure that the Python version is [compatible](https://docs.couchbase.com/python-sdk/current/project-docs/compatibility.html#python-version-compat) with the Couchbase SDK.
+- Configuring Bucket
+    Using the Capella UI, create an 'article' and a 'client' collection in the loaded scope ('client' because 'user' is a reserved Couchbase keyword) and using the Query data tool, create primary indicies for both collections.
+    ```
+    CREATE PRIMARY INDEX ON `default`:`<bucket_name>`.`<scope_name>`.`<collection_name>`;
+    ```
 
-> Create primary indicies for both collection.
+# Setting Up the Application
+
+### Cloning Repo
+
+```shell
+git clone https://github.com/couchbase-examples/python-quickstart-fastapi.git
 ```
-CREATE PRIMARY INDEX ON `default`:`BUCKET_NAME`.`SCOPE_NAME`.`COLLECTION_NAME`;
+
+### Install Dependencies
+
+The dependencies for the application are specified in the `requirements.txt` file in the root folder. Dependencies can be installed through `pip` the default package manager for Python.
+```
+python -m pip install -r requirements.txt
+```
+> Note: If your Python is not symbolically linked to python3, you need to run all commands using `python3` instead of `python`.
+
+### Setup Database Configuration
+
+To know more about connecting to your Capella cluster, please follow the [instructions](https://docs.couchbase.com/cloud/get-started/connect.html).
+
+Specifically, you need to do the following:
+
+- Create the [database credentials](https://docs.couchbase.com/cloud/clusters/manage-database-users.html) to access the travel-sample bucket (Read and Write) used in the application.
+- [Allow access](https://docs.couchbase.com/cloud/clusters/allow-ip-address.html) to the Cluster from the IP on which the application is running.
+
+All configuration for communication with the database is read from the environment variables. We have provided a convenience feature to read the environment variables from a local file, `.env` in the source folder.
+
+Add the values for the Couchbase connection to the `.env` file.
+
+> Note: Files starting with `.` could be hidden in the file manager in your Unix based systems including GNU/Linux and Mac OS.
+
+```sh
+DB_CONN_STR=<connection_string>
+DB_USERNAME=<user_with_read_write_permission_to_travel-sample_bucket>
+DB_PASSWORD=<password_for_user>
+DB_BUCKET_NAME=<bucket_name>
+DB_SCOPE_NAME=<scope_name>
 ```
 
-# Getting started
+> Note: The connection string expects the `couchbases://` or `couchbase://` part.
 
-> Install dependencies:
-```
-./scripts/install-deps.sh
-```
+## Running The API
 
-> Run API:
+### Directly on Machine
+
+At this point, we have installed the dependencies, setup the cluster and configured the api with the credentials. The api is now ready and you can run it.
+
 ```
 ./scripts/start-api.sh
 ```
 
-# Testing
+### Directly on Machine
 
-> Run Pytest:
-```
-./scripts/pytest-test.sh
-```
+COMING SOON
 
-> Run RealWorld API test:
+## Running Tests
+
+To run RealWorld API tests, use the following command:
+
 ```
 ./scripts/realworld-test.sh
+```
+
+To run tests, use the following command:
+
+```
+./scripts/pytest-test.sh
 ```
