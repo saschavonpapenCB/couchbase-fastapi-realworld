@@ -14,15 +14,15 @@ from dotenv import load_dotenv
 class CouchbaseClient(object):
     """Class to handle interactions with Couchbase cluster"""
 
-    def __init__(self, conn_str: str, username: str, password: str) -> CouchbaseClient:
+    def __init__(self, conn_str: str, username: str, password: str, bucket_name: str, scope_name:str) -> CouchbaseClient:
         self.cluster = None
         self.bucket = None
         self.scope = None
         self.conn_str = conn_str
         self.username = username
         self.password = password
-        self.bucket_name = "travel-sample"
-        self.scope_name = "inventory"
+        self.bucket_name = bucket_name
+        self.scope_name = scope_name
         self.connect()
 
     def connect(self) -> None:
@@ -111,10 +111,16 @@ def get_db() -> CouchbaseClient:
     conn_str = os.getenv("DB_CONN_STR")
     username = os.getenv("DB_USERNAME")
     password = os.getenv("DB_PASSWORD")
+    bucket_name = os.getenv("DB_BUCKET_NAME")
+    scope_name = os.getenv("DB_SCOPE_NAME")
     if conn_str is None:
         print("WARNING: DB_CONN_STR environment variable not set")
     if username is None:
         print("WARNING: DB_USERNAME environment variable not set")
     if password is None:
         print("WARNING: DB_PASSWORD environment variable not set")
-    return CouchbaseClient(conn_str, username, password)
+    if bucket_name is None:
+        print("WARNING: DB_BUCKET_NAME environment variable not set")
+    if scope_name is None:
+        print("WARNING: DB_SCOPE_NAME environment variable not set")
+    return CouchbaseClient(conn_str, username, password, bucket_name, scope_name)
