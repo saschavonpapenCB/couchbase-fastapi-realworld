@@ -3,24 +3,24 @@ from typing import List, Tuple
 
 from ..models.article import CommentModel
 from ..models.user import UserModel
-from ..schemas.user import ProfileResponseSchema
+from ..schemas.user import ProfileSchema
 from .base import BaseSchema
 
 
-class CommentResponseSchema(BaseSchema):
+class CommentSchema(BaseSchema):
     id: str
     createdAt: datetime
     updatedAt: datetime
     body: str
-    author: ProfileResponseSchema
+    author: ProfileSchema
 
 
 class SingleCommentResponseSchema(BaseSchema):
-    comment: CommentResponseSchema
+    comment: CommentSchema
 
 
 class MultipleCommentsResponseSchema(BaseSchema):
-    comments: List[CommentResponseSchema]
+    comments: List[CommentSchema]
 
     @classmethod
     def from_comments_and_authors(cls, data: List[Tuple[CommentModel, UserModel]]):

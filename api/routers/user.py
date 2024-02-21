@@ -8,8 +8,8 @@ from ..schemas.user import (
     AuthenticationSchema,
     RegistrationSchema,
     UpdateUserSchema,
+    UserSchema,
     UserResponseSchema,
-    UserWrapperSchema,
 )
 from ..utils.security import (
     OAUTH2_SCHEME,
@@ -28,7 +28,7 @@ router = APIRouter(
 USER_COLLECTION = "client"
 
 
-@router.post("/users", response_model=UserWrapperSchema)
+@router.post("/users", response_model=UserResponseSchema)
 async def register(
     user: RegistrationSchema = Body(..., embed=True), db=Depends(get_db)
 ):
@@ -38,8 +38,8 @@ async def register(
     try:
         db.insert_document(USER_COLLECTION, user_model.id, user_model.model_dump())
         token = await create_access_token(user_model)
-        response_user = UserResponseSchema(token=token, **user_model.model_dump())
-        return UserWrapperSchema(user=response_user)
+        response_user = UserSchema(token=token, **user_model.model_dump())
+        return UserResponseSchema(user=response_user)
     except DocumentExistsException:
         raise HTTPException(status_code=409, detail="User already exists")
     except TimeoutError:
@@ -48,7 +48,7 @@ async def register(
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
-@router.post("/users/login", response_model=UserWrapperSchema)
+@router.post("/users/login", response_model=UserResponseSchema)
 async def login_user(
     user: AuthenticationSchema = Body(..., embed=True), db=Depends(get_db)
 ):
@@ -56,18 +56,18 @@ async def login_user(
     if user is None:
         raise InvalidCredentialsException()
     token = await create_access_token(user)
-    response_user = UserResponseSchema(token=token, **user.model_dump())
-    return UserWrapperSchema(user=response_user)
+    response_user = UserSchema(token=token, **user.model_dump())
+    return UserResponseSchema(user=response_user)
 
 
-@router.get("/user", response_model=UserWrapperSchema)
+@router.get("/user", response_model=UserResponseSchema)
 async def current_user(
-    current_user: UserResponseSchema = Depends(get_current_user)
+    current_user: UserSchema = Depends(get_current_user)
 ):
-    return UserWrapperSchema(user=current_user)
+    return UserResponseSchema(user=current_user)
 
 
-@router.put("/user", response_model=UserWrapperSchema)
+@router.put("/user", response_model=UserResponseSchema)
 async def update_user(
     user: UpdateUserSchema = Body(..., embed=True),
     user_instance: UserModel = Depends(get_current_user_instance),
@@ -81,8 +81,8 @@ async def update_user(
         db.upsert_document(
             USER_COLLECTION, user_instance.id, user_instance.model_dump()
         )
-        response_user = UserResponseSchema(token=token, **user_instance.model_dump())
-        return UserWrapperSchema(user=response_user)
+        response_user = UserSchema(token=token, **user_instance.model_dump())
+        return UserResponseSchema(user=response_user)
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:

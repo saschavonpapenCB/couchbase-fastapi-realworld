@@ -10,9 +10,9 @@ from ..database import get_db
 from ..models.article import ArticleModel
 from ..models.user import UserModel
 from ..schemas.article import (
-    ArticleWrapperSchema,
+    ArticleResponseSchema,
     CreateArticleSchema,
-    MultipleArticlesWrapperSchema,
+    MultipleArticlesResponseSchema,
     UpdateArticleSchema,
 )
 from ..utils.security import (
@@ -29,7 +29,7 @@ router = APIRouter(
 ARTICLE_COLLECTION = "article"
 
 
-@router.get("/articles", response_model=MultipleArticlesWrapperSchema)
+@router.get("/articles", response_model=MultipleArticlesResponseSchema)
 async def get_articles(
     author: str | None = None,
     favorited: str | None = None,
@@ -116,7 +116,7 @@ async def get_articles(
             OFFSET $offset;
         """
     if query is None:
-        return MultipleArticlesWrapperSchema(articles=[], articles_count=0)
+        return MultipleArticlesResponseSchema(articles=[], articles_count=0)
     try:
         queryResult = db.query(
             query,
@@ -127,7 +127,7 @@ async def get_articles(
             offset=offset
         )
         article_list = [ArticleModel(**r) for r in queryResult]
-        response = MultipleArticlesWrapperSchema.from_article_instances(
+        response = MultipleArticlesResponseSchema.from_article_instances(
             article_list, len(article_list), user_instance
         )
         return response
@@ -137,7 +137,7 @@ async def get_articles(
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
-@router.get("/articles/feed", response_model=MultipleArticlesWrapperSchema)
+@router.get("/articles/feed", response_model=MultipleArticlesResponseSchema)
 async def get_feed_articles(
     limit: int = 20,
     offset: int = 0,
@@ -168,7 +168,7 @@ async def get_feed_articles(
         article_list = [r for r in queryResult]
         for article in article_list:
             article = ArticleModel(**article)
-        response = MultipleArticlesWrapperSchema(
+        response = MultipleArticlesResponseSchema(
             articles=article_list, articlesCount=len(article_list)
         )
         return response
@@ -178,7 +178,7 @@ async def get_feed_articles(
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
-@router.post("/articles", response_model=ArticleWrapperSchema)
+@router.post("/articles", response_model=ArticleResponseSchema)
 async def create_article(
     article: CreateArticleSchema = Body(..., embed=True),
     user_instance: UserModel = Depends(get_current_user_instance),
@@ -192,7 +192,7 @@ async def create_article(
             response_article.slug,
             jsonable_encoder(response_article)
         )
-        return ArticleWrapperSchema.from_article_instance(response_article, user_instance)
+        return ArticleResponseSchema.from_article_instance(response_article, user_instance)
     except DocumentExistsException:
         raise HTTPException(status_code=409, detail="Article already exists")
     except TimeoutError:
@@ -201,17 +201,17 @@ async def create_article(
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
-@router.get("/articles/{slug}", response_model=ArticleWrapperSchema)
+@router.get("/articles/{slug}", response_model=ArticleResponseSchema)
 async def get_single_article(
     slug: str,
     user_instance: UserModel | None = Depends(get_current_user_optional_instance),
     db=Depends(get_db),
 ):
     article_model = await query_articles_by_slug(slug, db)
-    return ArticleWrapperSchema.from_article_instance(article_model, user_instance)
+    return ArticleResponseSchema.from_article_instance(article_model, user_instance)
 
 
-@router.put("/articles/{slug}", response_model=ArticleWrapperSchema)
+@router.put("/articles/{slug}", response_model=ArticleResponseSchema)
 async def update_article(
     slug: str,
     article: UpdateArticleSchema = Body(..., embed=True),
@@ -231,7 +231,7 @@ async def update_article(
             article_instance.slug,
             jsonable_encoder((article_instance))
         )
-        return ArticleWrapperSchema.from_article_instance(
+        return ArticleResponseSchema.from_article_instance(
             article_instance,
             current_user
         )
@@ -241,7 +241,7 @@ async def update_article(
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
-@router.post("/articles/{slug}/favorite", response_model=ArticleWrapperSchema)
+@router.post("/articles/{slug}/favorite", response_model=ArticleResponseSchema)
 async def favorite_article(
     slug: str,
     current_user: UserModel = Depends(get_current_user_instance),
@@ -252,14 +252,14 @@ async def favorite_article(
     article.favoritedUserIds = tuple(favorited_set)
     try:
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
-        return ArticleWrapperSchema.from_article_instance(article, current_user)
+        return ArticleResponseSchema.from_article_instance(article, current_user)
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
-@router.delete("/articles/{slug}/favorite", response_model=ArticleWrapperSchema)
+@router.delete("/articles/{slug}/favorite", response_model=ArticleResponseSchema)
 async def unfavorite_article(
     slug: str,
     current_user: UserModel = Depends(get_current_user_instance),
@@ -270,7 +270,7 @@ async def unfavorite_article(
     article.favoritedUserIds = tuple(favorited_set)
     try:
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
-        return ArticleWrapperSchema.from_article_instance(article, current_user)
+        return ArticleResponseSchema.from_article_instance(article, current_user)
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:

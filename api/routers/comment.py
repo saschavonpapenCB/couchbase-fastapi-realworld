@@ -12,12 +12,12 @@ from ..models.article import CommentModel
 from ..models.user import UserModel
 from ..routers.article import ARTICLE_COLLECTION
 from ..schemas.comment import (
-    CommentResponseSchema,
+    CommentSchema,
     CreateCommentSchema,
     MultipleCommentsResponseSchema,
     SingleCommentResponseSchema,
 )
-from ..schemas.user import ProfileResponseSchema
+from ..schemas.user import ProfileSchema
 from ..utils.security import get_current_user_instance
 
 
@@ -40,8 +40,8 @@ async def add_article_comment(
     article.comments = article.comments + (comment_instance,)
     try:
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
-        response_profile = ProfileResponseSchema(**user_instance.model_dump())
-        response_comment = CommentResponseSchema(
+        response_profile = ProfileSchema(**user_instance.model_dump())
+        response_comment = CommentSchema(
             author=response_profile, **comment_instance.model_dump()
         )
         return SingleCommentResponseSchema(comment=response_comment)

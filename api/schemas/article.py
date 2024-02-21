@@ -4,7 +4,7 @@ from typing import List
 from ..models.article import ArticleModel
 from ..models.user import UserModel
 from .base import BaseSchema
-from .user import ProfileResponseSchema
+from .user import ProfileSchema
 
 
 class CreateArticleSchema(BaseSchema):
@@ -20,7 +20,7 @@ class UpdateArticleSchema(BaseSchema):
     body: str | None = None
 
 
-class ArticleResponseSchema(BaseSchema):
+class ArticleSchema(BaseSchema):
     slug: str
     title: str
     description: str
@@ -30,12 +30,12 @@ class ArticleResponseSchema(BaseSchema):
     updatedAt: datetime
     favorited: bool = False
     favoritesCount: int = 0
-    author: ProfileResponseSchema
+    author: ProfileSchema
 
     @classmethod
     def from_article_instance(
         cls, article: ArticleModel, user: UserModel | None = None
-    ) -> "ArticleResponseSchema":
+    ) -> "ArticleSchema":
         if user is None:
             favorited = False
         else:
@@ -48,22 +48,22 @@ class ArticleResponseSchema(BaseSchema):
         )
 
 
-class ArticleWrapperSchema(BaseSchema):
-    article: ArticleResponseSchema
+class ArticleResponseSchema(BaseSchema):
+    article: ArticleSchema
 
     @classmethod
     def from_article_instance(
         cls, article: ArticleModel, user: UserModel | None = None
-    ) -> "ArticleWrapperSchema":
+    ) -> "ArticleResponseSchema":
         return cls(
-            article=ArticleResponseSchema.from_article_instance(
+            article=ArticleSchema.from_article_instance(
                 article=article, user=user
             )
         )
 
 
-class MultipleArticlesWrapperSchema(BaseSchema):
-    articles: List[ArticleResponseSchema]
+class MultipleArticlesResponseSchema(BaseSchema):
+    articles: List[ArticleSchema]
     articlesCount: int = 0
 
     @classmethod
@@ -72,8 +72,8 @@ class MultipleArticlesWrapperSchema(BaseSchema):
         articles: List[ArticleModel],
         total_count: int,
         user: UserModel | None = None,
-    ) -> "MultipleArticlesWrapperSchema":
+    ) -> "MultipleArticlesResponseSchema":
         articles = [
-            ArticleResponseSchema.from_article_instance(a, user) for a in articles
+            ArticleSchema.from_article_instance(a, user) for a in articles
         ]
         return cls(articles=articles, articlesCount=total_count)

@@ -14,7 +14,7 @@ class RegistrationSchema(BaseSchema):
     password: str
 
 
-class UserResponseSchema(BaseSchema):
+class UserSchema(BaseSchema):
     email: str
     token: str
     username: str
@@ -22,8 +22,8 @@ class UserResponseSchema(BaseSchema):
     image: str | None = None
 
 
-class UserWrapperSchema(BaseSchema):
-    user: UserResponseSchema
+class UserResponseSchema(BaseSchema):
+    user: UserSchema
 
 
 class UpdateUserSchema(BaseSchema):
@@ -34,12 +34,12 @@ class UpdateUserSchema(BaseSchema):
     image: str | None = None
 
 
-class ProfileResponseSchema(BaseSchema):
+class ProfileSchema(BaseSchema):
     username: str
     bio: str | None
     image: str | None
     following: bool = False
 
 
-class ProfileWrapperSchema(BaseSchema):
-    profile: ProfileResponseSchema
+class ProfileResponseSchema(BaseSchema):
+    profile: ProfileSchema

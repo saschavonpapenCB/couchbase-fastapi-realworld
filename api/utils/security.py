@@ -14,7 +14,7 @@ from starlette.requests import Request
 from ..core.exceptions import CredentialsException, NotAuthenticatedException
 from ..database import get_db
 from ..models.user import UserModel
-from ..schemas.user import UserResponseSchema
+from ..schemas.user import UserSchema
 from ..settings import SETTINGS
 
 
@@ -160,5 +160,5 @@ async def get_current_user_optional_instance(
 async def get_current_user(
     user_instance: UserModel = Depends(get_current_user_instance),
     token: str = Depends(OAUTH2_SCHEME),
-) -> UserResponseSchema:
-    return UserResponseSchema(token=token, **user_instance.model_dump())
+) -> UserSchema:
+    return UserSchema(token=token, **user_instance.model_dump())
