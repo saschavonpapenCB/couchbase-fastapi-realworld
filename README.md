@@ -19,33 +19,40 @@ For more information on how to this works with other frontends/backends, head ov
 
 # Prerequisites
 
-> Couchbase Capella cluster with bucket loaded.
+> Couchbase Capella cluster with bucket and scope loaded.
+Details to be put in the .env file.
+
+> Create an 'article' and a 'client' collection in the loaded scope ('client' because 'user' is a reserved Couchbase keyword).
+
+> Create collection primary indicies.
+```
+CREATE PRIMARY INDEX ON `default`:`BUCKET_NAME`.`SCOPE_NAME`.`COLLECTION_NAME`;
+```
 
 # Getting started
 
-> 
+> Install dependencies.
+Run this command:
+```
+./scripts/install-deps.sh
+```
 
-
-
-
-
-
-IMPLEMENT COUCHBASE PRIMARY INDEXES:
-CREATE PRIMARY INDEX ON `default`:`travel-sample`.`inventory`.`COLLECTION_NAME`;
-
-
-
-RUN API:
+> Run API.
+Run this command:
 ```
 ./scripts/start-api.sh
 ```
 
-RUN REALWORLD TEST:
-```
-./scripts/realworld-test.sh
-```
+# Testing
 
-RUN PYTEST:
+> Run Pytest.
+Run this command:
 ```
 ./scripts/pytest-test.sh
+```
+
+> Run RealWorld API test:
+Run this command:
+```
+./scripts/realworld-test.sh
 ```
