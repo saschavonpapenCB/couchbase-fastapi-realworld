@@ -25,8 +25,6 @@ router = APIRouter(
     tags=["users"],
     responses={404: {"description": "Not found"}},
 )
-
-
 USER_COLLECTION = "client"
 
 
@@ -67,16 +65,15 @@ async def login_user(
     )
     if user is None:
         raise InvalidCredentialsException()
-
     token = await create_access_token(user)
-
     response_user = UserResponseSchema(token=token, **user.model_dump())
     return UserWrapperSchema(user = response_user)
 
 
 @router.get(
     "/user",
-    response_model=UserWrapperSchema)
+    response_model=UserWrapperSchema
+)
 async def current_user(
     current_user: UserResponseSchema = Depends(get_current_user),
 ):
@@ -96,7 +93,6 @@ async def update_user(
     patch_dict = user.model_dump(exclude_unset=True)
     for name, value in patch_dict.items():
         setattr(user_instance, name, value)
-
     try:
         db.upsert_document(USER_COLLECTION, user_instance.id, user_instance.model_dump())
     except TimeoutError:

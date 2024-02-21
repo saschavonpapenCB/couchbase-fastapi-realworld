@@ -9,7 +9,10 @@ from ..utils.security import get_current_user_optional_instance, get_current_use
 from .user import USER_COLLECTION
 
 
-router = APIRouter()
+router = APIRouter(
+    tags=["profiles"],
+    responses={404: {"description": "Not found"}},
+)
 
 
 @router.get(

@@ -23,9 +23,10 @@ from ..utils.security import (
 )
 
 
-router = APIRouter()
-
-
+router = APIRouter(
+    tags=["comments"],
+    responses={404: {"description": "Not found"}},
+)
 COMMENT_COLLECTION = "comment"
 
 

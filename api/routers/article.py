@@ -22,13 +22,17 @@ from ..utils.security import (
 )
 
 
-router = APIRouter()
-
-
+router = APIRouter(
+    tags=["articles"],
+    responses={404: {"description": "Not found"}},
+)
 ARTICLE_COLLECTION = "article"
 
 
-@router.get("/articles", response_model=MultipleArticlesWrapperSchema)
+@router.get(
+    "/articles",
+    response_model=MultipleArticlesWrapperSchema
+)
 async def get_articles(
     author: str | None = None,
     favorited: str | None = None,
@@ -38,7 +42,6 @@ async def get_articles(
     user_instance: UserModel | None = Depends(get_current_user_optional_instance),
     db=Depends(get_db)
 ):
-    
     if author:
         favorited_id = None
         query = """
@@ -131,7 +134,10 @@ async def get_articles(
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
     
 
-@router.get("/articles/feed", response_model=MultipleArticlesWrapperSchema)
+@router.get(
+    "/articles/feed",
+    response_model=MultipleArticlesWrapperSchema
+)
 async def get_feed_articles(
     limit: int = 20,
     offset: int = 0,
@@ -272,7 +278,9 @@ async def unfavorite_article(
         raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
 
 
-@router.delete("/articles/{slug}")
+@router.delete(
+    "/articles/{slug}"
+)
 async def delete_article(
     slug: str,
     current_user: UserModel = Depends(get_current_user_instance),
