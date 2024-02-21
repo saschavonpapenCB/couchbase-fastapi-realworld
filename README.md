@@ -36,9 +36,12 @@ RUN API:
 ./scripts/start-api.sh
 ```
 
-
 RUN REALWORLD TEST:
 ```
 ./scripts/realworld-test.sh
 ```
 
+RUN PYTEST:
+```
+./scripts/pytest-test.sh
+```
