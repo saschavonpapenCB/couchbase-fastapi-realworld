@@ -26,10 +26,10 @@ To run this prebuilt project, you will need:
 - Using the Capella UI, create the following collections in the loaded scope:
   - 'article'
   - 'client' ('client' because 'user' is a reserved Couchbase keyword)
-    and using the Query data tool, create primary indicies for both collections.
-    ```
-    CREATE PRIMARY INDEX ON `default`:`<bucket_name>`.`<scope_name>`.`<collection_name>`;
-    ```
+and using the Query data tool, create primary indicies for both collections.
+```
+CREATE PRIMARY INDEX ON `default`:`<bucket_name>`.`<scope_name>`.`<collection_name>`;
+```
 
 # Setting Up the Application
 
