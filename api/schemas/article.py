@@ -1,9 +1,9 @@
 from datetime import datetime
 from typing import List
 
-from .base import BaseSchema
 from ..models.article import ArticleModel
 from ..models.user import UserModel
+from .base import BaseSchema
 from .user import ProfileResponseSchema
 
 
@@ -55,7 +55,11 @@ class ArticleWrapperSchema(BaseSchema):
     def from_article_instance(
         cls, article: ArticleModel, user: UserModel | None = None
     ) -> "ArticleWrapperSchema":
-        return cls(article=ArticleResponseSchema.from_article_instance(article=article, user=user))
+        return cls(
+            article=ArticleResponseSchema.from_article_instance(
+                article=article, user=user
+            )
+        )
 
 
 class MultipleArticlesWrapperSchema(BaseSchema):
@@ -69,5 +73,7 @@ class MultipleArticlesWrapperSchema(BaseSchema):
         total_count: int,
         user: UserModel | None = None,
     ) -> "MultipleArticlesWrapperSchema":
-        articles = [ArticleResponseSchema.from_article_instance(a, user) for a in articles]
+        articles = [
+            ArticleResponseSchema.from_article_instance(a, user) for a in articles
+        ]
         return cls(articles=articles, articlesCount=total_count)

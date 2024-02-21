@@ -1,12 +1,14 @@
 from __future__ import annotations
-from couchbase.cluster import Cluster
-from couchbase.options import ClusterOptions
-from couchbase.auth import PasswordAuthenticator
-from couchbase.exceptions import CouchbaseException
-from datetime import timedelta
-from dotenv import load_dotenv
+
 import os
+from datetime import timedelta
 from functools import cache
+
+from couchbase.auth import PasswordAuthenticator
+from couchbase.cluster import Cluster
+from couchbase.exceptions import CouchbaseException
+from couchbase.options import ClusterOptions
+from dotenv import load_dotenv
 
 
 class CouchbaseClient(object):

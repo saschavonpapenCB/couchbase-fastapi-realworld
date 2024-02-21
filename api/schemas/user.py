@@ -12,7 +12,7 @@ class RegistrationSchema(BaseSchema):
     username: str
     email: str
     password: str
-    
+
 
 class UserResponseSchema(BaseSchema):
     email: str

@@ -4,10 +4,7 @@ from ..core.exceptions import ArticleNotFoundException
 from ..models.article import ArticleModel
 
 
-async def query_articles_by_slug(
-    slug: str,
-    db
-) -> ArticleModel:
+async def query_articles_by_slug(slug: str, db) -> ArticleModel:
     query = """
             SELECT article.slug,
                 article.title,

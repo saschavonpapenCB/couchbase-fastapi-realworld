@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field, root_validator
 from datetime import datetime
 from typing import List, Tuple
+
+from pydantic import BaseModel, Field, root_validator
 
 from .identifier import generate_id, generate_random_str
 from .user import UserModel

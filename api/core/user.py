@@ -1,13 +1,14 @@
 from fastapi import HTTPException
 
-from .exceptions import UserNotFoundException
 from ..models.user import UserModel
-    
+
+from .exceptions import UserNotFoundException
+
 
 async def query_users_db(
-        db,
-        id: str | None = None,
-        username: str | None = None,
+    db,
+    id: str | None = None,
+    username: str | None = None,
 ) -> UserModel:
     if id is not None:
         query = """

@@ -1,17 +1,17 @@
-from datetime import datetime, timedelta
-from jose import jwt, JWTError
 import json
-from pydantic import BaseModel, ValidationError
+from datetime import datetime, timedelta
 from typing import cast
-from fastapi import FastAPI, Depends, HTTPException
 
-from passlib.context import CryptContext
+from fastapi import FastAPI, Depends, HTTPException
 from fastapi.openapi.models import OAuthFlows
 from fastapi.security import OAuth2
 from fastapi.security.utils import get_authorization_scheme_param
+from jose import jwt, JWTError
+from passlib.context import CryptContext
+from pydantic import BaseModel, ValidationError
 from starlette.requests import Request
 
-from ..core.exceptions import NotAuthenticatedException, CredentialsException
+from ..core.exceptions import CredentialsException, NotAuthenticatedException
 from ..database import get_db
 from ..models.user import UserModel
 from ..schemas.user import UserResponseSchema
@@ -48,7 +48,7 @@ class OAuth2PasswordToken(OAuth2):
         if not authorization or scheme.lower() != "token":
             return None
         return cast(str, param)
-    
+
 
 OAUTH2_SCHEME = OAuth2PasswordToken(tokenUrl="/users")
 
@@ -96,7 +96,7 @@ async def get_user_instance(
     queryResult = db.query(query, email=email, username=username)
     user_data = [r for r in queryResult][0]
     if not user_data:
-            raise NotAuthenticatedException()
+        raise NotAuthenticatedException()
     else:
         return UserModel(**user_data)
 

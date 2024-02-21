@@ -4,7 +4,6 @@ from typing import List, Tuple
 from ..models.article import CommentModel
 from ..models.user import UserModel
 from ..schemas.user import ProfileResponseSchema
-
 from .base import BaseSchema
 
 
@@ -26,7 +25,9 @@ class MultipleCommentsResponseSchema(BaseSchema):
     @classmethod
     def from_comments_and_authors(cls, data: List[Tuple[CommentModel, UserModel]]):
         return cls(
-            comments=[{**comment.model_dump(), "author": author} for comment, author in data]
+            comments=[
+                {**comment.model_dump(), "author": author} for comment, author in data
+            ]
         )
 
 
