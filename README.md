@@ -20,13 +20,12 @@ For more information on how to this works with other frontends/backends, head ov
 
 To run this prebuilt project, you will need:
 
-- [Couchbase Capella](https://www.couchbase.com/products/capella/) cluster with a bucket loaded.
+- [Couchbase Capella](https://www.couchbase.com/products/capella/) cluster with a bucket and scope loaded.
 - [Python](https://www.python.org/downloads/) 3.9 or higher installed
   - Ensure that the Python version is [compatible](https://docs.couchbase.com/python-sdk/current/project-docs/compatibility.html#python-version-compat) with the Couchbase SDK.
-- Using the Capella UI, create the following collections in the loaded scope:
+- Using the Capella UI, create the following collections in the loaded scope, and using the Query data tool, create primary indicies for both:
   - 'article'
   - 'client' ('client' because 'user' is a reserved Couchbase keyword)
-and using the Query data tool, create primary indicies for both collections.
 ```
 CREATE PRIMARY INDEX ON `default`:`<bucket_name>`.`<scope_name>`.`<collection_name>`;
 ```
