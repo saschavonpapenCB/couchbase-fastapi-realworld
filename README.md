@@ -1,58 +1,53 @@
 # ![RealWorld Example App](logo.png)
 
-> ### [FastAPI](https://github.com/tiangolo/fastapi) + [Couchbase] codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.
+> ### [FastAPI](https://github.com/tiangolo/fastapi) + Couchbase codebase containing real world examples (CRUD, auth, advanced patterns, etc) that adheres to the [RealWorld](https://github.com/gothinkster/realworld) spec and API.
 
 
-### (https://demo.realworld.io/)&nbsp;&nbsp;&nbsp;&nbsp;[RealWorld](https://github.com/gothinkster/realworld)
+### [Demo](https://demo.realworld.io/)&nbsp;&nbsp;&nbsp;&nbsp;[RealWorld](https://github.com/gothinkster/realworld)
 
 
-This codebase was created to demonstrate a fully fledged fullstack application built with **[FastAPI](https://github.com/tiangolo/fastapi) + [Couchbase] including CRUD operations, authentication, routing, pagination, and more.
+This codebase was created to demonstrate a fully fledged fullstack application built with [FastAPI](https://github.com/tiangolo/fastapi) + Couchbase including CRUD operations, authentication, routing, pagination, and more.
 
-We've gone to great lengths to adhere to the [FastAPI](https://github.com/tiangolo/fastapi) + [Couchbase] community styleguides & best practices.
 
 For more information on how to this works with other frontends/backends, head over to the [RealWorld](https://github.com/gothinkster/realworld) repo.
 
 
 # How it works
 
-> Describe the general architecture of your app here
+> TBC
 
 # Prerequisites
 
-> Couchbase Capella cluster with bucket and scope loaded.
-Details to be put in the .env file.
+> Create a Couchbase Capella cluster with bucket and scope loaded.
+Cluster details to be put in the .env file.
 
-> Create an 'article' and a 'client' collection in the loaded scope ('client' because 'user' is a reserved Couchbase keyword).
+> Create an 'article' and a 'client' collection in the loaded scope on the cluster ('client' because 'user' is a reserved Couchbase keyword).
 
-> Create collection primary indicies.
+> Create primary indicies for both collection.
 ```
 CREATE PRIMARY INDEX ON `default`:`BUCKET_NAME`.`SCOPE_NAME`.`COLLECTION_NAME`;
 ```
 
 # Getting started
 
-> Install dependencies.
-Run this command:
+> Install dependencies:
 ```
 ./scripts/install-deps.sh
 ```
 
-> Run API.
-Run this command:
+> Run API:
 ```
 ./scripts/start-api.sh
 ```
 
 # Testing
 
-> Run Pytest.
-Run this command:
+> Run Pytest:
 ```
 ./scripts/pytest-test.sh
 ```
 
 > Run RealWorld API test:
-Run this command:
 ```
 ./scripts/realworld-test.sh
 ```
