@@ -33,7 +33,7 @@ CREATE PRIMARY INDEX ON `default`:`travel-sample`.`inventory`.`COLLECTION_NAME`;
 
 RUN API:
 ```
-uvicorn api.main:api --reload
+./scripts/start-api.sh
 ```
 
 
