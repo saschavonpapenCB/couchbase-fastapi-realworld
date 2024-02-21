@@ -8,8 +8,8 @@ from ..schemas.user import (
     AuthenticationSchema,
     RegistrationSchema,
     UpdateUserSchema,
-    UserSchema,
     UserResponseSchema,
+    UserSchema,
 )
 from ..utils.security import (
     OAUTH2_SCHEME,
@@ -19,7 +19,6 @@ from ..utils.security import (
     get_current_user_instance,
     get_password_hash,
 )
-
 
 router = APIRouter(
     tags=["users"],
@@ -33,7 +32,7 @@ async def register(
     user: RegistrationSchema = Body(..., embed=True), db=Depends(get_db)
 ):
     user_model = UserModel(
-        **user.model_dump(),hashed_password=get_password_hash(user.password)
+        **user.model_dump(), hashed_password=get_password_hash(user.password)
     )
     try:
         db.insert_document(USER_COLLECTION, user_model.id, user_model.model_dump())
@@ -61,9 +60,7 @@ async def login_user(
 
 
 @router.get("/user", response_model=UserResponseSchema)
-async def current_user(
-    current_user: UserSchema = Depends(get_current_user)
-):
+async def current_user(current_user: UserSchema = Depends(get_current_user)):
     return UserResponseSchema(user=current_user)
 
 
@@ -72,7 +69,7 @@ async def update_user(
     user: UpdateUserSchema = Body(..., embed=True),
     user_instance: UserModel = Depends(get_current_user_instance),
     token: str = Depends(OAUTH2_SCHEME),
-    db=Depends(get_db)
+    db=Depends(get_db),
 ):
     patch_dict = user.model_dump(exclude_unset=True)
     for name, value in patch_dict.items():

@@ -21,7 +21,6 @@ from ..utils.security import (
     get_user_instance,
 )
 
-
 router = APIRouter(
     tags=["articles"],
     responses={404: {"description": "Not found"}},
@@ -52,7 +51,7 @@ async def get_articles(
                 article.author,
                 article.favoritedUserIds,
                 article.comments
-            FROM article as article 
+            FROM article as article
             WHERE article.author.username=$author
             ORDER BY article.createdAt
             LIMIT $limit
@@ -72,7 +71,7 @@ async def get_articles(
                 article.author,
                 article.favoritedUserIds,
                 article.comments
-            FROM article as article 
+            FROM article as article
             WHERE $favoritedId IN article.favoritedUserIds
             ORDER BY article.createdAt
             LIMIT $limit
@@ -91,7 +90,7 @@ async def get_articles(
                 article.author,
                 article.favoritedUserIds,
                 article.comments
-            FROM article as article 
+            FROM article as article
             WHERE $tag IN article.tagList
             ORDER BY article.createdAt
             LIMIT $limit
@@ -110,7 +109,7 @@ async def get_articles(
                 article.author,
                 article.favoritedUserIds,
                 article.comments
-            FROM article as article 
+            FROM article as article
             ORDER BY article.createdAt
             LIMIT $limit
             OFFSET $offset;
@@ -124,7 +123,7 @@ async def get_articles(
             favoritedId=favorited_id,
             tag=tag,
             limit=limit,
-            offset=offset
+            offset=offset,
         )
         article_list = [ArticleModel(**r) for r in queryResult]
         response = MultipleArticlesResponseSchema.from_article_instances(
@@ -155,7 +154,7 @@ async def get_feed_articles(
                 article.author,
                 article.favoritedUserIds,
                 article.comments
-            FROM article as article 
+            FROM article as article
             WHERE $favoritedId IN article.favoritedUserIds
             ORDER BY article.createdAt
             LIMIT $limit
@@ -190,9 +189,11 @@ async def create_article(
         db.insert_document(
             ARTICLE_COLLECTION,
             response_article.slug,
-            jsonable_encoder(response_article)
+            jsonable_encoder(response_article),
         )
-        return ArticleResponseSchema.from_article_instance(response_article, user_instance)
+        return ArticleResponseSchema.from_article_instance(
+            response_article, user_instance
+        )
     except DocumentExistsException:
         raise HTTPException(status_code=409, detail="Article already exists")
     except TimeoutError:
@@ -229,11 +230,10 @@ async def update_article(
         db.upsert_document(
             ARTICLE_COLLECTION,
             article_instance.slug,
-            jsonable_encoder((article_instance))
+            jsonable_encoder((article_instance)),
         )
         return ArticleResponseSchema.from_article_instance(
-            article_instance,
-            current_user
+            article_instance, current_user
         )
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")

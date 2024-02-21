@@ -1,5 +1,3 @@
-from typing import Tuple
-
 from couchbase.exceptions import DocumentExistsException
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
@@ -19,7 +17,6 @@ from ..schemas.comment import (
 )
 from ..schemas.user import ProfileSchema
 from ..utils.security import get_current_user_instance
-
 
 router = APIRouter(
     tags=["comments"],

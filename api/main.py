@@ -13,7 +13,8 @@ from .routers.user import router as user_router
 # Initialize couchbase connection
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Method that gets called upon app initialization to initialize couchbase connection & close the connection on exit"""
+    """Method that gets called upon app initialization \
+        to initialize couchbase connection & close the connection on exit"""
     db = get_db()
     yield
     db.close()

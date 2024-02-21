@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from ..database import get_db
 from ..schemas.tag import TagsResponseSchema
 
-
 router = APIRouter(
     tags=["tags"],
     responses={404: {"description": "Not found"}},
@@ -11,12 +10,11 @@ router = APIRouter(
 
 
 @router.get("/tags", response_model=TagsResponseSchema)
-async def get_tags(db=Depends(get_db)
-):
+async def get_tags(db=Depends(get_db)):
     query = """
-            SELECT article.tagList
-            FROM article as article;
-        """
+        SELECT article.tagList
+        FROM article as article;
+    """
     try:
         queryResult = db.query(query)
         result_list = [r for r in queryResult]

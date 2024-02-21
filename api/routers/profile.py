@@ -10,7 +10,6 @@ from ..utils.security import (
 )
 from .user import USER_COLLECTION
 
-
 router = APIRouter(
     tags=["profiles"],
     responses={404: {"description": "Not found"}},

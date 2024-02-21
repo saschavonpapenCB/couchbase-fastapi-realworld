@@ -54,7 +54,8 @@ class CouchbaseClient(object):
 
             if not self.check_scope_exists():
                 print(
-                    "WARNING: Inventory scope does not exist in the bucket. \nEnsure that you have the inventory scope in your travel-sample bucket."
+                    "WARNING: Inventory scope does not exist in the bucket.\
+                        \n Ensure that you have the inventory scope in your travel-sample bucket."
                 )
 
             # get a reference to our scope

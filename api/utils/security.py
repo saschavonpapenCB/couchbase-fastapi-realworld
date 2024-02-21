@@ -2,11 +2,11 @@ import json
 from datetime import datetime, timedelta
 from typing import cast
 
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.openapi.models import OAuthFlows
 from fastapi.security import OAuth2
 from fastapi.security.utils import get_authorization_scheme_param
-from jose import jwt, JWTError
+from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel, ValidationError
 from starlette.requests import Request
@@ -77,18 +77,18 @@ async def get_user_instance(
                 client.bio,
                 client.image,
                 client.hashed_password
-            FROM client as client 
+            FROM client as client
             WHERE client.username=$username;
         """
     elif email is not None:
         query = """
-            SELECT client.id, 
+            SELECT client.id,
                 client.email,
                 client.username,
                 client.bio,
                 client.image,
                 client.hashed_password
-            FROM client as client 
+            FROM client as client
             WHERE client.email=$email;
         """
     else:

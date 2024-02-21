@@ -1,7 +1,6 @@
 from fastapi import HTTPException
 
 from ..models.user import UserModel
-
 from .exceptions import UserNotFoundException
 
 
@@ -18,7 +17,7 @@ async def query_users_db(
                 client.bio,
                 client.image,
                 client.hashed_password
-            FROM client as client 
+            FROM client as client
             WHERE client.id=$id;
         """
     elif username is not None:
@@ -29,7 +28,7 @@ async def query_users_db(
                 client.bio,
                 client.image,
                 client.hashed_password
-            FROM client as client 
+            FROM client as client
             WHERE client.username=$username;
         """
     if query is None:

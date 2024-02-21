@@ -56,9 +56,7 @@ class ArticleResponseSchema(BaseSchema):
         cls, article: ArticleModel, user: UserModel | None = None
     ) -> "ArticleResponseSchema":
         return cls(
-            article=ArticleSchema.from_article_instance(
-                article=article, user=user
-            )
+            article=ArticleSchema.from_article_instance(article=article, user=user)
         )
 
 
@@ -73,7 +71,5 @@ class MultipleArticlesResponseSchema(BaseSchema):
         total_count: int,
         user: UserModel | None = None,
     ) -> "MultipleArticlesResponseSchema":
-        articles = [
-            ArticleSchema.from_article_instance(a, user) for a in articles
-        ]
+        articles = [ArticleSchema.from_article_instance(a, user) for a in articles]
         return cls(articles=articles, articlesCount=total_count)
