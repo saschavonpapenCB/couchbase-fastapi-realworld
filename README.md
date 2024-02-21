@@ -24,8 +24,8 @@ To run this prebuilt project, you will need:
 - [Python](https://www.python.org/downloads/) 3.9 or higher installed
   - Ensure that the Python version is [compatible](https://docs.couchbase.com/python-sdk/current/project-docs/compatibility.html#python-version-compat) with the Couchbase SDK.
 - Using the Capella UI, create the following collections in the loaded scope, and using the Query data tool, create primary indicies for both:
-  - 'article'
-  - 'client' ('client' because 'user' is a reserved Couchbase keyword)
+  - `article`
+  - `client` (`client` because `user` is a reserved Couchbase keyword)
 ```
 CREATE PRIMARY INDEX ON `default`:`<bucket_name>`.`<scope_name>`.`<collection_name>`;
 ```
@@ -81,7 +81,7 @@ At this point, we have installed the dependencies, setup the cluster and configu
 ./scripts/start-api.sh
 ```
 
-### Directly on Machine
+### Using Docker
 
 COMING SOON
 
