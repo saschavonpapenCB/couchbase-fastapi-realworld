@@ -28,3 +28,17 @@ For more information on how to this works with other frontends/backends, head ov
 
 IMPLEMENT COUCHBASE PRIMARY INDEXES:
 CREATE PRIMARY INDEX ON `default`:`travel-sample`.`inventory`.`COLLECTION_NAME`;
+
+
+
+RUN API:
+```
+uvicorn api.main:api --reload
+```
+
+
+RUN REALWORLD TEST:
+```
+./scripts/realworld-test.sh
+```
+

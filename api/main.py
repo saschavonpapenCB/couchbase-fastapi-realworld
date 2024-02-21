@@ -30,8 +30,8 @@ api = FastAPI(
 )
 
 
-api.include_router(article_router, tags=["articles"], prefix="/api")
-api.include_router(comment_router, tags=["comments"], prefix="/api")
-api.include_router(profile_router, tags=["profiles"], prefix="/api")
-api.include_router(tag_router, tags=["tags"], prefix="/api")
-api.include_router(user_router, tags=["users"], prefix="/api")
+api.include_router(article_router, tags=["articles"])
+api.include_router(comment_router, tags=["comments"])
+api.include_router(profile_router, tags=["profiles"])
+api.include_router(tag_router, tags=["tags"])
+api.include_router(user_router, tags=["users"])
