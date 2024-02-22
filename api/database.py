@@ -14,7 +14,14 @@ from dotenv import load_dotenv
 class CouchbaseClient(object):
     """Class to handle interactions with Couchbase cluster"""
 
-    def __init__(self, conn_str: str, username: str, password: str, bucket_name: str, scope_name:str) -> CouchbaseClient:
+    def __init__(
+            self,
+            conn_str: str | None,
+            username: str | None,
+            password: str | None,
+            bucket_name: str | None,
+            scope_name:str | None,
+    ) -> CouchbaseClient:
         self.cluster = None
         self.bucket = None
         self.scope = None
@@ -49,13 +56,13 @@ class CouchbaseClient(object):
             except CouchbaseException as error:
                 print(f"Could not connect to cluster. \nError: {error}")
                 print(
-                    "WARNING: Ensure that you have the travel-sample bucket loaded in the cluster."
+                    "WARNING: Ensure that you have the bucket loaded in the cluster."
                 )
 
             if not self.check_scope_exists():
                 print(
-                    "WARNING: Inventory scope does not exist in the bucket.\
-                        \n Ensure that you have the inventory scope in your travel-sample bucket."
+                    "WARNING: Scope does not exist in the bucket.\
+                        \n Ensure that you have the scope in your bucket."
                 )
 
             # get a reference to our scope
@@ -70,7 +77,7 @@ class CouchbaseClient(object):
             return self.scope_name in scopes_in_bucket
         except Exception:
             print(
-                "Error fetching scopes in cluster. \nEnsure that travel-sample bucket exists."
+                "Error fetching scopes in cluster. \nEnsure that the bucket exists."
             )
 
     def close(self) -> None:

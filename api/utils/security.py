@@ -106,7 +106,8 @@ async def get_user_instance(
 
 
 async def authenticate_user(email: str, password: str, db):
-    """Queries db for user instance by email, compares password to instance's hashed password and returns user instance if verified."""
+    """Queries db for user instance by email, compares password to instance's hashed password and returns user \
+        instance if verified."""
     user = await get_user_instance(db, email=email)
     if not user:
         return False
@@ -140,9 +141,9 @@ async def get_current_user_instance(
             algorithms=[SETTINGS.ALGORITHM],
         )
     except ExpiredSignatureError:
-        raise CredentialsException("Token has expired")
-    except JWTError as e:
-        raise CredentialsException(f"JWT decode error: {e}")
+        raise CredentialsException()
+    except JWTError:
+        raise CredentialsException()
     try:
         payload_model = json.loads(payload.get("sub"))
         token_content = TokenContentModel(**payload_model)

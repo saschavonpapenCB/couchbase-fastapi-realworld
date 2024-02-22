@@ -38,7 +38,9 @@ async def register(
     try:
         db.insert_document(USER_COLLECTION, user_model.id, user_model.model_dump())
         token = await create_access_token(user_model)
-        return UserResponseSchema(user=UserSchema(token=token, **user_model.model_dump()))
+        return UserResponseSchema(
+            user=UserSchema(token=token, **user_model.model_dump())
+        )
     except DocumentExistsException:
         raise HTTPException(status_code=409, detail="User already exists")
     except TimeoutError:
@@ -72,7 +74,8 @@ async def update_user(
     token: str = Depends(OAUTH2_SCHEME),
     db=Depends(get_db),
 ):
-    """Queries db for current user instance by token, updates it with update schema, upserts instance to db and returns user schema."""
+    """Queries db for current user instance by token, updates it with update schema, upserts instance to db and \
+        returns user schema."""
     patch_dict = user.model_dump(exclude_unset=True)
     for name, value in patch_dict.items():
         setattr(user_instance, name, value)
@@ -80,7 +83,9 @@ async def update_user(
         db.upsert_document(
             USER_COLLECTION, user_instance.id, user_instance.model_dump()
         )
-        return UserResponseSchema(user=UserSchema(token=token, **user_instance.model_dump()))
+        return UserResponseSchema(
+            user=UserSchema(token=token, **user_instance.model_dump())
+        )
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:

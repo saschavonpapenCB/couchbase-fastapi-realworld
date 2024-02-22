@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from ..core.user import query_users_db
 from ..database import get_db
 from ..models.user import UserModel
-from ..schemas.user import ProfileSchema, ProfileResponseSchema
+from ..schemas.user import ProfileResponseSchema, ProfileSchema
 from ..utils.security import (
     get_current_user_instance,
     get_current_user_optional_instance,
@@ -36,7 +36,8 @@ async def follow_user(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
-    """Queries db for user instance by username, adds current user ID to instance's following_ids, upserts instance to db and returns profile schema."""
+    """Queries db for user instance by username, adds current user ID to instance's following_ids, upserts instance \
+        to db and returns profile schema."""
     user_to_follow = await query_users_db(db, username=username)
     following_set = set(user_instance.following_ids) | set((user_to_follow.id,))
     user_instance.following_ids = tuple(following_set)
@@ -44,7 +45,9 @@ async def follow_user(
         db.upsert_document(
             USER_COLLECTION, user_instance.id, user_instance.model_dump()
         )
-        return ProfileResponseSchema(profile=ProfileSchema(following=True, **user_to_follow.model_dump()))
+        return ProfileResponseSchema(
+            profile=ProfileSchema(following=True, **user_to_follow.model_dump())
+        )
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:
@@ -57,7 +60,8 @@ async def unfollow_user(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
-    """Queries db for user instance by username, removes current user ID from instance's following_ids, upserts instance to db and returns profile schema."""
+    """Queries db for user instance by username, removes current user ID from instance's following_ids, upserts \
+        instance to db and returns profile schema."""
     user_to_unfollow = await query_users_db(db, username=username)
     following_set = set(user_instance.following_ids) - set((user_to_unfollow.id,))
     user_instance.following_ids = tuple(following_set)
@@ -65,7 +69,9 @@ async def unfollow_user(
         db.upsert_document(
             USER_COLLECTION, user_instance.id, user_instance.model_dump()
         )
-        return ProfileResponseSchema(profile=ProfileSchema(following=False, **user_to_unfollow.model_dump()))
+        return ProfileResponseSchema(
+            profile=ProfileSchema(following=False, **user_to_unfollow.model_dump())
+        )
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:

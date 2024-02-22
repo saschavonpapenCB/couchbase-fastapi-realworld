@@ -3,7 +3,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 
 from ..core.article import query_articles_by_slug
-from ..core.exceptions import NotCommentAuthorException, CommentNotFoundException
+from ..core.exceptions import CommentNotFoundException
 from ..core.user import query_users_db
 from ..database import get_db
 from ..models.article import CommentModel
@@ -32,7 +32,8 @@ async def add_article_comment(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
-    """Queries db for article instance by slug, creates comment instance from create schema, adds comment instance to article instance, upserts article instance and returns comment schema."""
+    """Queries db for article instance by slug, creates comment instance from create schema, adds comment instance \
+        to article instance, upserts article instance and returns comment schema."""
     article = await query_articles_by_slug(slug, db)
     comment_instance = CommentModel(authorId=user_instance.id, **comment.model_dump())
     article.comments = article.comments + (comment_instance,)
@@ -53,10 +54,13 @@ async def add_article_comment(
 
 @router.get("/articles/{slug}/comments", response_model=MultipleCommentsResponseSchema)
 async def get_article_comments(slug: str, db=Depends(get_db)):
-    """Queries db for article instance by slug, queries db for user instances by id of article comments, creates comment schemas and returns multiple comments schema."""
+    """Queries db for article instance by slug, queries db for user instances by id of article comments, creates \
+        comment schemas and returns multiple comments schema."""
     article = await query_articles_by_slug(slug, db)
     comments = [comment for comment in article.comments]
-    data = [(comment, await query_users_db(db, id=comment.authorId)) for comment in comments]
+    data = [
+        (comment, await query_users_db(db, id=comment.authorId)) for comment in comments
+    ]
     return MultipleCommentsResponseSchema.from_comments_and_authors(data)
 
 
@@ -67,13 +71,23 @@ async def delete_article_comment(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
-    """Queries db for article instance by slug, identifies comment by comment ID and user ID, removes comment from article instance and upserts article instance to db."""
+    """Queries db for article instance by slug, identifies comment by comment ID and user ID, removes comment from \
+        article instance and upserts article instance to db."""
     try:
         article = await query_articles_by_slug(slug, db)
-        comment = next((c for c in article.comments if c.id == id and c.authorId == user_instance.id), None)
+        comment = next(
+            (
+                c
+                for c in article.comments
+                if c.id == id and c.authorId == user_instance.id
+            ),
+            None,
+        )
         if comment:
             article.comments = tuple(c for c in article.comments if c.id != id)
-            db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
+            db.upsert_document(
+                ARTICLE_COLLECTION, article.slug, jsonable_encoder(article)
+            )
         else:
             raise CommentNotFoundException()
     except DocumentExistsException:

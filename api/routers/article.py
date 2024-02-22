@@ -5,7 +5,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 
 from ..core.article import query_articles_by_slug
-from ..core.exceptions import NotArticleAuthorException, ArticleNotFoundException
+from ..core.exceptions import NotArticleAuthorException
 from ..core.user import query_users_db
 from ..database import get_db
 from ..models.article import ArticleModel
@@ -39,7 +39,8 @@ async def get_articles(
     user_instance: UserModel | None = Depends(get_current_user_optional_instance),
     db=Depends(get_db),
 ):
-    """Queries db for article instances by author, favorited or tag with a limit and offset and builds and returns multiple articles schema."""
+    """Queries db for article instances by author, favorited or tag with a limit and offset and returns multiple \
+        articles schema."""
     if author:
         query = """
             SELECT article.slug,
@@ -144,7 +145,7 @@ async def get_feed_articles(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
-    """Query db for article instances by author (that current user follows) and builds and returns multiple articles schema."""
+    """Query db for article instances by author (that current user follows) and returns multiple articles schema."""
     query = """
             SELECT article.slug,
                 article.title,
@@ -164,7 +165,10 @@ async def get_feed_articles(
         """
     try:
         queryResult = db.query(
-            query, users_followed=user_instance.following_ids, limit=limit, offset=offset
+            query,
+            users_followed=user_instance.following_ids,
+            limit=limit,
+            offset=offset,
         )
         article_list = [ArticleModel(**article) for article in queryResult]
         return MultipleArticlesResponseSchema(
@@ -208,7 +212,7 @@ async def get_single_article(
     user_instance: UserModel | None = Depends(get_current_user_optional_instance),
     db=Depends(get_db),
 ):
-    """Queries db for article instance by slug and builds and returns article schema."""
+    """Queries db for article instance by slug and returns article schema."""
     article_model = await query_articles_by_slug(slug, db)
     return ArticleResponseSchema.from_article_instance(article_model, user_instance)
 
@@ -220,7 +224,8 @@ async def update_article(
     current_user: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
-    """Queries db for article instance by slug, updates instance with update schema, upserts article to db and returns article schema."""
+    """Queries db for article instance by slug, updates instance with update schema, upserts article to db and \
+        returns article schema."""
     article_instance = await query_articles_by_slug(slug, db)
     if current_user != article_instance.author:
         raise NotArticleAuthorException()
@@ -249,7 +254,8 @@ async def favorite_article(
     current_user: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
-    """Queries db for article instance by slug, adds user ID to favoritedUserIds, upserts instance to db and returns article schema."""
+    """Queries db for article instance by slug, adds user ID to favoritedUserIds, upserts instance to db and returns \
+        article schema."""
     article = await query_articles_by_slug(slug, db)
     favorited_set = {*article.favoritedUserIds, current_user.id}
     article.favoritedUserIds = tuple(favorited_set)
@@ -268,7 +274,8 @@ async def unfavorite_article(
     current_user: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
-    """Queries db for article instance by slug, removes user ID from favoritedUserIds, upserts instance to db and returns article schema."""
+    """Queries db for article instance by slug, removes user ID from favoritedUserIds, upserts instance to db and \
+        returns article schema."""
     article = await query_articles_by_slug(slug, db)
     favorited_set = {*article.favoritedUserIds} - {current_user.id}
     article.favoritedUserIds = tuple(favorited_set)

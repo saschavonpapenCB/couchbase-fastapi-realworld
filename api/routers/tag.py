@@ -20,7 +20,9 @@ async def get_tags(db=Depends(get_db)):
         queryResult = db.query(query)
         result_list = [r for r in queryResult]
         if len(result_list) > 0:
-            return TagsResponseSchema(tags=[tags for tagList in result_list for tags in tagList["tagList"]])
+            return TagsResponseSchema(
+                tags=[tags for tagList in result_list for tags in tagList["tagList"]]
+            )
         else:
             return TagsResponseSchema(tags=[])
     except TimeoutError:
