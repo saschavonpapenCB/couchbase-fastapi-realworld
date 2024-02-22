@@ -6,6 +6,7 @@ from fastapi.encoders import jsonable_encoder
 
 from ..core.article import query_articles_by_slug
 from ..core.exceptions import NotArticleAuthorException
+from ..core.user import query_users_db
 from ..database import get_db
 from ..models.article import ArticleModel
 from ..models.user import UserModel
@@ -143,7 +144,7 @@ async def get_feed_articles(
     offset: int = 0,
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
-): # BROKEN - searching for user id not user following id
+):
     """Query db for article instances by author (that current user follows) and builds and returns multiple articles schema."""
     query = """
             SELECT article.slug,
@@ -157,14 +158,14 @@ async def get_feed_articles(
                 article.favoritedUserIds,
                 article.comments
             FROM article as article
-            WHERE $favoritedId IN article.favoritedUserIds
+            WHERE article.author.id IN $users_followed
             ORDER BY article.createdAt
             LIMIT $limit
             OFFSET $offset;
         """
     try:
         queryResult = db.query(
-            query, favoritedId=user_instance.id, limit=limit, offset=offset
+            query, users_followed=user_instance.following_ids, limit=limit, offset=offset
         )
         article_list = [r for r in queryResult]
         for article in article_list:

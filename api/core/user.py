@@ -17,7 +17,8 @@ async def query_users_db(
                 client.username,
                 client.bio,
                 client.image,
-                client.hashed_password
+                client.hashed_password,
+                dlient.following_ids
             FROM client as client
             WHERE client.id=$id;
         """
@@ -28,7 +29,8 @@ async def query_users_db(
                 client.username,
                 client.bio,
                 client.image,
-                client.hashed_password
+                client.hashed_password,
+                client.following_ids
             FROM client as client
             WHERE client.username=$username;
         """

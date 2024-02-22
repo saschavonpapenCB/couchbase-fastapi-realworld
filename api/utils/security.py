@@ -78,7 +78,8 @@ async def get_user_instance(
                 client.username,
                 client.bio,
                 client.image,
-                client.hashed_password
+                client.hashed_password,
+                client.following_ids
             FROM client as client
             WHERE client.username=$username;
         """
@@ -89,18 +90,19 @@ async def get_user_instance(
                 client.username,
                 client.bio,
                 client.image,
-                client.hashed_password
+                client.hashed_password,
+                client.following_ids
             FROM client as client
             WHERE client.email=$email;
         """
     else:
         return None
     queryResult = db.query(query, email=email, username=username)
-    user_data = [r for r in queryResult][0]
+    user_data = [r for r in queryResult]
     if not user_data:
         raise NotAuthenticatedException()
     else:
-        return UserModel(**user_data)
+        return UserModel(**user_data[0])
 
 
 async def authenticate_user(email: str, password: str, db):
