@@ -9,6 +9,7 @@ async def query_users_db(
     id: str | None = None,
     username: str | None = None,
 ) -> UserModel:
+    """Query db for user instance by ID or username and returns instance."""
     if id is not None:
         query = """
             SELECT client.id,
@@ -31,9 +32,10 @@ async def query_users_db(
             FROM client as client
             WHERE client.username=$username;
         """
+    else:
+        raise HTTPException(status_code=422, details="No id or username provided")
     if query is None:
         raise UserNotFoundException()
-    print(username)
     try:
         queryResult = db.query(query, id=id, username=username)
         response_data = [r for r in queryResult]

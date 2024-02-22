@@ -7,6 +7,7 @@ from fastapi.openapi.models import OAuthFlows
 from fastapi.security import OAuth2
 from fastapi.security.utils import get_authorization_scheme_param
 from jose import JWTError, jwt
+from jose.exceptions import ExpiredSignatureError
 from passlib.context import CryptContext
 from pydantic import BaseModel, ValidationError
 from starlette.requests import Request
@@ -69,6 +70,7 @@ async def get_user_instance(
     email: str | None = None,
     username: str | None = None,
 ):
+    """Queries db for user instance by email or username and returns user instance or none."""
     if username is not None:
         query = """
             SELECT client.id,
@@ -102,6 +104,7 @@ async def get_user_instance(
 
 
 async def authenticate_user(email: str, password: str, db):
+    """Queries db for user instance by email, compares password to instance's hashed password and returns user instance if verified."""
     user = await get_user_instance(db, email=email)
     if not user:
         return False
@@ -111,6 +114,7 @@ async def authenticate_user(email: str, password: str, db):
 
 
 async def create_access_token(user: UserModel) -> str:
+    """Create an access token based on the user's username."""
     token_content = TokenContentModel(username=user.username)
     expire = datetime.utcnow() + timedelta(minutes=SETTINGS.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = {"exp": expire, "sub": token_content.model_dump_json()}
@@ -124,7 +128,7 @@ async def get_current_user_instance(
     db=Depends(get_db),
     token: str | None = Depends(OAUTH2_SCHEME),
 ) -> UserModel:
-    """Decode the JWT and return the associated User"""
+    """Decode JWT, queries db for user instance by username and returns user instance."""
     if token is None:
         raise NotAuthenticatedException()
     try:
@@ -133,8 +137,10 @@ async def get_current_user_instance(
             SETTINGS.SECRET_KEY.get_secret_value(),
             algorithms=[SETTINGS.ALGORITHM],
         )
-    except JWTError:
-        raise CredentialsException()
+    except ExpiredSignatureError:
+        raise CredentialsException("Token has expired")
+    except JWTError as e:
+        raise CredentialsException(f"JWT decode error: {e}")
     try:
         payload_model = json.loads(payload.get("sub"))
         token_content = TokenContentModel(**payload_model)
@@ -150,6 +156,7 @@ async def get_current_user_optional_instance(
     db=Depends(get_db),
     token: str = Depends(OAUTH2_SCHEME),
 ) -> UserModel | None:
+    """Queries db for user instance by token and return user instance or none."""
     try:
         user = await get_current_user_instance(db, token)
         return user
@@ -161,4 +168,5 @@ async def get_current_user(
     user_instance: UserModel = Depends(get_current_user_instance),
     token: str = Depends(OAUTH2_SCHEME),
 ) -> UserSchema:
+    """Queries db for user instance by token and returns user schema."""
     return UserSchema(token=token, **user_instance.model_dump())

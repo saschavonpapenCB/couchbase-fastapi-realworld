@@ -5,6 +5,7 @@ from ..models.article import ArticleModel
 
 
 async def query_articles_by_slug(slug: str, db) -> ArticleModel:
+    """Queries db for article instance by slug and returns article instance."""
     query = """
             SELECT article.slug,
                 article.title,

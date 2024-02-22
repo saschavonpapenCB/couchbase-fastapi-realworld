@@ -11,6 +11,7 @@ router = APIRouter(
 
 @router.get("/tags", response_model=TagsResponseSchema)
 async def get_tags(db=Depends(get_db)):
+    """Queries db for tags and returns tags schema."""
     query = """
         SELECT article.tagList
         FROM article as article;

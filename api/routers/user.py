@@ -31,6 +31,7 @@ USER_COLLECTION = "client"
 async def register(
     user: RegistrationSchema = Body(..., embed=True), db=Depends(get_db)
 ):
+    """Creates a user instance with registration data, then inserts instance to db and returns user schema."""
     user_model = UserModel(
         **user.model_dump(), hashed_password=get_password_hash(user.password)
     )
@@ -51,6 +52,7 @@ async def register(
 async def login_user(
     user: AuthenticationSchema = Body(..., embed=True), db=Depends(get_db)
 ):
+    """Authenticates user with login data, creates a token and returns user schema."""
     user = await authenticate_user(user.email, user.password.get_secret_value(), db)
     if user is None:
         raise InvalidCredentialsException()
@@ -61,6 +63,7 @@ async def login_user(
 
 @router.get("/user", response_model=UserResponseSchema)
 async def current_user(current_user: UserSchema = Depends(get_current_user)):
+    """Queries db for current user instance by token and returns user schema."""
     return UserResponseSchema(user=current_user)
 
 
@@ -71,6 +74,7 @@ async def update_user(
     token: str = Depends(OAUTH2_SCHEME),
     db=Depends(get_db),
 ):
+    """Queries db for current user instance by token, updates it with update schema, upserts instance to db and returns user schema."""
     patch_dict = user.model_dump(exclude_unset=True)
     for name, value in patch_dict.items():
         setattr(user_instance, name, value)

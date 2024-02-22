@@ -38,6 +38,7 @@ async def get_articles(
     user_instance: UserModel | None = Depends(get_current_user_optional_instance),
     db=Depends(get_db),
 ):
+    """Queries db for article instances by author, favorited or tag with a limit and offset and builds and returns multiple articles schema."""
     if author:
         favorited_id = None
         query = """
@@ -142,7 +143,8 @@ async def get_feed_articles(
     offset: int = 0,
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
-):
+): # BROKEN - searching for user id not user following id
+    """Query db for article instances by author (that current user follows) and builds and returns multiple articles schema."""
     query = """
             SELECT article.slug,
                 article.title,
@@ -183,6 +185,7 @@ async def create_article(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
+    """Create article instance from create schema, inserts instance to db then returns article schema."""
     response_article = ArticleModel(author=user_instance, **article.model_dump())
     response_article.tagList.sort()
     try:
@@ -208,6 +211,7 @@ async def get_single_article(
     user_instance: UserModel | None = Depends(get_current_user_optional_instance),
     db=Depends(get_db),
 ):
+    """Queries db for article instance by slug and builds and returns article schema."""
     article_model = await query_articles_by_slug(slug, db)
     return ArticleResponseSchema.from_article_instance(article_model, user_instance)
 
@@ -219,6 +223,7 @@ async def update_article(
     current_user: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
+    """Queries db for article instance by slug, updates instance with update schema, upserts article to db and returns article schema."""
     article_instance = await query_articles_by_slug(slug, db)
     if current_user != article_instance.author:
         raise NotArticleAuthorException()
@@ -247,6 +252,7 @@ async def favorite_article(
     current_user: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
+    """Queries db for article instance by slug, adds user ID to favoritedUserIds, upserts instance to db and returns article schema."""
     article = await query_articles_by_slug(slug, db)
     favorited_set = {*article.favoritedUserIds, current_user.id}
     article.favoritedUserIds = tuple(favorited_set)
@@ -265,6 +271,7 @@ async def unfavorite_article(
     current_user: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
+    """Queries db for article instance by slug, removes user ID from favoritedUserIds, upserts instance to db and returns article schema."""
     article = await query_articles_by_slug(slug, db)
     favorited_set = {*article.favoritedUserIds} - {current_user.id}
     article.favoritedUserIds = tuple(favorited_set)
@@ -283,6 +290,7 @@ async def delete_article(
     current_user: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
+    """Queries db for article instance by slug and deletes instance from db."""
     article = await query_articles_by_slug(slug, db)
     if current_user.id != article.author.id:
         raise NotArticleAuthorException()

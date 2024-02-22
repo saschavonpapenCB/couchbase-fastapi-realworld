@@ -22,6 +22,7 @@ async def get_profile(
     logged_user: UserModel | None = Depends(get_current_user_optional_instance),
     db=Depends(get_db),
 ):
+    """Queries db for user instance by username and returns profile schema."""
     user = await query_users_db(db, username=username)
     following = False
     if logged_user is not None and user.id in logged_user.following_ids:
@@ -37,6 +38,7 @@ async def follow_user(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
+    """Queries db for user instance by username, adds current user ID to instance's following_ids, upserts instance to db and returns profile schema."""
     user_to_follow = await query_users_db(db, username=username)
     following_set = set(user_instance.following_ids) | set((user_to_follow.id,))
     user_instance.following_ids = tuple(following_set)
@@ -58,6 +60,7 @@ async def unfollow_user(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
+    """Queries db for user instance by username, removes current user ID from instance's following_ids, upserts instance to db and returns profile schema."""
     user_to_unfollow = await query_users_db(db, username=username)
     following_set = set(user_instance.following_ids) - set((user_to_unfollow.id,))
     user_instance.following_ids = tuple(following_set)

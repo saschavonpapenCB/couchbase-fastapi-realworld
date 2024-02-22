@@ -32,6 +32,7 @@ async def add_article_comment(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
+    """Queries db for article instance by slug, creates comment instance from create schema, adds comment instance to article instance, upserts article instance and returns comment schema."""
     article = await query_articles_by_slug(slug, db)
     comment_instance = CommentModel(authorId=user_instance.id, **comment.model_dump())
     article.comments = article.comments + (comment_instance,)
@@ -52,6 +53,7 @@ async def add_article_comment(
 
 @router.get("/articles/{slug}/comments", response_model=MultipleCommentsResponseSchema)
 async def get_article_comments(slug: str, db=Depends(get_db)):
+    """Queries db for article instance by slug, queries db for user instances by id of article comments, creates comment schemas and returns multiple comments schema."""
     article = await query_articles_by_slug(slug, db)
     comments = [comment for comment in article.comments]
     comment_authorIds = [comment.authorId for comment in comments]
@@ -71,6 +73,7 @@ async def delete_article_comment(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
+    """Queries db for article instance by slug, identifies comment by comment ID and user ID, removes comment from article instance and upserts article instance to db."""
     article = await query_articles_by_slug(slug, db)
     comments = [comment for comment in article.comments]
     if not comments:
