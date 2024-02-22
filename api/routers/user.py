@@ -38,8 +38,7 @@ async def register(
     try:
         db.insert_document(USER_COLLECTION, user_model.id, user_model.model_dump())
         token = await create_access_token(user_model)
-        response_user = UserSchema(token=token, **user_model.model_dump())
-        return UserResponseSchema(user=response_user)
+        return UserResponseSchema(user=UserSchema(token=token, **user_model.model_dump()))
     except DocumentExistsException:
         raise HTTPException(status_code=409, detail="User already exists")
     except TimeoutError:
@@ -57,8 +56,7 @@ async def login_user(
     if user is None:
         raise InvalidCredentialsException()
     token = await create_access_token(user)
-    response_user = UserSchema(token=token, **user.model_dump())
-    return UserResponseSchema(user=response_user)
+    return UserResponseSchema(user=UserSchema(token=token, **user.model_dump()))
 
 
 @router.get("/user", response_model=UserResponseSchema)
@@ -82,8 +80,7 @@ async def update_user(
         db.upsert_document(
             USER_COLLECTION, user_instance.id, user_instance.model_dump()
         )
-        response_user = UserSchema(token=token, **user_instance.model_dump())
-        return UserResponseSchema(user=response_user)
+        return UserResponseSchema(user=UserSchema(token=token, **user_instance.model_dump()))
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:

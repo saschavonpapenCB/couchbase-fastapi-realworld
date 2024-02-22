@@ -38,8 +38,6 @@ class ArticleModel(BaseModel):
         words = [w.lower() for w in words]
         slug = "-".join(words) + f"-{generate_random_str()}"
         values["slug"] = slug
-        # Note on why the tag_list is sorted:
-        # https://github.com/gothinkster/realworld/issues/839
         if values.get("tag_list") is not None and isinstance(values["tag_list"], list):
             values["tag_list"].sort()
         return values

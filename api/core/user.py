@@ -36,16 +36,13 @@ async def query_users_db(
         """
     else:
         raise HTTPException(status_code=422, details="No id or username provided")
-    if query is None:
-        raise UserNotFoundException()
     try:
         queryResult = db.query(query, id=id, username=username)
         response_data = [r for r in queryResult]
         if not response_data:
             raise UserNotFoundException()
         else:
-            response_user = response_data[0]
-            return UserModel(**response_user)
+            return UserModel(**response_data[0])
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:

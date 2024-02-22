@@ -5,7 +5,7 @@ from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 
 from ..core.article import query_articles_by_slug
-from ..core.exceptions import NotArticleAuthorException
+from ..core.exceptions import NotArticleAuthorException, ArticleNotFoundException
 from ..core.user import query_users_db
 from ..database import get_db
 from ..models.article import ArticleModel
@@ -41,7 +41,6 @@ async def get_articles(
 ):
     """Queries db for article instances by author, favorited or tag with a limit and offset and builds and returns multiple articles schema."""
     if author:
-        favorited_id = None
         query = """
             SELECT article.slug,
                 article.title,
@@ -59,9 +58,8 @@ async def get_articles(
             LIMIT $limit
             OFFSET $offset;
         """
+        favorited_id = None
     elif favorited:
-        favorited_user = await get_user_instance(db, username=favorited)
-        favorited_id = favorited_user.id
         query = """
             SELECT article.slug,
                 article.title,
@@ -79,8 +77,9 @@ async def get_articles(
             LIMIT $limit
             OFFSET $offset;
         """
+        favorited_user = await get_user_instance(db, username=favorited)
+        favorited_id = favorited_user.id
     elif tag:
-        favorited_id = None
         query = """
             SELECT article.slug,
                 article.title,
@@ -98,8 +97,8 @@ async def get_articles(
             LIMIT $limit
             OFFSET $offset;
         """
-    else:
         favorited_id = None
+    else:
         query = """
             SELECT article.slug,
                 article.title,
@@ -116,6 +115,7 @@ async def get_articles(
             LIMIT $limit
             OFFSET $offset;
         """
+        favorited_id = None
     if query is None:
         return MultipleArticlesResponseSchema(articles=[], articles_count=0)
     try:
@@ -128,10 +128,9 @@ async def get_articles(
             offset=offset,
         )
         article_list = [ArticleModel(**r) for r in queryResult]
-        response = MultipleArticlesResponseSchema.from_article_instances(
+        return MultipleArticlesResponseSchema.from_article_instances(
             article_list, len(article_list), user_instance
         )
-        return response
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:
@@ -167,13 +166,10 @@ async def get_feed_articles(
         queryResult = db.query(
             query, users_followed=user_instance.following_ids, limit=limit, offset=offset
         )
-        article_list = [r for r in queryResult]
-        for article in article_list:
-            article = ArticleModel(**article)
-        response = MultipleArticlesResponseSchema(
+        article_list = [ArticleModel(**article) for article in queryResult]
+        return MultipleArticlesResponseSchema(
             articles=article_list, articlesCount=len(article_list)
         )
-        return response
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:

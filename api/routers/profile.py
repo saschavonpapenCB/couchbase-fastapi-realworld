@@ -24,9 +24,7 @@ async def get_profile(
 ):
     """Queries db for user instance by username and returns profile schema."""
     user = await query_users_db(db, username=username)
-    following = False
-    if logged_user is not None and user.id in logged_user.following_ids:
-        following = True
+    following = logged_user is not None and user.id in logged_user.following_ids
     return ProfileResponseSchema(
         profile=ProfileSchema(following=following, **user.model_dump())
     )
@@ -46,8 +44,7 @@ async def follow_user(
         db.upsert_document(
             USER_COLLECTION, user_instance.id, user_instance.model_dump()
         )
-        profile = ProfileSchema(following=True, **user_to_follow.model_dump())
-        return ProfileResponseSchema(profile=profile)
+        return ProfileResponseSchema(profile=ProfileSchema(following=True, **user_to_follow.model_dump()))
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:
@@ -68,8 +65,7 @@ async def unfollow_user(
         db.upsert_document(
             USER_COLLECTION, user_instance.id, user_instance.model_dump()
         )
-        profile = ProfileSchema(following=False, **user_to_unfollow.model_dump())
-        return ProfileResponseSchema(profile=profile)
+        return ProfileResponseSchema(profile=ProfileSchema(following=False, **user_to_unfollow.model_dump()))
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:

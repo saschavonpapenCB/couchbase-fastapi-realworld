@@ -56,13 +56,7 @@ async def get_article_comments(slug: str, db=Depends(get_db)):
     """Queries db for article instance by slug, queries db for user instances by id of article comments, creates comment schemas and returns multiple comments schema."""
     article = await query_articles_by_slug(slug, db)
     comments = [comment for comment in article.comments]
-    comment_authorIds = [comment.authorId for comment in comments]
-    comment_authors = []
-    for author_id in comment_authorIds:
-        comment_authors.append(await query_users_db(db, id=author_id))
-    data = []
-    for index, comment in enumerate(comments):
-        data.append((comment, comment_authors[index]))
+    data = [(comment, await query_users_db(db, id=comment.authorId)) for comment in comments]
     return MultipleCommentsResponseSchema.from_comments_and_authors(data)
 
 
@@ -74,18 +68,14 @@ async def delete_article_comment(
     db=Depends(get_db),
 ):
     """Queries db for article instance by slug, identifies comment by comment ID and user ID, removes comment from article instance and upserts article instance to db."""
-    article = await query_articles_by_slug(slug, db)
-    comments = [comment for comment in article.comments]
-    if not comments:
-        raise CommentNotFoundException()
-    for index, comment in enumerate(comments):
-        if comment.id == id:
-            if comment.authorId == user_instance.id:
-                article.comments = (
-                    article.comments[:index] + article.comments[index + 1 :]
-                )
     try:
-        db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
+        article = await query_articles_by_slug(slug, db)
+        comment = next((c for c in article.comments if c.id == id and c.authorId == user_instance.id), None)
+        if comment:
+            article.comments = tuple(c for c in article.comments if c.id != id)
+            db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
+        else:
+            raise CommentNotFoundException()
     except DocumentExistsException:
         raise HTTPException(status_code=409, detail="Article already exists")
     except TimeoutError:

@@ -28,8 +28,7 @@ async def query_articles_by_slug(slug: str, db) -> ArticleModel:
         if not article_data:
             raise ArticleNotFoundException()
         else:
-            response_article = article_data[0]
-            return ArticleModel(**response_article)
+            return ArticleModel(**article_data[0])
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:
