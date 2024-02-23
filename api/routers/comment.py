@@ -1,4 +1,3 @@
-from couchbase.exceptions import DocumentExistsException
 from fastapi import APIRouter, Body, Depends, HTTPException
 from fastapi.encoders import jsonable_encoder
 
@@ -44,8 +43,6 @@ async def add_article_comment(
             author=response_profile, **comment_instance.model_dump()
         )
         return SingleCommentResponseSchema(comment=response_comment)
-    except DocumentExistsException:
-        raise HTTPException(status_code=409, detail="Article already exists")
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:
@@ -90,8 +87,6 @@ async def delete_article_comment(
             )
         else:
             raise CommentNotFoundException()
-    except DocumentExistsException:
-        raise HTTPException(status_code=409, detail="Article already exists")
     except TimeoutError:
         raise HTTPException(status_code=408, detail="Request timeout")
     except Exception as e:

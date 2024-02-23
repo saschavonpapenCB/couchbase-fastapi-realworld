@@ -6,7 +6,6 @@ from fastapi.encoders import jsonable_encoder
 
 from ..core.article import query_articles_by_slug
 from ..core.exceptions import NotArticleAuthorException
-from ..core.user import query_users_db
 from ..database import get_db
 from ..models.article import ArticleModel
 from ..models.user import UserModel

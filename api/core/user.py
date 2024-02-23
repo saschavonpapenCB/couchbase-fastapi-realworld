@@ -35,7 +35,7 @@ async def query_users_db(
             WHERE client.username=$username;
         """
     else:
-        raise HTTPException(status_code=422, details="No id or username provided")
+        raise HTTPException(status_code=422, details="No ID or username provided")
     try:
         queryResult = db.query(query, id=id, username=username)
         response_data = [r for r in queryResult]
