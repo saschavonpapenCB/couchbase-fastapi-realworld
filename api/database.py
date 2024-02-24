@@ -37,8 +37,7 @@ class CouchbaseClient(object):
         # If the connection is not established, establish it now
         if not self.cluster:
             print("connecting to db")
-            print(os.getenv("DB_CONN_STR"))
-            print(os.environ.get("DB_CONN_STR"))
+            
             try:
                 # authentication for Couchbase cluster
                 auth = PasswordAuthenticator(self.username, self.password)
