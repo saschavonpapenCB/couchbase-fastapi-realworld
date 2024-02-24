@@ -118,10 +118,10 @@ def get_db() -> CouchbaseClient:
     """Get Couchbase client"""
     load_dotenv()
     conn_str = "couchbases://cb.zlaigahlligbqidy.cloud.couchbase.com" #os.getenv("DB_CONN_STR")
-    username = "Administrator" #os.getenv("DB_USERNAME")
-    password = "RealWorld123456!" #os.getenv("DB_PASSWORD")
-    bucket_name = "travel-sample" #os.getenv("DB_BUCKET_NAME")
-    scope_name = "inventory" #os.getenv("DB_SCOPE_NAME")
+    username = os.getenv("DB_USERNAME")
+    password = os.getenv("DB_PASSWORD")
+    bucket_name = os.getenv("DB_BUCKET_NAME")
+    scope_name = os.getenv("DB_SCOPE_NAME")
     if conn_str is None:
         print("WARNING: DB_CONN_STR environment variable not set")
     if username is None:
