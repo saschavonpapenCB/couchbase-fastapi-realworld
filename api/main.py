@@ -30,6 +30,11 @@ api = FastAPI(
 )
 
 
+@api.get("/health", tags=["health"])
+async def health_check():
+    return {"status": "ok"}
+
+
 api.include_router(article_router, tags=["articles"])
 api.include_router(comment_router, tags=["comments"])
 api.include_router(profile_router, tags=["profiles"])
