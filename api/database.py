@@ -38,6 +38,7 @@ class CouchbaseClient(object):
         if not self.cluster:
             print("connecting to db")
             print(os.getenv("DB_CONN_STR"))
+            print("oh oh")
             try:
                 # authentication for Couchbase cluster
                 auth = PasswordAuthenticator(self.username, self.password)
