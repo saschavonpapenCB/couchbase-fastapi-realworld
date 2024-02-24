@@ -117,7 +117,7 @@ class CouchbaseClient(object):
 def get_db() -> CouchbaseClient:
     """Get Couchbase client"""
     load_dotenv()
-    conn_str = "couchbases://cb.zlaigahlligbqidy.cloud.couchbase.com" #os.getenv("DB_CONN_STR")
+    conn_str = os.getenv("DB_CONN_STR")
     username = os.getenv("DB_USERNAME")
     password = os.getenv("DB_PASSWORD")
     bucket_name = os.getenv("DB_BUCKET_NAME")
