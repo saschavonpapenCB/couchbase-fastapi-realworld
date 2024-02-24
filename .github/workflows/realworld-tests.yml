@@ -25,6 +25,13 @@ jobs:
       - uses: actions/checkout@v1
         with:
           submodules: recursive
+      - name: Print Action Variables
+        run: |
+          echo "Action Variable 1: ${{ vars.DB_CONN_STR }}"
+          echo "Action Variable 2: ${{ vars.DB_BUCKET_NAME }}"
+          echo "Action Variable 3: ${{ vars.DB_USERNAME }}"
+          echo "Action Variable 4: ${{ vars.DB_SCOPE_NAME }}"
+          echo "Action Secret: ${{ secrets.DB_PASSWORD }}"
       - name: Set up Python and requirements
         run: |
           sudo apt -y update
