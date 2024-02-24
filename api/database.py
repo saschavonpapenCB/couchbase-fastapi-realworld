@@ -120,6 +120,9 @@ def get_db() -> CouchbaseClient:
     password = os.getenv("DB_PASSWORD")
     bucket_name = os.getenv("DB_BUCKET_NAME")
     scope_name = os.getenv("DB_SCOPE_NAME")
+    print(conn_str)
+    print(bucket_name)
+    print(scope_name)
     if conn_str is None:
         print("WARNING: DB_CONN_STR environment variable not set")
     if username is None:
