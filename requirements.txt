@@ -3,7 +3,7 @@ couchbase==4.1.10
 fastapi==0.109.2
 passlib==1.7.4
 pydantic-settings==2.1.0
-pydantic==2.5.3
+pydantic==2.6.2
 pytest-xdist==3.5.0
 pytest==8.0.1
 python-jose==3.3.0
