@@ -9,7 +9,7 @@
       workflow_dispatch:
     
     jobs:
-      realworld-tests:
+      tests:
         timeout-minutes: 10
         runs-on: ubuntu-latest
         env:
