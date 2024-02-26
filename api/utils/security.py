@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, timedelta
-from typing import cast
+from typing import cast, Union
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.openapi.models import OAuthFlows
@@ -35,15 +35,15 @@ class OAuth2PasswordToken(OAuth2):
     def __init__(
         self,
         tokenUrl: str,
-        scheme_name: str | None = None,
-        scopes: dict | None = None,
+        scheme_name: Union[str, None] = None,
+        scopes: Union[dict, None] = None,
     ):
         if not scopes:
             scopes = {}
         flows = OAuthFlows(password={"tokenUrl": tokenUrl, "scopes": scopes})
         super().__init__(flows=flows, scheme_name=scheme_name, auto_error=False)
 
-    async def __call__(self, request: Request) -> str | None:
+    async def __call__(self, request: Request) -> Union[str, None]:
         authorization: str = request.headers.get("Authorization")
         scheme, param = get_authorization_scheme_param(authorization)
         if not authorization or scheme.lower() != "token":
@@ -67,8 +67,8 @@ def get_password_hash(password):
 
 async def get_user_instance(
     db,
-    email: str | None = None,
-    username: str | None = None,
+    email: Union[str, None] = None,
+    username: Union[str, None] = None,
 ):
     """Queries db for user instance by email or username and returns user instance or none."""
     if username is not None:
@@ -129,7 +129,7 @@ async def create_access_token(user: UserModel) -> str:
 
 async def get_current_user_instance(
     db=Depends(get_db),
-    token: str | None = Depends(OAUTH2_SCHEME),
+    token: Union[str, None] = Depends(OAUTH2_SCHEME),
 ) -> UserModel:
     """Decode JWT, queries db for user instance by username and returns user instance."""
     if token is None:
@@ -158,7 +158,7 @@ async def get_current_user_instance(
 async def get_current_user_optional_instance(
     db=Depends(get_db),
     token: str = Depends(OAUTH2_SCHEME),
-) -> UserModel | None:
+) -> Union[UserModel, None]:
     """Queries db for user instance by token and return user instance or none."""
     try:
         user = await get_current_user_instance(db, token)

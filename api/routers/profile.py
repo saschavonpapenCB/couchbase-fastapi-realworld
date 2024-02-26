@@ -1,3 +1,5 @@
+from typing import Union
+
 from fastapi import APIRouter, Depends, HTTPException
 
 from ..core.user import query_users_db
@@ -19,7 +21,7 @@ router = APIRouter(
 @router.get("/profiles/{username}", response_model=ProfileResponseSchema)
 async def get_profile(
     username: str,
-    logged_user: UserModel | None = Depends(get_current_user_optional_instance),
+    logged_user: Union[UserModel, None] = Depends(get_current_user_optional_instance),
     db=Depends(get_db),
 ):
     """Queries db for user instance by username and returns profile schema."""

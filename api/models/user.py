@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, Union
 
 from pydantic import BaseModel, Field
 
@@ -10,6 +10,6 @@ class UserModel(BaseModel):
     username: str
     email: str
     hashed_password: str
-    bio: str | None = None
-    image: str | None = None
+    bio: Union[str, None] = None
+    image: Union[str, None] = None
     following_ids: Tuple[str, ...] = ()

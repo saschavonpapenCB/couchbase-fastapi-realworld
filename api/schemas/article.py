@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import List
+from typing import List, Union
 
 from ..models.article import ArticleModel
 from ..models.user import UserModel
@@ -11,13 +11,13 @@ class CreateArticleSchema(BaseSchema):
     title: str
     description: str
     body: str
-    tagList: List[str] | None = None
+    tagList: Union[List[str], None] = None
 
 
 class UpdateArticleSchema(BaseSchema):
-    title: str | None = None
-    description: str | None = None
-    body: str | None = None
+    title: Union[str, None] = None
+    description: Union[str, None] = None
+    body: Union[str, None] = None
 
 
 class ArticleSchema(BaseSchema):
@@ -34,7 +34,7 @@ class ArticleSchema(BaseSchema):
 
     @classmethod
     def from_article_instance(
-        cls, article: ArticleModel, user: UserModel | None = None
+        cls, article: ArticleModel, user: Union[UserModel, None] = None
     ) -> "ArticleSchema":
         if user is None:
             favorited = False
@@ -53,7 +53,7 @@ class ArticleResponseSchema(BaseSchema):
 
     @classmethod
     def from_article_instance(
-        cls, article: ArticleModel, user: UserModel | None = None
+        cls, article: ArticleModel, user: Union[UserModel, None] = None
     ) -> "ArticleResponseSchema":
         return cls(
             article=ArticleSchema.from_article_instance(article=article, user=user)
@@ -69,7 +69,7 @@ class MultipleArticlesResponseSchema(BaseSchema):
         cls,
         articles: List[ArticleModel],
         total_count: int,
-        user: UserModel | None = None,
+        user: Union[UserModel, None] = None,
     ) -> "MultipleArticlesResponseSchema":
         articles = [ArticleSchema.from_article_instance(a, user) for a in articles]
         return cls(articles=articles, articlesCount=total_count)

@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import Union
 
 from couchbase.exceptions import DocumentExistsException
 from fastapi import APIRouter, Body, Depends, HTTPException
@@ -30,12 +31,12 @@ ARTICLE_COLLECTION = "article"
 
 @router.get("/articles", response_model=MultipleArticlesResponseSchema)
 async def get_articles(
-    author: str | None = None,
-    favorited: str | None = None,
-    tag: str | None = None,
+    author: Union[str, None] = None,
+    favorited: Union[str, None] = None,
+    tag: Union[str, None] = None,
     limit: int = 20,
     offset: int = 0,
-    user_instance: UserModel | None = Depends(get_current_user_optional_instance),
+    user_instance: Union[UserModel, None] = Depends(get_current_user_optional_instance),
     db=Depends(get_db),
 ):
     """Queries db for article instances by author, favorited or tag with a limit and offset and returns multiple \
@@ -208,7 +209,7 @@ async def create_article(
 @router.get("/articles/{slug}", response_model=ArticleResponseSchema)
 async def get_single_article(
     slug: str,
-    user_instance: UserModel | None = Depends(get_current_user_optional_instance),
+    user_instance: Union[UserModel, None] = Depends(get_current_user_optional_instance),
     db=Depends(get_db),
 ):
     """Queries db for article instance by slug and returns article schema."""

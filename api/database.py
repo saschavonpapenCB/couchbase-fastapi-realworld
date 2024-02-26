@@ -37,6 +37,7 @@ class CouchbaseClient(object):
         # If the connection is not established, establish it now
         if not self.cluster:
             print("connecting to db")
+            print(self.conn_str)
             
             try:
                 # authentication for Couchbase cluster

@@ -1,3 +1,5 @@
+from typing import Union
+
 from fastapi import HTTPException
 
 from ..models.user import UserModel
@@ -6,8 +8,8 @@ from .exceptions import UserNotFoundException
 
 async def query_users_db(
     db,
-    id: str | None = None,
-    username: str | None = None,
+    id: Union[str, None] = None,
+    username: Union[str, None] = None,
 ) -> UserModel:
     """Query db for user instance by ID or username and returns instance."""
     if id is not None:

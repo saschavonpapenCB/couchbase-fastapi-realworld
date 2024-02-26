@@ -1,3 +1,4 @@
+from typing import Union
 from pydantic import SecretStr
 
 from .base import BaseSchema
@@ -18,8 +19,8 @@ class UserSchema(BaseSchema):
     email: str
     token: str
     username: str
-    bio: str | None = None
-    image: str | None = None
+    bio: Union[str, None] = None
+    image: Union[str, None] = None
 
 
 class UserResponseSchema(BaseSchema):
@@ -27,17 +28,17 @@ class UserResponseSchema(BaseSchema):
 
 
 class UpdateUserSchema(BaseSchema):
-    email: str | None = None
-    token: str | None = None
-    username: str | None = None
-    bio: str | None = None
-    image: str | None = None
+    email: Union[str, None] = None
+    token: Union[str, None] = None
+    username: Union[str, None] = None
+    bio: Union[str, None] = None
+    image: Union[str, None] = None
 
 
 class ProfileSchema(BaseSchema):
     username: str
-    bio: str | None
-    image: str | None
+    bio: Union[str, None] = None
+    image: Union[str, None] = None
     following: bool = False
 
 
