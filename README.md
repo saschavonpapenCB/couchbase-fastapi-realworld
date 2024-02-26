@@ -86,13 +86,13 @@ At this point, we have installed the dependencies, setup the cluster and configu
 - Build the Docker image
 
 ```sh
-docker build -t couchbase-fastapi-realworld . 
+./scripts/build-container.sh
 ```
 
 - Run the Docker image
 
 ```sh
-docker run -it --env-file api/.env -p 8000:8000 couchbase-fastapi-realworld
+./scripts/run-container.sh
 ```
 
 > Note: The `.env` file has the connection information to connect to your Capella cluster. These will be part of the environment variables in the Docker container.
