@@ -1,4 +1,6 @@
 from contextlib import asynccontextmanager
+import logging
+import sys
 
 from fastapi import FastAPI
 
@@ -27,6 +29,14 @@ api = FastAPI(
     RealWorld backend built with FastAPI and Couchbase Capella.
     """,
     lifespan=lifespan,
+)
+
+
+logging.basicConfig(
+    level=logging.INFO,
+    stream=sys.stdout,
+    format="%(asctime)s %(levelname)s %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
 )
 
 
