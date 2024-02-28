@@ -3,6 +3,7 @@ import logging
 import sys
 
 from fastapi import FastAPI
+from starlette.middleware.cors import CORSMiddleware
 
 from .database import get_db
 from .routers.article import router as article_router
@@ -37,6 +38,15 @@ logging.basicConfig(
     stream=sys.stdout,
     format="%(asctime)s %(levelname)s %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
+)
+
+
+api.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 
