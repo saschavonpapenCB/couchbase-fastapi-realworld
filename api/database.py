@@ -15,12 +15,12 @@ class CouchbaseClient(object):
     """Class to handle interactions with Couchbase cluster"""
 
     def __init__(
-            self,
-            conn_str: str | None,
-            username: str | None,
-            password: str | None,
-            bucket_name: str | None,
-            scope_name:str | None,
+        self,
+        conn_str: str | None,
+        username: str | None,
+        password: str | None,
+        bucket_name: str | None,
+        scope_name: str | None,
     ) -> CouchbaseClient:
         self.cluster = None
         self.bucket = None
@@ -37,7 +37,7 @@ class CouchbaseClient(object):
         # If the connection is not established, establish it now
         if not self.cluster:
             print("connecting to db")
-            
+
             try:
                 # authentication for Couchbase cluster
                 auth = PasswordAuthenticator(self.username, self.password)
@@ -56,15 +56,11 @@ class CouchbaseClient(object):
                 self.bucket = self.cluster.bucket(self.bucket_name)
             except CouchbaseException as error:
                 print(f"Could not connect to cluster. \nError: {error}")
-                print(
-                    "WARNING: Ensure that you have the bucket loaded in the cluster."
-                )
+                print("WARNING: Ensure that you have the bucket loaded in the cluster.")
 
             if not self.check_scope_exists():
-                print(
-                    "WARNING: Scope does not exist in the bucket.\
-                        \n Ensure that you have the scope in your bucket."
-                )
+                print("WARNING: Scope does not exist in the bucket.\
+                      \n Ensure that you have the scope in your bucket.")
 
             # get a reference to our scope
             self.scope = self.bucket.scope(self.scope_name)

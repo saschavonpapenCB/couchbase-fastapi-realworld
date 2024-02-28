@@ -1,4 +1,5 @@
 from typing import Union
+
 from pydantic import SecretStr
 
 from .base import BaseSchema

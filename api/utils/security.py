@@ -1,6 +1,6 @@
 import json
 from datetime import datetime, timedelta
-from typing import cast, Union
+from typing import Union, cast
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.openapi.models import OAuthFlows

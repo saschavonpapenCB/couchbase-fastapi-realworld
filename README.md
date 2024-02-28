@@ -9,7 +9,7 @@
 This codebase was created to demonstrate a fully fledged fullstack application built with [FastAPI](https://github.com/tiangolo/fastapi) + Couchbase including CRUD operations, authentication, routing, pagination, and more.
 
 
-For more information on how to this works with other frontends/backends, head over to the [RealWorld](https://github.com/gothinkster/realworld) repo.
+For more information on how to this works with other frontends/backends, head over to the [RealWorld](https://github.com/gothinkster/realworld) repository.
 
 
 # How it works
@@ -32,7 +32,7 @@ CREATE PRIMARY INDEX ON `default`:`<bucket_name>`.`<scope_name>`.`<collection_na
 
 # Setting Up the Application
 
-### Cloning Repo
+### Cloning Repository
 
 ```shell
 git clone https://github.com/couchbase-examples/python-quickstart-fastapi.git
@@ -75,7 +75,7 @@ DB_SCOPE_NAME=<scope_name>
 
 ### Directly on Machine
 
-At this point, we have installed the dependencies, setup the cluster and configured the api with the credentials. The api is now ready and you can run it.
+At this point, we have installed the dependencies, setup the cluster and configured the API with the credentials. The API is now ready and you can run it.
 
 ```
 ./scripts/start-api.sh
