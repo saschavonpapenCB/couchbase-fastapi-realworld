@@ -42,7 +42,7 @@ git clone https://github.com/couchbase-examples/python-quickstart-fastapi.git
 
 The dependencies for the application are specified in the `requirements.txt` file in the root folder. Dependencies can be installed through `pip` the default package manager for Python.
 ```
-python -m pip install -r requirements.txt
+./scripts/install-dependencies.sh
 ```
 > Note: If your Python is not symbolically linked to python3, you need to run all commands using `python3` instead of `python`.
 
