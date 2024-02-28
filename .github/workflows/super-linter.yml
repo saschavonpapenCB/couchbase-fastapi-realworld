@@ -7,6 +7,7 @@ jobs:
   super-lint:
     name: Lint code base
     runs-on: ubuntu-latest
+    environment: development
     steps:
       - name: Checkout code
         uses: actions/checkout@v2

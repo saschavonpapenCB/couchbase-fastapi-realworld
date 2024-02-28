@@ -12,6 +12,7 @@
       tests:
         timeout-minutes: 10
         runs-on: ubuntu-latest
+        environment: development
         env:
           DB_CONN_STR: ${{ vars.DB_CONN_STR }}
           DB_BUCKET_NAME: ${{ vars.DB_BUCKET_NAME }}
