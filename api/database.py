@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import os
 from datetime import timedelta
 from functools import cache
@@ -36,7 +37,7 @@ class CouchbaseClient(object):
         """Connect to the Couchbase cluster"""
         # If the connection is not established, establish it now
         if not self.cluster:
-            print("connecting to db")
+            logging.info("connecting to db")
 
             try:
                 # authentication for Couchbase cluster
@@ -55,11 +56,11 @@ class CouchbaseClient(object):
                 # get a reference to our bucket
                 self.bucket = self.cluster.bucket(self.bucket_name)
             except CouchbaseException as error:
-                print(f"Could not connect to cluster. \nError: {error}")
-                print("WARNING: Ensure that you have the bucket loaded in the cluster.")
+                logging.error(f"Could not connect to cluster. \nError: {error}")
+                logging.warning("Ensure that you have the bucket loaded in the cluster.")
 
             if not self.check_scope_exists():
-                print("WARNING: Scope does not exist in the bucket.\
+                logging.warning("Scope does not exist in the bucket.\
                       \n Ensure that you have the scope in your bucket.")
 
             # get a reference to our scope
@@ -73,7 +74,7 @@ class CouchbaseClient(object):
             ]
             return self.scope_name in scopes_in_bucket
         except Exception:
-            print(
+            logging.error(
                 "Error fetching scopes in cluster. \nEnsure that the bucket exists."
             )
 
@@ -83,7 +84,7 @@ class CouchbaseClient(object):
             try:
                 self.cluster.close()
             except Exception as e:
-                print(f"Error closing cluster. \nError: {e}")
+                logging.error(f"Error closing cluster. \nError: {e}")
 
     def get_document(self, collection_name: str, key: str):
         """Get document by key using KV operation"""
@@ -118,13 +119,13 @@ def get_db() -> CouchbaseClient:
     bucket_name = os.getenv("DB_BUCKET_NAME")
     scope_name = os.getenv("DB_SCOPE_NAME")
     if conn_str is None:
-        print("WARNING: DB_CONN_STR environment variable not set")
+        logging.warning("DB_CONN_STR environment variable not set")
     if username is None:
-        print("WARNING: DB_USERNAME environment variable not set")
+        logging.warning("DB_USERNAME environment variable not set")
     if password is None:
-        print("WARNING: DB_PASSWORD environment variable not set")
+        logging.warning("DB_PASSWORD environment variable not set")
     if bucket_name is None:
-        print("WARNING: DB_BUCKET_NAME environment variable not set")
+        logging.warning("DB_BUCKET_NAME environment variable not set")
     if scope_name is None:
-        print("WARNING: DB_SCOPE_NAME environment variable not set")
+        logging.warning("DB_SCOPE_NAME environment variable not set")
     return CouchbaseClient(conn_str, username, password, bucket_name, scope_name)
