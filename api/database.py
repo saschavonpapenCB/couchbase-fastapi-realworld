@@ -11,18 +11,13 @@ from couchbase.exceptions import CouchbaseException
 from couchbase.options import ClusterOptions
 from dotenv import load_dotenv
 
+from .core.exceptions import EmptyEnvironmentVariableError
+
 
 class CouchbaseClient(object):
     """Class to handle interactions with Couchbase cluster"""
 
-    def __init__(
-        self,
-        conn_str: str | None,
-        username: str | None,
-        password: str | None,
-        bucket_name: str | None,
-        scope_name: str | None,
-    ) -> CouchbaseClient:
+    def __init__(self, conn_str: str, username: str, password: str, bucket_name: str, scope_name: str):
         self.cluster = None
         self.bucket = None
         self.scope = None
@@ -35,36 +30,33 @@ class CouchbaseClient(object):
 
     def connect(self) -> None:
         """Connect to the Couchbase cluster"""
-        # If the connection is not established, establish it now
-        if not self.cluster:
-            logging.info("connecting to db")
+        if self.cluster:
+            return
+        
+        logging.info("connecting to db")
 
-            try:
-                # authentication for Couchbase cluster
-                auth = PasswordAuthenticator(self.username, self.password)
+        try:
+            auth = PasswordAuthenticator(self.username, self.password)
 
-                cluster_opts = ClusterOptions(auth)
-                # wan_development is used to avoid latency issues while connecting to Couchbase over the internet
-                cluster_opts.apply_profile("wan_development")
+            cluster_opts = ClusterOptions(auth)
+            cluster_opts.apply_profile("wan_development")
 
-                # connect to the cluster
-                self.cluster = Cluster(self.conn_str, cluster_opts)
+            self.cluster = Cluster(self.conn_str, cluster_opts)
+            self.cluster.wait_until_ready(timedelta(seconds=5))
+            self.bucket = self.cluster.bucket(self.bucket_name)
+        except CouchbaseException as error:
+            self.connection_error(error)
+            
+        if not self.check_scope_exists():
+            logging.warning("Scope does not exist in the bucket. Ensure that you have the scope in your bucket.")
 
-                # wait until the cluster is ready for use
-                self.cluster.wait_until_ready(timedelta(seconds=5))
+        self.scope = self.bucket.scope(self.scope_name)
+    
+    def connection_error(self, error: CouchbaseException) -> None:
+        """Handle connection errors"""
+        logging.error(f"Could not connect to the cluster. Error: {error}")
+        logging.warning("Ensure that you have the bucket loaded in the cluster.")
 
-                # get a reference to our bucket
-                self.bucket = self.cluster.bucket(self.bucket_name)
-            except CouchbaseException as error:
-                logging.error(f"Could not connect to cluster. \nError: {error}")
-                logging.warning("Ensure that you have the bucket loaded in the cluster.")
-
-            if not self.check_scope_exists():
-                logging.warning("Scope does not exist in the bucket.\
-                      \n Ensure that you have the scope in your bucket.")
-
-            # get a reference to our scope
-            self.scope = self.bucket.scope(self.scope_name)
 
     def check_scope_exists(self) -> bool:
         """Check if the scope exists in the bucket"""
@@ -74,9 +66,8 @@ class CouchbaseClient(object):
             ]
             return self.scope_name in scopes_in_bucket
         except Exception:
-            logging.error(
-                "Error fetching scopes in cluster. \nEnsure that the bucket exists."
-            )
+            logging.error("Error fetching scopes in cluster. \nEnsure that the bucket exists.")
+            return False
 
     def close(self) -> None:
         """Close the connection to the Couchbase cluster"""
@@ -104,28 +95,24 @@ class CouchbaseClient(object):
 
     def query(self, sql_query, *options, **kwargs):
         """Query Couchbase using SQL++"""
-        # options are used for positional parameters
-        # kwargs are used for named parameters
         return self.scope.query(sql_query, *options, **kwargs)
 
 
 @cache
-def get_db() -> CouchbaseClient:
+def get_db():
     """Get Couchbase client"""
     load_dotenv()
-    conn_str = os.getenv("DB_CONN_STR")
-    username = os.getenv("DB_USERNAME")
-    password = os.getenv("DB_PASSWORD")
-    bucket_name = os.getenv("DB_BUCKET_NAME")
-    scope_name = os.getenv("DB_SCOPE_NAME")
-    if conn_str is None:
-        logging.warning("DB_CONN_STR environment variable not set")
-    if username is None:
-        logging.warning("DB_USERNAME environment variable not set")
-    if password is None:
-        logging.warning("DB_PASSWORD environment variable not set")
-    if bucket_name is None:
-        logging.warning("DB_BUCKET_NAME environment variable not set")
-    if scope_name is None:
-        logging.warning("DB_SCOPE_NAME environment variable not set")
-    return CouchbaseClient(conn_str, username, password, bucket_name, scope_name)
+    env_vars = ["DB_CONN_STR", "DB_USERNAME", "DB_PASSWORD", "DB_BUCKET_NAME", "DB_SCOPE_NAME"]
+
+    try:
+        conn_str, username, password, bucket_name, scope_name = (
+            os.getenv(var) for var in env_vars
+        )
+
+        for env_var, var_name in zip([conn_str, username, password, bucket_name, scope_name], env_vars):
+            if not env_var:
+                raise EmptyEnvironmentVariableError(var_name)
+
+        return CouchbaseClient(conn_str, username, password, bucket_name, scope_name)
+    except Exception as e:
+        raise e

@@ -1,6 +1,13 @@
 from fastapi import HTTPException, status
 
 
+class EmptyEnvironmentVariableError(HTTPException):
+    def __init__(self, var_name: str) -> None:
+        super().__init__(status_code=status.HTTP_204_NO_CONTENT,
+            detail=f"Environment variable '{var_name}' cannot be an empty string"
+        )
+
+
 class UserNotFoundException(HTTPException):
     def __init__(self) -> None:
         super().__init__(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
