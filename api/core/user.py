@@ -1,6 +1,6 @@
 from typing import Union
 
-from fastapi import HTTPException
+from fastapi import HTTPException, status
 
 from ..models.user import UserModel
 from .exceptions import UserNotFoundException
@@ -14,30 +14,15 @@ async def query_users_db(
     """Query db for user instance by ID or username and returns instance."""
     if id is not None:
         query = """
-            SELECT client.id,
-                client.email,
-                client.username,
-                client.bio,
-                client.image,
-                client.hashed_password,
-                dlient.following_ids
-            FROM client as client
-            WHERE client.id=$id;
+            SELECT client.* FROM client WHERE client.id=$id;
         """
     elif username is not None:
         query = """
-            SELECT client.id,
-                client.email,
-                client.username,
-                client.bio,
-                client.image,
-                client.hashed_password,
-                client.following_ids
-            FROM client as client
-            WHERE client.username=$username;
+            SELECT client.* FROM client WHERE client.username=$username;
         """
     else:
-        raise HTTPException(status_code=422, details="No ID or username provided")
+        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, details="No ID or username provided")
+    
     try:
         queryResult = db.query(query, id=id, username=username)
         response_data = [r for r in queryResult]
@@ -46,6 +31,6 @@ async def query_users_db(
         else:
             return UserModel(**response_data[0])
     except TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timeout")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")

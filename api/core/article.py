@@ -7,24 +7,15 @@ from ..models.article import ArticleModel
 async def query_articles_by_slug(slug: str, db) -> ArticleModel:
     """Queries db for article instance by slug and returns article instance."""
     query = """
-            SELECT article.slug,
-                article.title,
-                article.description,
-                article.body,
-                article.tagList,
-                article.createdAt,
-                article.updatedAt,
-                article.favorited,
-                article.favoritesCount,
-                article.author,
-                article.comments
-            FROM article as article
+            SELECT article.*
+            FROM article
             WHERE article.slug=$slug
             ORDER BY article.createdAt;
         """
     try:
-        queryResult = db.query(query, slug=slug)
-        article_data = [r for r in queryResult]
+        query_result = db.query(query, slug=slug)
+        article_data = [r for r in query_result]
+
         if not article_data:
             raise ArticleNotFoundException()
         else:
