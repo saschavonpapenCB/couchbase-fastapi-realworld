@@ -15,7 +15,6 @@ async def query_articles_by_slug(slug: str, db) -> ArticleModel:
     try:
         query_result = db.query(query, slug=slug)
         article_data = [r for r in query_result]
-
         if not article_data:
             raise ArticleNotFoundException()
         else:

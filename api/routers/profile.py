@@ -1,6 +1,6 @@
 from typing import Union
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 
 from ..core.user import query_users_db
 from ..database import get_db
@@ -51,9 +51,9 @@ async def follow_user(
             profile=ProfileSchema(following=True, **user_to_follow.model_dump())
         )
     except TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timeout")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
 
 
 @router.delete("/profiles/{username}/follow", response_model=ProfileResponseSchema)
@@ -75,6 +75,6 @@ async def unfollow_user(
             profile=ProfileSchema(following=False, **user_to_unfollow.model_dump())
         )
     except TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timeout")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")

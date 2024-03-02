@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Union
 
 from couchbase.exceptions import DocumentExistsException
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 
 from ..core.article import query_articles_by_slug
@@ -29,6 +29,63 @@ router = APIRouter(
 ARTICLE_COLLECTION = "article"
 
 
+async def build_query(filter_type: str, limit: int, offset: int) -> str:
+    """Builds SQL++ queries based on filter type and returns filter."""
+    base_query = f"""SELECT article.*
+        FROM article
+        ORDER BY article.createdAt
+        LIMIT {limit}
+        OFFSET {offset};
+    """
+    if filter_type == "author":
+        return f"""SELECT article.*
+            FROM article
+            WHERE article.author.username=$author
+            ORDER BY article.createdAt
+            LIMIT {limit}
+            OFFSET {offset};
+        """
+    elif filter_type == "favorited":
+        return f"""SELECT article.*
+            FROM article
+            WHERE $favoritedId IN article.favoritedUserIds
+            ORDER BY article.createdAt
+            LIMIT {limit}
+            OFFSET {offset};
+        """
+    elif filter_type == "tag":
+        return f"""SELECT article.*
+            FROM article
+            WHERE $tag IN article.tagList
+            ORDER BY article.createdAt
+            LIMIT {limit}
+            OFFSET {offset};
+        """
+    return base_query
+
+
+async def get_article_filter_type(
+    author: Union[str, None] = None,
+    favorited: Union[str, None] = None,
+    tag: Union[str, None] = None,
+) -> str:
+    """Queries db for article instances by author, favorited or tag with a limit and offset and returns multiple \
+        articles schema."""
+    if author:
+        return "author"
+    elif favorited:
+        return "favorited"
+    elif tag:
+        return "tag"
+    else:
+        return "all"
+    
+
+async def get_favorited_id(db, favorited: Union[str, None] = None):
+    favorited_user = await get_user_instance(db, username=favorited)
+    return favorited_user.id if favorited_user else None
+
+
 @router.get("/articles", response_model=MultipleArticlesResponseSchema)
 async def get_articles(
     author: Union[str, None] = None,
@@ -41,82 +98,9 @@ async def get_articles(
 ):
     """Queries db for article instances by author, favorited or tag with a limit and offset and returns multiple \
         articles schema."""
-    if author:
-        query = """
-            SELECT article.slug,
-                article.title,
-                article.description,
-                article.body,
-                article.tagList,
-                article.createdAt,
-                article.updatedAt,
-                article.author,
-                article.favoritedUserIds,
-                article.comments
-            FROM article as article
-            WHERE article.author.username=$author
-            ORDER BY article.createdAt
-            LIMIT $limit
-            OFFSET $offset;
-        """
-        favorited_id = None
-    elif favorited:
-        query = """
-            SELECT article.slug,
-                article.title,
-                article.description,
-                article.body,
-                article.tagList,
-                article.createdAt,
-                article.updatedAt,
-                article.author,
-                article.favoritedUserIds,
-                article.comments
-            FROM article as article
-            WHERE $favoritedId IN article.favoritedUserIds
-            ORDER BY article.createdAt
-            LIMIT $limit
-            OFFSET $offset;
-        """
-        favorited_user = await get_user_instance(db, username=favorited)
-        favorited_id = favorited_user.id
-    elif tag:
-        query = """
-            SELECT article.slug,
-                article.title,
-                article.description,
-                article.body,
-                article.tagList,
-                article.createdAt,
-                article.updatedAt,
-                article.author,
-                article.favoritedUserIds,
-                article.comments
-            FROM article as article
-            WHERE $tag IN article.tagList
-            ORDER BY article.createdAt
-            LIMIT $limit
-            OFFSET $offset;
-        """
-        favorited_id = None
-    else:
-        query = """
-            SELECT article.slug,
-                article.title,
-                article.description,
-                article.body,
-                article.tagList,
-                article.createdAt,
-                article.updatedAt,
-                article.author,
-                article.favoritedUserIds,
-                article.comments
-            FROM article as article
-            ORDER BY article.createdAt
-            LIMIT $limit
-            OFFSET $offset;
-        """
-        favorited_id = None
+    favorited_id = await get_favorited_id(db, favorited)
+    filter_type = await get_article_filter_type(author, favorited, tag)
+    query = await build_query(filter_type, limit, offset)
     if query is None:
         return MultipleArticlesResponseSchema(articles=[], articles_count=0)
     try:
@@ -133,9 +117,9 @@ async def get_articles(
             article_list, len(article_list), user_instance
         )
     except TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timeout")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
 
 
 @router.get("/articles/feed", response_model=MultipleArticlesResponseSchema)
@@ -147,17 +131,8 @@ async def get_feed_articles(
 ):
     """Query db for article instances by author (that current user follows) and returns multiple articles schema."""
     query = """
-            SELECT article.slug,
-                article.title,
-                article.description,
-                article.body,
-                article.tagList,
-                article.createdAt,
-                article.updatedAt,
-                article.author,
-                article.favoritedUserIds,
-                article.comments
-            FROM article as article
+            SELECT article.*
+            FROM article
             WHERE article.author.id IN $users_followed
             ORDER BY article.createdAt
             LIMIT $limit
@@ -175,9 +150,9 @@ async def get_feed_articles(
             articles=article_list, articlesCount=len(article_list)
         )
     except TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timeout")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
 
 
 @router.post("/articles", response_model=ArticleResponseSchema)
@@ -199,11 +174,11 @@ async def create_article(
             response_article, user_instance
         )
     except DocumentExistsException:
-        raise HTTPException(status_code=409, detail="Article already exists")
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Article already exists")
     except TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timeout")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
 
 
 @router.get("/articles/{slug}", response_model=ArticleResponseSchema)
@@ -243,9 +218,9 @@ async def update_article(
             article_instance, current_user
         )
     except TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timeout")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
 
 
 @router.post("/articles/{slug}/favorite", response_model=ArticleResponseSchema)
@@ -263,9 +238,9 @@ async def favorite_article(
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
         return ArticleResponseSchema.from_article_instance(article, current_user)
     except TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timeout")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
 
 
 @router.delete("/articles/{slug}/favorite", response_model=ArticleResponseSchema)
@@ -283,9 +258,9 @@ async def unfavorite_article(
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
         return ArticleResponseSchema.from_article_instance(article, current_user)
     except TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timeout")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
 
 
 @router.delete("/articles/{slug}")
@@ -301,6 +276,6 @@ async def delete_article(
     try:
         db.delete_document(ARTICLE_COLLECTION, article.slug)
     except TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timeout")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")

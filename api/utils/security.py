@@ -81,10 +81,8 @@ async def get_user_instance(
         """
     else:
         return None
-    
     queryResult = db.query(query, email=email, username=username)
     user_data = [r for r in queryResult]
-
     if not user_data:
         raise NotAuthenticatedException()
     else:
@@ -95,10 +93,8 @@ async def authenticate_user(email: str, password: str, db):
     """Queries db for user instance by email, compares password to instance's hashed password and returns user \
         instance if verified."""
     user = await get_user_instance(db, email=email)
-
     if not user or not verify_password(password, user.hashed_password):
         return False
-    
     return user
 
 
@@ -107,11 +103,9 @@ async def create_access_token(user: UserModel) -> str:
     token_content = TokenContentModel(username=user.username)
     expire = datetime.utcnow() + timedelta(minutes=SETTINGS.ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode = {"exp": expire, "sub": token_content.model_dump_json()}
-
     encoded_jwt = jwt.encode(
         to_encode, SETTINGS.SECRET_KEY.get_secret_value(), algorithm=SETTINGS.ALGORITHM
     )
-
     return str(encoded_jwt)
 
 
@@ -122,7 +116,6 @@ async def get_current_user_instance(
     """Decode JWT, queries db for user instance by username and returns user instance."""
     if token is None:
         raise NotAuthenticatedException()
-    
     try:
         payload = jwt.decode(
             token,
@@ -133,18 +126,14 @@ async def get_current_user_instance(
         raise CredentialsException()
     except JWTError:
         raise CredentialsException()
-    
     try:
         payload_model = json.loads(payload.get("sub"))
         token_content = TokenContentModel(**payload_model)
     except ValidationError:
         raise CredentialsException()
-    
     user = await get_user_instance(db, username=token_content.username)
-
     if user is None:
         raise CredentialsException()
-    
     return user
 
 

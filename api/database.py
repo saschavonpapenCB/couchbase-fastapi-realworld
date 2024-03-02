@@ -32,31 +32,24 @@ class CouchbaseClient(object):
         """Connect to the Couchbase cluster"""
         if self.cluster:
             return
-        
         logging.info("connecting to db")
-
         try:
             auth = PasswordAuthenticator(self.username, self.password)
-
             cluster_opts = ClusterOptions(auth)
             cluster_opts.apply_profile("wan_development")
-
             self.cluster = Cluster(self.conn_str, cluster_opts)
             self.cluster.wait_until_ready(timedelta(seconds=5))
             self.bucket = self.cluster.bucket(self.bucket_name)
         except CouchbaseException as error:
             self.connection_error(error)
-            
         if not self.check_scope_exists():
             logging.warning("Scope does not exist in the bucket. Ensure that you have the scope in your bucket.")
-
         self.scope = self.bucket.scope(self.scope_name)
     
     def connection_error(self, error: CouchbaseException) -> None:
         """Handle connection errors"""
         logging.error(f"Could not connect to the cluster. Error: {error}")
         logging.warning("Ensure that you have the bucket loaded in the cluster.")
-
 
     def check_scope_exists(self) -> bool:
         """Check if the scope exists in the bucket"""
@@ -103,16 +96,13 @@ def get_db():
     """Get Couchbase client"""
     load_dotenv()
     env_vars = ["DB_CONN_STR", "DB_USERNAME", "DB_PASSWORD", "DB_BUCKET_NAME", "DB_SCOPE_NAME"]
-
     try:
         conn_str, username, password, bucket_name, scope_name = (
             os.getenv(var) for var in env_vars
         )
-
         for env_var, var_name in zip([conn_str, username, password, bucket_name, scope_name], env_vars):
             if not env_var:
                 raise EmptyEnvironmentVariableError(var_name)
-
         return CouchbaseClient(conn_str, username, password, bucket_name, scope_name)
     except Exception as e:
         raise e

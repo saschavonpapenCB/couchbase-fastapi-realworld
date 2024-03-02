@@ -22,7 +22,6 @@ async def query_users_db(
         """
     else:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, details="No ID or username provided")
-    
     try:
         queryResult = db.query(query, id=id, username=username)
         response_data = [r for r in queryResult]

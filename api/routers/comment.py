@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Body, Depends, HTTPException
+from fastapi import APIRouter, Body, Depends, HTTPException, status
 from fastapi.encoders import jsonable_encoder
 
 from ..core.article import query_articles_by_slug
@@ -38,15 +38,14 @@ async def add_article_comment(
     article.comments = article.comments + (comment_instance,)
     try:
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
-        response_profile = ProfileSchema(**user_instance.model_dump())
-        response_comment = CommentSchema(
-            author=response_profile, **comment_instance.model_dump()
-        )
-        return SingleCommentResponseSchema(comment=response_comment)
+        return SingleCommentResponseSchema(comment=CommentSchema(
+            author=ProfileSchema(**user_instance.model_dump()),
+            **comment_instance.model_dump(),
+        ))
     except TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timeout")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
 
 
 @router.get("/articles/{slug}/comments", response_model=MultipleCommentsResponseSchema)
@@ -88,6 +87,6 @@ async def delete_article_comment(
         else:
             raise CommentNotFoundException()
     except TimeoutError:
-        raise HTTPException(status_code=408, detail="Request timeout")
+        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Unexpected error: {e}")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
