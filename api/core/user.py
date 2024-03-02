@@ -21,7 +21,10 @@ async def query_users_db(
             SELECT client.* FROM client WHERE client.username=$username;
         """
     else:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, details="No ID or username provided")
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            details="No ID or username provided",
+        )
     try:
         queryResult = db.query(query, id=id, username=username)
         response_data = [r for r in queryResult]
@@ -30,6 +33,11 @@ async def query_users_db(
         else:
             return UserModel(**response_data[0])
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}",
+        )

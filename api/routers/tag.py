@@ -26,6 +26,11 @@ async def get_tags(db=Depends(get_db)):
         else:
             return TagsResponseSchema(tags=[])
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}",
+        )

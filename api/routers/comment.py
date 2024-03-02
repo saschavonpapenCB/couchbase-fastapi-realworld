@@ -38,14 +38,21 @@ async def add_article_comment(
     article.comments = article.comments + (comment_instance,)
     try:
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
-        return SingleCommentResponseSchema(comment=CommentSchema(
-            author=ProfileSchema(**user_instance.model_dump()),
-            **comment_instance.model_dump(),
-        ))
+        return SingleCommentResponseSchema(
+            comment=CommentSchema(
+                author=ProfileSchema(**user_instance.model_dump()),
+                **comment_instance.model_dump(),
+            )
+        )
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}",
+        )
 
 
 @router.get("/articles/{slug}/comments", response_model=MultipleCommentsResponseSchema)
@@ -87,6 +94,11 @@ async def delete_article_comment(
         else:
             raise CommentNotFoundException()
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}",
+        )

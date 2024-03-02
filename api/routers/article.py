@@ -79,7 +79,7 @@ async def get_article_filter_type(
         return "tag"
     else:
         return "all"
-    
+
 
 async def get_favorited_id(db, favorited: Union[str, None] = None):
     favorited_user = await get_user_instance(db, username=favorited)
@@ -117,9 +117,14 @@ async def get_articles(
             article_list, len(article_list), user_instance
         )
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}",
+        )
 
 
 @router.get("/articles/feed", response_model=MultipleArticlesResponseSchema)
@@ -150,9 +155,14 @@ async def get_feed_articles(
             articles=article_list, articlesCount=len(article_list)
         )
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}"
+        )
 
 
 @router.post("/articles", response_model=ArticleResponseSchema)
@@ -174,11 +184,18 @@ async def create_article(
             response_article, user_instance
         )
     except DocumentExistsException:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Article already exists")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="Article already exists"
+        )
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}",
+        )
 
 
 @router.get("/articles/{slug}", response_model=ArticleResponseSchema)
@@ -218,9 +235,14 @@ async def update_article(
             article_instance, current_user
         )
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}",
+        )
 
 
 @router.post("/articles/{slug}/favorite", response_model=ArticleResponseSchema)
@@ -238,9 +260,14 @@ async def favorite_article(
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
         return ArticleResponseSchema.from_article_instance(article, current_user)
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}"
+        )
 
 
 @router.delete("/articles/{slug}/favorite", response_model=ArticleResponseSchema)
@@ -258,9 +285,14 @@ async def unfavorite_article(
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
         return ArticleResponseSchema.from_article_instance(article, current_user)
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}"
+        )
 
 
 @router.delete("/articles/{slug}")
@@ -276,6 +308,11 @@ async def delete_article(
     try:
         db.delete_document(ARTICLE_COLLECTION, article.slug)
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}",
+        )

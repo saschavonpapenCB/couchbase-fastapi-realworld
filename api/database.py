@@ -17,7 +17,14 @@ from .core.exceptions import EmptyEnvironmentVariableError
 class CouchbaseClient(object):
     """Class to handle interactions with Couchbase cluster"""
 
-    def __init__(self, conn_str: str, username: str, password: str, bucket_name: str, scope_name: str):
+    def __init__(
+            self,
+            conn_str: str,
+            username: str,
+            password: str,
+            bucket_name: str,
+            scope_name: str
+        ):
         self.cluster = None
         self.bucket = None
         self.scope = None
@@ -43,9 +50,11 @@ class CouchbaseClient(object):
         except CouchbaseException as error:
             self.connection_error(error)
         if not self.check_scope_exists():
-            logging.warning("Scope does not exist in the bucket. Ensure that you have the scope in your bucket.")
+            logging.warning(
+                "Scope does not exist in the bucket. Ensure that you have the scope in your bucket."
+            )
         self.scope = self.bucket.scope(self.scope_name)
-    
+
     def connection_error(self, error: CouchbaseException) -> None:
         """Handle connection errors"""
         logging.error(f"Could not connect to the cluster. Error: {error}")
@@ -59,7 +68,9 @@ class CouchbaseClient(object):
             ]
             return self.scope_name in scopes_in_bucket
         except Exception:
-            logging.error("Error fetching scopes in cluster. \nEnsure that the bucket exists.")
+            logging.error(
+                "Error fetching scopes in cluster. \nEnsure that the bucket exists."
+            )
             return False
 
     def close(self) -> None:
@@ -95,12 +106,20 @@ class CouchbaseClient(object):
 def get_db():
     """Get Couchbase client"""
     load_dotenv()
-    env_vars = ["DB_CONN_STR", "DB_USERNAME", "DB_PASSWORD", "DB_BUCKET_NAME", "DB_SCOPE_NAME"]
+    env_vars = [
+        "DB_CONN_STR",
+        "DB_USERNAME",
+        "DB_PASSWORD",
+        "DB_BUCKET_NAME",
+        "DB_SCOPE_NAME",
+    ]
     try:
         conn_str, username, password, bucket_name, scope_name = (
             os.getenv(var) for var in env_vars
         )
-        for env_var, var_name in zip([conn_str, username, password, bucket_name, scope_name], env_vars):
+        for env_var, var_name in zip(
+            [conn_str, username, password, bucket_name, scope_name], env_vars
+        ):
             if not env_var:
                 raise EmptyEnvironmentVariableError(var_name)
         return CouchbaseClient(conn_str, username, password, bucket_name, scope_name)

@@ -42,11 +42,18 @@ async def register(
             user=UserSchema(token=token, **user_model.model_dump())
         )
     except DocumentExistsException:
-        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="User already exists")
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT, detail="User already exists"
+        )
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}",
+        )
 
 
 @router.post("/users/login", response_model=UserResponseSchema)
@@ -87,6 +94,11 @@ async def update_user(
             user=UserSchema(token=token, **user_instance.model_dump())
         )
     except TimeoutError:
-        raise HTTPException(status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout")
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Unexpected error: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}",
+        )
