@@ -1,5 +1,5 @@
 bcrypt==4.1.2
-couchbase==4.1.11
+couchbase==4.1.12
 fastapi==0.110.0
 passlib==1.7.4
 pydantic-settings==2.1.0
