@@ -1,10 +1,9 @@
-import pytest
 from fastapi.testclient import TestClient
-from starlette.status import HTTP_200_OK
 
 from ..main import api
 
 client = TestClient(api)
+
 
 class TestArticle:
     def test_read_article(
@@ -16,10 +15,7 @@ class TestArticle:
             "title": "Example Article Title",
             "description": "Example article description.",
             "body": "Example article body.",
-            "tagList": [
-                "ExampleTag1",
-                "ExampleTag2"
-            ],
+            "tagList": ["ExampleTag1", "ExampleTag2"],
             "createdAt": "2024-03-06T09:05:14.377741",
             "updatedAt": "2024-03-06T09:05:14.377748",
             "author": {
@@ -29,7 +25,7 @@ class TestArticle:
                 "hashed_password": "68b77a946d17400f0cca8ddd86b145015e5d01cb89c8d953bb4067adebb91fbe",
                 "bio": None,
                 "image": None,
-                "following_ids": []
+                "following_ids": [],
             },
             "favoritedUserIds": [],
             "comments": [],

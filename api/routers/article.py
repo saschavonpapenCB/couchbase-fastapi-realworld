@@ -161,7 +161,7 @@ async def get_feed_articles(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unexpected error: {e}"
+            detail=f"Unexpected error: {e}",
         )
 
 
@@ -266,7 +266,7 @@ async def favorite_article(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unexpected error: {e}"
+            detail=f"Unexpected error: {e}",
         )
 
 
@@ -291,7 +291,7 @@ async def unfavorite_article(
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Unexpected error: {e}"
+            detail=f"Unexpected error: {e}",
         )
 
 

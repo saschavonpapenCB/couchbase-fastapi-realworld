@@ -18,13 +18,13 @@ class CouchbaseClient(object):
     """Class to handle interactions with Couchbase cluster"""
 
     def __init__(
-            self,
-            conn_str: str,
-            username: str,
-            password: str,
-            bucket_name: str,
-            scope_name: str
-        ):
+        self,
+        conn_str: str,
+        username: str,
+        password: str,
+        bucket_name: str,
+        scope_name: str
+    ):
         self.cluster = None
         self.bucket = None
         self.scope = None
