@@ -1,9 +1,9 @@
 import pytest
 from couchbase.exceptions import DocumentNotFoundException
-from ..database import get_db  
 
-BASE = "http://127.0.0.1:8000"
-BASE_URI = f"{BASE}/api/v1"
+from ..database import get_db
+
+BASE_URI = "http://127.0.0.1:8000"
 
 @pytest.fixture(scope="session")
 def couchbase_client():
@@ -12,7 +12,7 @@ def couchbase_client():
 
 @pytest.fixture(scope="module")
 def article_api():
-    return f"{BASE_URI}/article"
+    return f"{BASE_URI}/articles"
 
 @pytest.fixture(scope="module")
 def article_collection():
