@@ -12,10 +12,6 @@ This codebase was created to demonstrate a fully fledged fullstack application b
 For more information on how to this works with other frontends/backends, head over to the [RealWorld](https://github.com/gothinkster/realworld) repository.
 
 
-# How it works
-
-> COMING SOON
-
 ## Prerequisites
 
 To run this prebuilt project, you will need:
@@ -70,6 +66,21 @@ DB_SCOPE_NAME=<scope_name>
 ```
 
 > Note: The connection string expects the `couchbases://` or `couchbase://` part.
+
+### Setup JWT Token Configureation
+
+Create a random secret key that will be used to sign the JWT tokens.
+
+To generate a secure random secret key use the command:
+
+```
+./scripts/generate-secret-key.sh
+```
+
+And copy the output to the JWT_SECRET environment variable in the .env file.
+
+> Note: The CORS_ALLOWED_ORIGINS, CORS_ALLOWED_METHODS and CORS_ALLOWED_HEADERS environment variables can be left blank unless specific CORS options are required.
+
 
 ## Running The API
 
