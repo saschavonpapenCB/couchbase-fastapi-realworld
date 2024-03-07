@@ -23,7 +23,7 @@ class CouchbaseClient(object):
         username: str,
         password: str,
         bucket_name: str,
-        scope_name: str
+        scope_name: str,
     ):
         self.cluster = None
         self.bucket = None
