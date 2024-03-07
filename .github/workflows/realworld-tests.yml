@@ -21,6 +21,7 @@ jobs:
       DB_SCOPE_NAME: ${{ vars.DB_SCOPE_NAME }}
       DB_USERNAME: ${{ vars.DB_USERNAME }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
 
     steps:
       - uses: actions/checkout@v1
