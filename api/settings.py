@@ -1,12 +1,13 @@
+import os
 from pydantic import Field
 from pydantic.types import SecretStr
 from pydantic_settings import BaseSettings
+from dotenv import load_dotenv
 
 
 class _Settings(BaseSettings):
-    SECRET_KEY: SecretStr = Field(
-        "a91e4985fb8dc2120b9aa9dd5c891b1c9f1127c74edd7080413359bd5fee9b54"
-    )
+    load_dotenv()
+    SECRET_KEY: SecretStr = Field(os.getenv("JWT_SECRET"))
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
