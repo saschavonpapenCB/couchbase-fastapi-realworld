@@ -1,5 +1,6 @@
 import logging
 import sys
+import os
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
@@ -41,12 +42,16 @@ logging.basicConfig(
 )
 
 
+allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
+allowed_methods = os.getenv("CORS_ALLOWED_METHODS", "GET, POST, PUT, DELETE")
+allowed_headers = os.getenv("CORS_ALLOWED_HEADERS", "*")
+
 api.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[allowed_origins],
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=allowed_methods.split(","),
+    allow_headers=allowed_headers.split(","),
 )
 
 
