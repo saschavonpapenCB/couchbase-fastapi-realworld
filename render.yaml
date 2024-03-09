@@ -1,5 +1,6 @@
 services:
-  - name: couchbase-fastapi-realworld
+  - type: web
+    name: couchbase-fastapi-realworld
     runtime: docker
     branch: master
     numInstances: 1
