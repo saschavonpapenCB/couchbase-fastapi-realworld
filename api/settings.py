@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings
 
 class _Settings(BaseSettings):
     load_dotenv()
-    SECRET_KEY: SecretStr = Field(os.getenv("JWT_SECRET"))
+    SECRET_KEY: SecretStr = Field(os.environ.get("JWT_SECRET"))
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
