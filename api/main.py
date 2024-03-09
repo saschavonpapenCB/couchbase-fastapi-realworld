@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import RedirectResponse
 
 from .database import get_db
 from .routers.article import router as article_router
@@ -65,3 +66,8 @@ api.include_router(comment_router, tags=["comments"])
 api.include_router(profile_router, tags=["profiles"])
 api.include_router(tag_router, tags=["tags"])
 api.include_router(user_router, tags=["users"])
+
+
+@api.get("/", include_in_schema=False)
+def redirect_to_docs():
+    return RedirectResponse(url="/docs")
