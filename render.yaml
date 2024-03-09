@@ -1,9 +1,10 @@
 version: '3.8'
 
 services:
-  myapp:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    ports:
-      - "8080:8080"
+  - type: web
+    name: couchbase-fastapi-realworld
+    runtime: docker
+    region: singapore
+    branch: master
+    numInstances: 1
+    healthCheckPath: /
