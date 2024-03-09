@@ -1,8 +1,6 @@
 services:
-  - type: web
-    name: couchbase-fastapi-realworld
+  - name: couchbase-fastapi-realworld
     runtime: docker
-    region: singapore
     branch: master
     numInstances: 1
     healthCheckPath: /
