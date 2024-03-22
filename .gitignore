@@ -105,3 +105,25 @@ venv.bak/
 
 # macOS specific
 .DS_Store
+
+# Terraform
+.terraform.lock.hcl
+main.tfplan
+**/.terraform/*
+
+*.tfstate
+*.tfstate.*
+
+crash.log
+crash.*.log
+
+*.tfvars
+*.tfvars.json
+
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+.terraformrc
+terraform.rc
