@@ -1,0 +1,14 @@
+version: '3'
+services:
+  frontend:
+    build:
+      dockerfile: ./Dockerfile.frontend
+    ports:
+      - "80:4200"
+    depends_on:
+      - backend
+  backend:
+    build:
+      dockerfile: ./Dockerfile.backend
+    ports:
+      - "8000:8000"
