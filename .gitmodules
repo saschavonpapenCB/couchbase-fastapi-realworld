@@ -1,3 +1,6 @@
 [submodule "realworld"]
 	path = realworld
 	url = https://github.com/gothinkster/realworld
+[submodule "angular-conduit-signals"]
+	path = angular-conduit-signals
+	url = https://github.com/AndyT2503/angular-conduit-signals
