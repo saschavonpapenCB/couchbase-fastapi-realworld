@@ -49,7 +49,7 @@ allowed_headers = os.getenv("CORS_ALLOWED_HEADERS", "*")
 
 api.add_middleware(
     CORSMiddleware,
-    allow_origins=[allowed_origins],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=allowed_methods.split(","),
     allow_headers=allowed_headers.split(","),
