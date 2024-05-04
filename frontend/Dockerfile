@@ -2,20 +2,20 @@ FROM node:alpine AS build
 
 WORKDIR /app
 
-COPY frontend/angular-conduit-signals/package*.json ./
+COPY angular-conduit-signals/package*.json ./
 
 RUN npm install
 
 RUN npx ngcc --properties es2023 browser module main --first-only --create-ivy-entry-points
 
-COPY ./frontend/angular-conduit-signals .
+COPY ./angular-conduit-signals .
 
 RUN npm run build
 
 
 FROM nginx:stable
 
-COPY ./frontend/default.conf /etc/nginx/conf.d
+COPY default.conf /etc/nginx/conf.d
 
 COPY --from=build /app/dist/angular-conduit-signals/ usr/share/nginx/html
 

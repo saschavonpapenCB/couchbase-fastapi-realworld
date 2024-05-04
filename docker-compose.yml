@@ -2,7 +2,7 @@ version: '3'
 services:
   backend:
     build:
-      dockerfile: ./Dockerfile.backend
+      dockerfile: ./api/Dockerfile
     ports:
       - "8000:8000"
     networks:
@@ -10,7 +10,7 @@ services:
 
   frontend:
     build:
-      dockerfile: ./Dockerfile.frontend
+      dockerfile: ./frontend/Dockerfile
     ports:
       - "80:80"
     networks:
