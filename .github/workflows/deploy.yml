@@ -45,7 +45,6 @@ jobs:
         
       - name: Build and push Docker image
         run: |
-          cd frontend
           docker buildx create --use
           docker buildx inspect --bootstrap
           docker buildx build --platform linux/arm64 -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_FRONTEND_IMAGE:latest --push .
