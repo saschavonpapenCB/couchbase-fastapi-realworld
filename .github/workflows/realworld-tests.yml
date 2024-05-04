@@ -31,7 +31,7 @@ jobs:
         run: |
           sudo apt -y update
           sudo apt -y install python3-pip python3-testresources
-          python -m pip install -r requirements.txt
+          python -m pip install -r api/requirements.txt
       - name: Start the FastAPI server
         run: |
           ./scripts/start-api.sh &
