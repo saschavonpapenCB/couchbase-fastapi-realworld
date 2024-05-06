@@ -15,7 +15,7 @@ RUN npm run build
 
 FROM nginx:stable
 
-COPY default.conf /etc/nginx/conf.d
+COPY ./default.conf /etc/nginx/conf.d
 
 COPY --from=build /app/dist/angular-conduit-signals/ usr/share/nginx/html
 
