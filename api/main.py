@@ -43,21 +43,17 @@ logging.basicConfig(
 )
 
 
-#allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS")
-#allowed_methods = os.getenv("CORS_ALLOWED_METHODS")
-#allowed_headers = os.getenv("CORS_ALLOWED_HEADERS")
+allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
+allowed_methods = os.getenv("CORS_ALLOWED_METHODS", "GET,POST,PUT,DELETE")
+allowed_headers = os.getenv("CORS_ALLOWED_HEADERS", "*")
 
-allowed_origins = [
-    "http://localhost",
-    "http://localhost:80"
-]
 
 api.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
     allow_credentials=True,
-    allow_methods=["*"], #allowed_methods.split(","),
-    allow_headers=["*"], #allowed_headers.split(","),
+    allow_methods=allowed_methods.split(","),
+    allow_headers=allowed_headers.split(","),
 )
 
 
