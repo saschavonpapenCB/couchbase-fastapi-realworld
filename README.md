@@ -116,7 +116,7 @@ To run RealWorld API tests, use the following command:
 ```
 ./scripts/realworld-test.sh
 ```
-
+test
 To run tests, use the following command:
 
 ```
