@@ -82,7 +82,7 @@ jobs:
           run: echo I am deploying!
 
   FrontendTestDeploy:
-    name: Deploy to Test Env
+    name: Deploy Frontend to Test Env
     if: github.event.ref == 'refs/heads/master'
     needs: [Setup]
     runs-on: ubuntu-latest
