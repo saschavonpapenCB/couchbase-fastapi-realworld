@@ -61,7 +61,7 @@ jobs:
   FrontendDevDeploy:
     name: Deploy Frontend to Dev Env
     if: github.event_name == 'pull_request'
-    needs: [BackendDevDeploy]
+    needs: [Setup]
     runs-on: ubuntu-latest
     environment:
       name: development
@@ -84,7 +84,7 @@ jobs:
   FrontendTestDeploy:
     name: Deploy to Test Env
     if: github.event.ref == 'refs/heads/master'
-    needs: [BackendTestDeploy]
+    needs: [Setup]
     runs-on: ubuntu-latest
     environment:
       name: testing
@@ -95,7 +95,7 @@ jobs:
 
   BackendQADeploy:
     name: Deploy Backend to QA Env
-    needs: [FrontendTestDeploy]
+    needs: [FrontendTestDeploy, BackendTestDeploy]
     runs-on: ubuntu-latest
     environment:
       name: QA
@@ -106,7 +106,7 @@ jobs:
 
   FrontendQADeploy:
     name: Deploy Backend to QA Env
-    needs: [FrontendTestDeploy]
+    needs: [FrontendTestDeploy, BackendTestDeploy]
     runs-on: ubuntu-latest
     environment:
       name: QA
