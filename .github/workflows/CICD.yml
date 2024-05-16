@@ -15,8 +15,8 @@ jobs:
         run: echo setting up!
           
 
-  DevDeploy:
-    name: Deploy to Dev Env
+  BackendDevDeploy:
+    name: Deploy Backend to Dev Env
     if: github.event_name == 'pull_request'
     needs: [Setup]
     runs-on: ubuntu-latest
@@ -55,11 +55,23 @@ jobs:
           cd frontend
           docker buildx create --use
           docker buildx inspect --bootstrap
-          docker buildx build --platform linux/arm64 -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_FRONTEND_IMAGE:latest --push .
+          docker buildx build --platform linux/arm64 -t ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com/$ECR_BACKEND_IMAGE:latest --push .
+
+      
+  FrontendDevDeploy:
+    name: Deploy Frontend to Dev Env
+    if: github.event_name == 'pull_request'
+    needs: [BackendDevDeploy]
+    runs-on: ubuntu-latest
+    environment:
+      name: development
+    steps:
+      - name: Placeholder
+        run: echo I am deploying!
 
     
-  TestDeploy:
-    name: Deploy to Test Env
+  BackendTestDeploy:
+    name: Deploy Backend to Test Env
     if: github.event.ref == 'refs/heads/master'
     needs: [Setup]
     runs-on: ubuntu-latest
@@ -69,10 +81,32 @@ jobs:
         - name: Placeholder
           run: echo I am deploying!
 
+  FrontendTestDeploy:
+    name: Deploy to Test Env
+    if: github.event.ref == 'refs/heads/master'
+    needs: [BackendTestDeploy]
+    runs-on: ubuntu-latest
+    environment:
+      name: testing
+    steps:
+      - name: Placeholder
+        run: echo I am deploying!
 
-  QADeploy:
-    name: Deploy to QA Env
-    needs: [TestDeploy]
+
+  BackendQADeploy:
+    name: Deploy Backend to QA Env
+    needs: [FrontendTestDeploy]
+    runs-on: ubuntu-latest
+    environment:
+      name: QA
+    steps:
+      - name: Placeholder
+        run: echo I am deploying!
+
+
+  FrontendQADeploy:
+    name: Deploy Backend to QA Env
+    needs: [FrontendTestDeploy]
     runs-on: ubuntu-latest
     environment:
       name: QA
