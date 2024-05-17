@@ -98,7 +98,7 @@ jobs:
             -var 'iam_role=${{ secrets.AWS_GITHUB_ACCESS_ROLE }}' \
             -var 'aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}' \
             -auto-approve
-        working-directory: ${{ github.action_path }}
+        working-directory: ${{ github.action_path }}/infrastructure
 
 
       - name: Login to Amazon ECR
