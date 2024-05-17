@@ -115,12 +115,6 @@ jobs:
         working-directory: ./infrastructure
 
 
-      - name: Debug Directory Contents # TBR
-        run: |
-          ls -la ${{ github.action_path }}
-        working-directory: ./infrastructure
-
-
       - name: TF apply (Create ECR repo)
         shell: bash
         run: |
