@@ -79,13 +79,13 @@ jobs:
             -backend-config='key=docker-ecr/terraform-${{ vars.BACKEND_ECR_REPO_NAME }}.tfstate' \
             -backend-config='dynamodb_table=${{ vars.BACKEND_DYNAMODB_TABLE }}' \
             -backend-config='role_arn=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}'
-        working-directory: ${{ github.action_path }}/infrastructure
+        working-directory: ./infrastructure
 
 
       - name: Debug Directory Contents # TBR
         run: |
           ls -la ${{ github.action_path }}
-        working-directory: ${{ github.action_path }}/infrastructure
+        working-directory: ./infrastructure
 
 
       - name: TF apply (Create ECR repo)
@@ -98,7 +98,7 @@ jobs:
             -var 'iam_role=${{ secrets.AWS_GITHUB_ACCESS_ROLE }}' \
             -var 'aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}' \
             -auto-approve
-        working-directory: ${{ github.action_path }}/infrastructure
+        working-directory: ./infrastructure
 
 
       - name: Login to Amazon ECR
