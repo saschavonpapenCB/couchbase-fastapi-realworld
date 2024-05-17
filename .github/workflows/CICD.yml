@@ -78,7 +78,7 @@ jobs:
             -backend-config='bucket=${{ vars.BACKEND_S3_BUCKET }}' \
             -backend-config='key=docker-ecr/terraform-${{ vars.BACKEND_ECR_REPO_NAME }}.tfstate' \
             -backend-config='dynamodb_table=${{ vars.BACKEND_DYNAMODB_TABLE }}' \
-            -backend-config='role_arn=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}'
+            -backend-config='role_arn=${{ secrets.AWS_GITHUB_ACCESS_ROLE }}'
         working-directory: ./infrastructure
 
 
@@ -95,7 +95,7 @@ jobs:
           terraform apply \
             -var 'repository_name=${{ vars.BACKEND_ECR_REPO_NAME }}' \
             -var 'lifecycle_policy=./policy.json' \
-            -var 'iam_role=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}' \
+            -var 'iam_role=${{ secrets.AWS_GITHUB_ACCESS_ROLE }}' \
             -var 'aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}' \
             -auto-approve
         working-directory: ./infrastructure
