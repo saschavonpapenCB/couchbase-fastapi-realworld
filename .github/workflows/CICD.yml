@@ -74,6 +74,7 @@ jobs:
           REGION=${{ vars.AWS_REGION }}
           if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2&gt;/dev/null; then
             aws s3api create-bucket --bucket "$BUCKET_NAME" --region "$REGION" --create-bucket-configuration LocationConstraint="$REGION"
+            echo "Bucket $BUCKET_NAME created in $REGION"
           else
             echo "Bucket $BUCKET_NAME already exists"
           fi
