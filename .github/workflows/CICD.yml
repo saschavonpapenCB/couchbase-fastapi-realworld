@@ -70,7 +70,7 @@ jobs:
         shell: bash
         run: |
           set -eux
-          BUCKET_NAME=saschavonpapencb-${{ vars.BACKEND_S3_BUCKET }}
+          BUCKET_NAME=${{ vars.BACKEND_S3_BUCKET }}${{ secrets.AWS_ACCOUNT_ID }}
           REGION=${{ vars.AWS_REGION }}
           if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
             aws s3api create-bucket --bucket "$BUCKET_NAME" --region "$REGION" --create-bucket-configuration LocationConstraint="$REGION"
@@ -89,7 +89,7 @@ jobs:
             -backend-config='skip_region_validation=true' \
             -backend-config='skip_credentials_validation=true' \
             -backend-config='region=${{ vars.AWS_REGION }}' \
-            -backend-config='bucket=${{ vars.BACKEND_S3_BUCKET }}' \
+            -backend-config='bucket=${{ vars.BACKEND_S3_BUCKET }}${{ secrets.AWS_ACCOUNT_ID }}' \
             -backend-config='key=docker-ecr/terraform-${{ vars.BACKEND_ECR_REPO_NAME }}.tfstate' \
             -backend-config='dynamodb_table=${{ vars.BACKEND_DYNAMODB_TABLE }}' \
             -backend-config='role_arn=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}'
