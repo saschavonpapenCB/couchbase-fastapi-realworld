@@ -78,7 +78,7 @@ jobs:
             -backend-config='bucket=${{ vars.BACKEND_S3_BUCKET }}' \
             -backend-config='key=docker-ecr/terraform-${{ vars.BACKEND_ECR_REPO_NAME }}.tfstate' \
             -backend-config='dynamodb_table=${{ vars.BACKEND_DYNAMODB_TABLE }}' \
-            -backend-config='assume_role.role_arn=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}'
+            -backend-config='role_arn=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}'
         working-directory: ./infrastructure
 
 
