@@ -70,7 +70,7 @@ jobs:
         shell: bash
         run: |
           set -eux
-          BUCKET_NAME=${{ vars.BACKEND_S3_BUCKET }}
+          BUCKET_NAME=saschavonpapenCB-${{ vars.BACKEND_S3_BUCKET }}
           REGION=${{ vars.AWS_REGION }}
           if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
             aws s3api create-bucket --bucket "$BUCKET_NAME" --region "$REGION" --create-bucket-configuration LocationConstraint="$REGION"
