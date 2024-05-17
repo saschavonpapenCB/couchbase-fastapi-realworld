@@ -45,7 +45,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
-          aws-region: ${{ vars.AWS_DEFAULT_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
           role-session-name: GitHub-OIDC-Terraform
 
 
@@ -74,11 +74,11 @@ jobs:
             -backend-config='skip_metadata_api_check=true' \
             -backend-config='skip_region_validation=true' \
             -backend-config='skip_credentials_validation=true' \
-            -backend-config='region=${{ vars.AWS_DEFAULT_REGION }}' \
-            -backend-config='bucket=${{ inputs.backend_s3_bucket }}' \
+            -backend-config='region=${{ vars.AWS_REGION }}' \
+            -backend-config='bucket=${{ vars.BACKEND_S3_BUCKET }}' \
             -backend-config='key=docker-ecr/terraform-${{ vars.BACKEND_ECR_REPO_NAME }}.tfstate' \
-            -backend-config='dynamodb_table=${{ inputs.backend_dynamodb_table }}' \
-            -backend-config='role_arn=arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ inputs.backend_iam_role }}'
+            -backend-config='dynamodb_table=${{ vars.BACKEND_DYNAMODB_TABLE }}' \
+            -backend-config='role_arn=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}'
         working-directory: ${{ github.action_path }}
 
 
@@ -88,8 +88,8 @@ jobs:
           set -eux
           terraform apply \
             -var 'repository_name=${{ vars.BACKEND_ECR_REPO_NAME }}' \
-            -var 'lifecycle_policy=${{ inputs.lifecycle_policy_file }}' \
-            -var 'iam_role=arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/${{ inputs.github_iam_role }}' \
+            -var 'lifecycle_policy=./policy.json' \
+            -var 'iam_role=${{ secrets.AWS_GITHUB_ACCESS_ROLE }}' \
             -var 'aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}' \
             -auto-approve
           working-directory: ${{ github.action_path }}
