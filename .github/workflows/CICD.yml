@@ -7,21 +7,48 @@ on:
     branches: [ master ]
   workflow_dispatch:
 
+# concurrency required to avoid terraform lock contention during ECR provisioning
+concurrency: cicd-${{ github.repository }}-pipeline
 
 jobs:
-  Setup:
+
+  Setup: # Bolster
     runs-on: ubuntu-latest
     steps:
       - name: Placeholder
         run: echo setting up!
 
 
-  call-deploy-backend:
+  deploy-dev:
+    name: Deploy FE & BE to Dev Env
     if: github.event_name == 'pull_request'
     needs: [Setup]
-    uses: ./.github/workflows/deploy-backend.yml
+    uses: ./.github/workflows/deploy-fe-be.yml
     with:
         environment: development
+        AWS_REGION: ${{ vars.AWS_REGION }}
+    secrets:
+        AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
+        
+            
+  deploy-test:
+    name: Deploy FE & BE to Test Env
+    if: github.event.ref == 'refs/heads/master'
+    needs: [Setup]
+    uses: ./.github/workflows/deploy-fe-be.yml
+    with:
+        environment: testing
+        AWS_REGION: ${{ vars.AWS_REGION }}
+    secrets:
+        AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
+        
+        
+  deploy-qa:
+    name: Deploy FE & BE to QA Env
+    needs: [deploy-test]
+    uses: ./.github/workflows/deploy-fe-be.yml
+    with:
+        environment: qa
         AWS_REGION: ${{ vars.AWS_REGION }}
     secrets:
         AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}

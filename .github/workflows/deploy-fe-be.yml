@@ -1,4 +1,4 @@
-name: Deploy Backend
+name: Deploy FE + BE
 
 on:
   workflow_call:
@@ -13,12 +13,9 @@ on:
       AWS_GITHUB_ACCESS_ROLE:
         required: true
 
-# concurrency required to avoid terraform lock contention during ECR provisioning
-concurrency: cicd-${{ github.repository }}-pipeline
-
 jobs:
-  BackendDevDeploy:
-    name: Deploy Backend to Dev Env
+  DeployBackend:
+    name: Deploy Backend
     runs-on: ubuntu-latest
 
     environment:
@@ -130,11 +127,11 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
         with:
           registries: ${{ secrets.AWS_ACCOUNT_ID }}
-          mask-password: "true" # see: https://github.com/aws-actions/amazon-ecr-login#docker-credentials
+          mask-password: "true"
   
 
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-publish
+      - name: Build, tag, and push backend image to Amazon ECR
+        id: build-publish-backend
         shell: bash
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
@@ -147,58 +144,17 @@ jobs:
           echo "image_tag=$IMAGE_TAG" 
           echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-      
-  FrontendDevDeploy:
-    name: Deploy Frontend to Dev Env
-    if: github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
-    environment:
-      name: development
-    steps:
-      - name: Placeholder
-        run: echo I am deploying!
 
-    
-  BackendTestDeploy:
-    name: Deploy Backend to Test Env
-    if: github.event.ref == 'refs/heads/master'
-    # Add needs
-    runs-on: ubuntu-latest
-    environment:
-        name: testing
-    steps:
-        - name: Placeholder
-          run: echo I am deploying!
-
-  FrontendTestDeploy:
-    name: Deploy Frontend to Test Env
-    if: github.event.ref == 'refs/heads/master'
-    # Add needs
-    runs-on: ubuntu-latest
-    environment:
-      name: testing
-    steps:
-      - name: Placeholder
-        run: echo I am deploying!
-
-
-  BackendQADeploy:
-    name: Deploy Backend to QA Env
-    needs: [FrontendTestDeploy, BackendTestDeploy]
-    runs-on: ubuntu-latest
-    environment:
-      name: QA
-    steps:
-      - name: Placeholder
-        run: echo I am deploying!
-
-
-  FrontendQADeploy:
-    name: Deploy Backend to QA Env
-    needs: [FrontendTestDeploy, BackendTestDeploy]
-    runs-on: ubuntu-latest
-    environment:
-      name: QA
-    steps:
-      - name: Placeholder
-        run: echo I am deploying!
+      - name: Build, tag, and push image to Amazon ECR
+        id: build-publish-frontend
+        shell: bash
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ vars.FRONTEND_ECR_REPO_NAME }}
+          IMAGE_TAG: snapshot-${{ vars.FRONTEND_IMAGE_TAG }}
+        run: |
+          docker build "./frontend" -f "./frontend/Dockerfile" -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
+          echo "image_tag=$IMAGE_TAG" 
+          echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
