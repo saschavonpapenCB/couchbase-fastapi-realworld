@@ -3,10 +3,6 @@ name: Deploy Backend
 on:
   workflow_call:
 
-permissions:
-  id-token: write
-  contents: read
-
 # concurrency required to avoid terraform lock contention during ECR provisioning
 concurrency: cicd-${{ github.repository }}-pipeline
 
@@ -17,6 +13,10 @@ jobs:
 
     environment:
       name: development
+
+    permissions:
+      id-token: write
+      contents: read
 
     outputs:
       image_tag: ${{ steps.build-publish.outputs.image_tag }} #change
@@ -29,7 +29,7 @@ jobs:
 
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@master
         with:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
           aws-region: ${{ vars.AWS_REGION }}
