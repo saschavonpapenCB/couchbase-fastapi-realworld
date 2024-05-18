@@ -15,8 +15,8 @@ jobs:
   Start:
     runs-on: ubuntu-latest
     steps:
-      - name: Begin
-        run: echo Beginning env dependent jobs...
+      - name: Begin Message
+        run: echo Beginning deployment!
 
 
   deploy-dev:
