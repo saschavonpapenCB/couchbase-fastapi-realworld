@@ -20,3 +20,8 @@ jobs:
     if: github.event_name == 'pull_request'
     needs: [Setup]
     uses: ./.github/workflows/deploy-backend.yml
+    with:
+        environment: development
+        AWS_REGION: ${{ vars.AWS_REGION }}
+    secrets:
+        AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}

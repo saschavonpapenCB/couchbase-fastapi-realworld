@@ -2,6 +2,16 @@ name: Deploy Backend
 
 on:
   workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      AWS_REGION:
+        required: true
+        type: string
+    secrets:
+      AWS_GITHUB_ACCESS_ROLE:
+        required: true
 
 # concurrency required to avoid terraform lock contention during ECR provisioning
 concurrency: cicd-${{ github.repository }}-pipeline
@@ -12,7 +22,7 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: development
+      name: ${{ inputs.environment }}
 
     permissions:
       id-token: write
@@ -29,10 +39,10 @@ jobs:
 
 
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@master
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           role-to-assume: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
-          aws-region: ${{ vars.AWS_REGION }}
+          aws-region: ${{ inputs.AWS_REGION }}
           role-session-name: GitHub-OIDC-Terraform
 
 
