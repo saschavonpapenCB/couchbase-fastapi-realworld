@@ -21,6 +21,10 @@ jobs:
     if: github.event_name == 'pull_request'
     needs: [Setup]
 
+    permissions:
+      id-token: write
+      contents: read
+
     uses: ./.github/workflows/deploy-backend.yml
     with:
       environment: development
