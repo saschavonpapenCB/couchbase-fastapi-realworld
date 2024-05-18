@@ -22,7 +22,7 @@ jobs:
   deploy-dev:
     name: Deploy to Dev Env
     if: github.event_name == 'pull_request'
-    needs: [Setup]
+    needs: [Start]
     runs-on: ubuntu-latest
     environment:
       name: development
@@ -170,7 +170,7 @@ jobs:
   deploy-test:
     name: Deploy to Test Env
     if: github.event.ref == 'refs/heads/master'
-    needs: [Setup]
+    needs: [Start]
     runs-on: ubuntu-latest
 
     environment:
