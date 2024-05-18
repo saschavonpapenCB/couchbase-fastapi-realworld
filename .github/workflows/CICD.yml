@@ -19,19 +19,18 @@ jobs:
         run: echo setting up!
 
 
-  deploy-dev:
-    name: Deploy to Dev Env
+  deploy-dev-backend:
+    name: Deploy Backend to Dev Env
     if: github.event_name == 'pull_request'
     needs: [Setup]
-    runs-on: ubuntu-latest
-    environment: development
-    steps:
-      - uses: ./.github/workflows/deploy.yml
-        with:
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          BACKEND_S3_BUCKET: ${{ vars.BACKEND_S3_BUCKET }}
-          AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+    uses: ./.github/workflows/deploy-backend.yml
+    with:
+      environment: development
+      AWS_REGION: ${{ vars.AWS_REGION }}
+      BACKEND_S3_BUCKET: ${{ vars.BACKEND_S3_BUCKET }}
+    secrets:
+      AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         
             
   deploy-test:

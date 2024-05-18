@@ -1,4 +1,4 @@
-name: Deploy
+name: Deploy Backend
 
 on:
   workflow_call:
@@ -19,8 +19,8 @@ on:
         required: true
         
 jobs:
-  Deploy:
-    name: Deploy
+  deploy-backend:
+    name: Deploy Backend
     runs-on: ubuntu-latest
 
     environment:
@@ -144,21 +144,6 @@ jobs:
           IMAGE_TAG: snapshot-${{ vars.BACKEND_IMAGE_TAG }}
         run: |
           docker build "./api" -f "./api/Dockerfile" -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-          echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
-          echo "image_tag=$IMAGE_TAG" 
-          echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
-
-
-      - name: Build, tag, and push image to Amazon ECR
-        id: build-publish-frontend
-        shell: bash
-        env:
-          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: ${{ vars.FRONTEND_ECR_REPO_NAME }}
-          IMAGE_TAG: snapshot-${{ vars.FRONTEND_IMAGE_TAG }}
-        run: |
-          docker build "./frontend" -f "./frontend/Dockerfile" -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
           echo "image_tag=$IMAGE_TAG" 
