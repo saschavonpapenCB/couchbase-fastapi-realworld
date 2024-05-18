@@ -12,11 +12,11 @@ concurrency: cicd-${{ github.repository }}-pipeline
 
 jobs:
 
-  Setup: # Bolster
+  Start:
     runs-on: ubuntu-latest
     steps:
-      - name: Placeholder
-        run: echo setting up!
+      - name: Begin
+        run: echo Beginning env dependent jobs...
 
 
   deploy-dev:
@@ -115,7 +115,7 @@ jobs:
         working-directory: ./infrastructure
   
   
-      - name: TF apply (Create ECR repo) #fix
+      - name: TF apply (Create ECR repo)
         shell: bash
         run: |
           set -eux
@@ -143,7 +143,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: ${{ vars.BACKEND_ECR_REPO_NAME }}
-          IMAGE_TAG: snapshot-${{ vars.BACKEND_IMAGE_TAG }}
+          IMAGE_TAG: ${{ vars.BACKEND_IMAGE_TAG }}
         run: |
           docker build "./api" -f "./api/Dockerfile" -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
           docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
@@ -166,9 +166,6 @@ jobs:
           echo "image_tag=$IMAGE_TAG" 
           echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
-
-
-
             
   deploy-test:
     name: Deploy to Test Env
@@ -178,20 +175,21 @@ jobs:
 
     environment:
       name: testing
+  
+    permissions:
+      id-token: write
+      contents: read
+  
+    outputs:
+      image_tag: ${{ steps.build-publish.outputs.image_tag }}
+      full_image: ${{ steps.build-publish.outputs.full_image }}
 
     steps:
     
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Deploy
-        uses: ./.github/workflows/deploy.yml
-        with:
-          environment: testing
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          BACKEND_S3_BUCKET: ${{ vars.BACKEND_S3_BUCKET }}
-          AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+    # TO BE IMPLEMENTED
         
         
   deploy-qa:
@@ -201,17 +199,18 @@ jobs:
 
     environment:
       name: qa
+    
+    permissions:
+      id-token: write
+      contents: read
+    
+    outputs:
+      image_tag: ${{ steps.build-publish.outputs.image_tag }}
+      full_image: ${{ steps.build-publish.outputs.full_image }}
 
     steps:
     
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      - name: Deploy
-        uses: ./.github/workflows/deploy.yml
-        with:
-          environment: qa
-          AWS_REGION: ${{ vars.AWS_REGION }}
-          BACKEND_S3_BUCKET: ${{ vars.BACKEND_S3_BUCKET }}
-          AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
-          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+    # TO BE IMPLEMENTED
