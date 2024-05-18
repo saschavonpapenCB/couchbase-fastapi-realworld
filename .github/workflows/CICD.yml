@@ -20,7 +20,7 @@ jobs:
 
 
   deploy-dev:
-    name: Deploy FE & BE to Dev Env
+    name: Deploy to Dev Env
     if: github.event_name == 'pull_request'
     needs: [Setup]
     runs-on: ubuntu-latest
@@ -40,7 +40,7 @@ jobs:
         
             
   deploy-test:
-    name: Deploy FE & BE to Test Env
+    name: Deploy to Test Env
     if: github.event.ref == 'refs/heads/master'
     needs: [Setup]
     runs-on: ubuntu-latest
@@ -60,7 +60,7 @@ jobs:
         
         
   deploy-qa:
-    name: Deploy FE & BE to QA Env
+    name: Deploy to QA Env
     needs: [deploy-test]
     runs-on: ubuntu-latest
 

@@ -1,4 +1,4 @@
-name: Deploy FE + BE
+name: Deploy
 
 on:
   workflow_call:
