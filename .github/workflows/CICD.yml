@@ -29,6 +29,10 @@ jobs:
       name: development
 
     steps:
+
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Deploy
         uses: ./.github/workflows/deploy.yml
         with:
@@ -49,6 +53,10 @@ jobs:
       name: testing
 
     steps:
+    
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Deploy
         uses: ./.github/workflows/deploy.yml
         with:
@@ -68,6 +76,10 @@ jobs:
       name: qa
 
     steps:
+    
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
       - name: Deploy
         uses: ./.github/workflows/deploy.yml
         with:
