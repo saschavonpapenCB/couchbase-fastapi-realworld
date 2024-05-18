@@ -30,7 +30,7 @@ data "aws_iam_policy_document" "ecr_repo_policy" {
     effect = "Allow"
     principals {
       type        = "AWS"
-      identifiers = ["arn:aws:iam::${local.account-id}:role/${var.iam_role}"]
+      identifiers = ["${var.iam_role}"]
     }
     actions = ["ecr:BatchCheckLayerAvailability",
       "ecr:CompleteLayerUpload",
