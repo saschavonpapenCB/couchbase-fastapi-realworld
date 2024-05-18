@@ -9,13 +9,18 @@ on:
       AWS_REGION:
         required: true
         type: string
+      BACKEND_S3_BUCKET:
+        required: true
+        type: string
     secrets:
       AWS_GITHUB_ACCESS_ROLE:
         required: true
-
+      AWS_ACCOUNT_ID:
+        required: true
+        
 jobs:
-  DeployBackend:
-    name: Deploy Backend
+  Deploy:
+    name: Deploy FE & BE
     runs-on: ubuntu-latest
 
     environment:
@@ -64,8 +69,8 @@ jobs:
         shell: bash
         run: |
           set -eux
-          BUCKET_NAME=${{ vars.BACKEND_S3_BUCKET }}-${{ secrets.AWS_ACCOUNT_ID }}
-          REGION=${{ vars.AWS_REGION }}
+          BUCKET_NAME=${{ inputs.BACKEND_S3_BUCKET }}-${{ secrets.AWS_ACCOUNT_ID }}
+          REGION=${{ inputs.AWS_REGION }}
           if ! aws s3api head-bucket --bucket "$BUCKET_NAME" 2>/dev/null; then
             aws s3api create-bucket --bucket "$BUCKET_NAME" --region "$REGION" --create-bucket-configuration LocationConstraint="$REGION"
             echo "Bucket $BUCKET_NAME created in $REGION"

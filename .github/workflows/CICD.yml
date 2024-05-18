@@ -23,32 +23,56 @@ jobs:
     name: Deploy FE & BE to Dev Env
     if: github.event_name == 'pull_request'
     needs: [Setup]
-    uses: ./.github/workflows/deploy-fe-be.yml
-    with:
-        environment: development
-        AWS_REGION: ${{ vars.AWS_REGION }}
-    secrets:
-        AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
+    runs-on: ubuntu-latest
+
+    environment:
+      name: development
+
+    steps:
+      - name: Deploy
+        uses: ./.github/workflows/deploy.yml
+        with:
+          environment: development
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          BACKEND_S3_BUCKET: ${{ vars.BACKEND_S3_BUCKET }}
+          AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         
             
   deploy-test:
     name: Deploy FE & BE to Test Env
     if: github.event.ref == 'refs/heads/master'
     needs: [Setup]
-    uses: ./.github/workflows/deploy-fe-be.yml
-    with:
-        environment: testing
-        AWS_REGION: ${{ vars.AWS_REGION }}
-    secrets:
-        AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
+    runs-on: ubuntu-latest
+
+    environment:
+      name: testing
+
+    steps:
+      - name: Deploy
+        uses: ./.github/workflows/deploy.yml
+        with:
+          environment: testing
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          BACKEND_S3_BUCKET: ${{ vars.BACKEND_S3_BUCKET }}
+          AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
         
         
   deploy-qa:
     name: Deploy FE & BE to QA Env
     needs: [deploy-test]
-    uses: ./.github/workflows/deploy-fe-be.yml
-    with:
-        environment: qa
-        AWS_REGION: ${{ vars.AWS_REGION }}
-    secrets:
-        AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
+    runs-on: ubuntu-latest
+
+    environment:
+      name: qa
+
+    steps:
+      - name: Deploy
+        uses: ./.github/workflows/deploy.yml
+        with:
+          environment: qa
+          AWS_REGION: ${{ vars.AWS_REGION }}
+          BACKEND_S3_BUCKET: ${{ vars.BACKEND_S3_BUCKET }}
+          AWS_GITHUB_ACCESS_ROLE: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
+          AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
