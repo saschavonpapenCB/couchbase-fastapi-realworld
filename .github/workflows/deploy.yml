@@ -20,7 +20,7 @@ on:
         
 jobs:
   Deploy:
-    name: Deploy FE & BE
+    name: Deploy
     runs-on: ubuntu-latest
 
     environment:
