@@ -3,6 +3,10 @@ name: Deploy Backend
 on:
   workflow_call:
 
+permissions:
+  id-token: write
+  contents: read
+
 # concurrency required to avoid terraform lock contention during ECR provisioning
 concurrency: cicd-${{ github.repository }}-pipeline
 
@@ -13,10 +17,6 @@ jobs:
 
     environment:
       name: development
-
-    permissions:
-      id-token: write
-      contents: read
 
     outputs:
       image_tag: ${{ steps.build-publish.outputs.image_tag }} #change
