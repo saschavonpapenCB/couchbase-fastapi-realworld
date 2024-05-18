@@ -7,6 +7,9 @@ on:
     branches: [ master ]
   workflow_dispatch:
 
+# concurrency required to avoid terraform lock contention during ECR provisioning
+concurrency: cicd-${{ github.repository }}-pipeline
+
 jobs:
   Setup:
     runs-on: ubuntu-latest
