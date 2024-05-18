@@ -128,5 +128,3 @@ override.tf.json
 
 .terraformrc
 terraform.rc
-
-oldCICD.yml
