@@ -26,12 +26,12 @@ resource "aws_ecr_repository" "frontend" {
   }
 }
 
-resource "aws_ecr_lifecycle_policy" "name" {
+resource "aws_ecr_lifecycle_policy" "backend" {
   repository = aws_ecr_repository.backend.name
   policy     = templatefile(var.lifecycle_policy, {})
 }
 
-resource "aws_ecr_lifecycle_policy" "name" {
+resource "aws_ecr_lifecycle_policy" "frontend" {
   repository = aws_ecr_repository.frontend.name
   policy     = templatefile(var.lifecycle_policy, {})
 }
