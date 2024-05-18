@@ -33,6 +33,9 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: test
+        uses: ./.github/workflows/pytest-tests.yml
+
       - name: Deploy
         uses: ./.github/workflows/deploy.yml
         with:
