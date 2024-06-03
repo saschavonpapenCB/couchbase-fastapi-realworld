@@ -113,6 +113,7 @@ def get_db():
         "DB_BUCKET_NAME",
         "DB_SCOPE_NAME",
     ]
+    print("testing DB_BUCKET_NAME" + os.getenv('DB_BUCKET_NAME'))
     try:
         conn_str, username, password, bucket_name, scope_name = (
             os.getenv(var) for var in env_vars
