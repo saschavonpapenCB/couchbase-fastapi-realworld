@@ -44,7 +44,7 @@ logging.basicConfig(
 
 
 allowed_origins = os.getenv("CORS_ALLOWED_ORIGINS", "*")
-allowed_methods = os.getenv("CORS_ALLOWED_METHODS", "GET,POST,PUT,DELETE")
+allowed_methods = os.getenv("CORS_ALLOWED_METHODS", "*")
 allowed_headers = os.getenv("CORS_ALLOWED_HEADERS", "*")
 
 
