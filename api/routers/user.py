@@ -21,6 +21,7 @@ from ..utils.security import (
 )
 
 router = APIRouter(
+    prefix="/api",
     tags=["users"],
     responses={404: {"description": "Not found"}},
 )

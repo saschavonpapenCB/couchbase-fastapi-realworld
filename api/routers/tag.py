@@ -4,6 +4,7 @@ from ..database import get_db
 from ..schemas.tag import TagsResponseSchema
 
 router = APIRouter(
+    prefix="/api",
     tags=["tags"],
     responses={404: {"description": "Not found"}},
 )

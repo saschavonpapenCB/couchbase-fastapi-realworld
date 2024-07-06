@@ -23,6 +23,7 @@ from ..utils.security import (
 )
 
 router = APIRouter(
+    prefix="/api",
     tags=["articles"],
     responses={404: {"description": "Not found"}},
 )
