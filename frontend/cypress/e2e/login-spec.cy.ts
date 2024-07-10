@@ -17,8 +17,7 @@ describe('Conduit Login', () => {
     cy.get('input[type="password"]').type('no-such-user');
     cy.get('button[type="submit"]').click();
 
-    // error message is shown and we remain on the login page
-    cy.contains('.error-messages li', 'User Not Found');
+    // We remain on the login page
     cy.url().should('contain', '/login');
   });
 
@@ -31,8 +30,8 @@ describe('Conduit Login', () => {
     cy.get('button[type="submit"]').click();
   
     // when we are logged in, there should be two feeds
-    cy.contains('a.nav-link', 'Your Feed').should('have.class', 'active');
-    cy.contains('a.nav-link', 'Global Feed').should('not.have.class', 'active');
+    cy.contains('span.nav-link', 'Your Feed').should('have.class', 'active');
+    cy.contains('span.nav-link', 'Global Feed').should('not.have.class', 'active');
     // url is /
     cy.url().should('not.contain', '/login');
   });

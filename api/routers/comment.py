@@ -18,6 +18,7 @@ from ..schemas.user import ProfileSchema
 from ..utils.security import get_current_user_instance
 
 router = APIRouter(
+    prefix="/api",
     tags=["comments"],
     responses={404: {"description": "Not found"}},
 )
