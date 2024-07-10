@@ -2,15 +2,14 @@
 
 describe('Register', () => {
   beforeEach(() => {
-    cy.task('cleanDatabase')
     cy.visit('/')
     // we are not logged in
   })
 
   it('registers new user', () => {
-    const username = 'visitor'
-    const email = 'visitor@email.com'
-    const password = 'visiting'
+    const username = 'tester'
+    const email = 'tester@test.com'
+    const password = 'password1234'
     cy.contains('li', 'Sign up').click();
 
     cy.url().should('include', '/register')
