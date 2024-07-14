@@ -19,7 +19,9 @@ services:
       - real-world-network
 
   cypress:
-    image: cypress/included:10.3.0
+    build:
+      context: ./frontend/cypress
+      dockerfile: Dockerfile
     depends_on:
       - frontend
       - backend
@@ -27,8 +29,6 @@ services:
       - CYPRESS_BASE_URL=http://frontend
     volumes:
       - ./frontend:/e2e
-    working_dir: /e2e
-    command: cypress run
     networks:
       - real-world-network
 
