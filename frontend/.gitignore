@@ -1,6 +1,6 @@
 
 # Cypress videos
-*.ts.mp4
+*.mp4
 
 # Compiled output
 /tmp
