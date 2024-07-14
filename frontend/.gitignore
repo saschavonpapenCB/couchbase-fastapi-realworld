@@ -1,7 +1,3 @@
-
-# Cypress videos
-*.mp4
-
 # Compiled output
 /tmp
 /out-tsc
