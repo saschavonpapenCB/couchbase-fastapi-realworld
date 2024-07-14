@@ -18,6 +18,20 @@ services:
     networks:
       - real-world-network
 
+  cypress:
+    image: cypress/included:10.3.0
+    depends_on:
+      - frontend
+      - backend
+    environment:
+      - CYPRESS_BASE_URL=http://frontend
+    volumes:
+      - ./frontend:/e2e
+    working_dir: /e2e
+    command: cypress run
+    networks:
+      - real-world-network
+
 
 networks:
   real-world-network:
