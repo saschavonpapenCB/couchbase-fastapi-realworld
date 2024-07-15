@@ -167,6 +167,7 @@ jobs:
           echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
 
+
       - name: Build, tag, and push testing image to Amazon ECR
         id: build-publish-testing
         shell: bash
