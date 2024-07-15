@@ -166,6 +166,21 @@ jobs:
           echo "image_tag=$IMAGE_TAG" 
           echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
+
+      - name: Build, tag, and push testing image to Amazon ECR
+        id: build-publish-testing
+        shell: bash
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ vars.CYPRESS_ECR_REPO_NAME }}
+          IMAGE_TAG: ${{ vars.CYPRESS_IMAGE_TAG }}
+        run: |
+          docker build "./frontend/cypress" -f "./frontend/cypress/Dockerfile" -t "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          docker push "$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
+          echo "image_tag=$IMAGE_TAG" 
+          echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+
             
   deploy-test:
     name: Deploy to Test Env
