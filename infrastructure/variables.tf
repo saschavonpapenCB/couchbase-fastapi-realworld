@@ -8,6 +8,11 @@ variable "frontend_repository_name" {
   type        = string
 }
 
+variable "cypress_repository_name" {
+  description = "Name of the cypress repo"
+  type        = string
+}
+
 variable "iam_role" {
   type        = string
   description = "Self-hosted runner EC2 instance role"

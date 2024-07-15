@@ -26,6 +26,18 @@ resource "aws_ecr_repository" "frontend" {
   }
 }
 
+resource "aws_ecr_repository" "cypress" {
+  name                 = var.cypress_repository_name
+  image_tag_mutability = "IMMUTABLE"
+  image_scanning_configuration {
+    scan_on_push = true
+  }
+
+  encryption_configuration {
+    encryption_type = "KMS"
+  }
+}
+
 resource "aws_ecr_lifecycle_policy" "backend" {
   repository = aws_ecr_repository.backend.name
   policy     = templatefile(var.lifecycle_policy, {})
@@ -33,6 +45,11 @@ resource "aws_ecr_lifecycle_policy" "backend" {
 
 resource "aws_ecr_lifecycle_policy" "frontend" {
   repository = aws_ecr_repository.frontend.name
+  policy     = templatefile(var.lifecycle_policy, {})
+}
+
+resource "aws_ecr_lifecycle_policy" "cypress" {
+  repository = aws_ecr_repository.cypress.name
   policy     = templatefile(var.lifecycle_policy, {})
 }
 
