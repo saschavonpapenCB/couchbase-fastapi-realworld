@@ -122,6 +122,7 @@ jobs:
           terraform apply \
             -var 'backend_repository_name=${{ vars.BACKEND_ECR_REPO_NAME }}' \
             -var 'frontend_repository_name=${{ vars.FRONTEND_ECR_REPO_NAME }}' \
+            -var 'cypress_repository_name=${{ vars.CYPRESS_ECR_REPO_NAME }}' \
             -var 'lifecycle_policy=./policy.json' \
             -var 'iam_role=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}' \
             -var 'aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}' \
