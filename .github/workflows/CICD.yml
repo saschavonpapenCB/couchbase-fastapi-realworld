@@ -1,11 +1,11 @@
 name: CI/CD
 
 on:
-  workflow_dispatch:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+  workflow_dispatch:
 
 # concurrency required to avoid terraform lock contention during ECR provisioning
 concurrency: cicd-${{ github.repository }}-pipeline
