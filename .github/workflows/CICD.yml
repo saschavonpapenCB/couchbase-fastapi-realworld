@@ -105,13 +105,13 @@ jobs:
           set -eux
           terraform init -upgrade -reconfigure \
             -backend-config='skip_metadata_api_check=true' \
-          -backend-config='skip_region_validation=true' \
-          -backend-config='skip_credentials_validation=true' \
-          -backend-config='region=${{ vars.AWS_REGION }}' \
+            -backend-config='skip_region_validation=true' \
+            -backend-config='skip_credentials_validation=true' \
+            -backend-config='region=${{ vars.AWS_REGION }}' \
             -backend-config='bucket=${{ vars.BACKEND_S3_BUCKET }}-${{ secrets.AWS_ACCOUNT_ID }}' \
-          -backend-config='key=docker-terraform-${{ vars.DB_SCOPE_NAME }}.tfstate' \
-          -backend-config='dynamodb_table=${{ vars.BACKEND_DYNAMODB_TABLE }}' \
-          -backend-config='role_arn=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}'
+            -backend-config='key=docker-terraform-${{ vars.DB_SCOPE_NAME }}.tfstate' \
+            -backend-config='dynamodb_table=${{ vars.BACKEND_DYNAMODB_TABLE }}' \
+            -backend-config='role_arn=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}'
         working-directory: ./infrastructure
   
   
@@ -195,7 +195,48 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
-      # Rest to be implemented
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: ${{ secrets.AWS_GITHUB_ACCESS_ROLE }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-session-name: GitHub-OIDC-Terraform
+  
+  
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_wrapper: false
+
+      - name: TF init
+        shell: bash
+        run: |
+          set -eux
+          terraform init -upgrade -reconfigure \
+            -backend-config='skip_metadata_api_check=true' \
+            -backend-config='skip_region_validation=true' \
+            -backend-config='skip_credentials_validation=true' \
+            -backend-config='region=${{ vars.AWS_REGION }}' \
+            -backend-config='bucket=${{ vars.BACKEND_S3_BUCKET }}-${{ secrets.AWS_ACCOUNT_ID }}' \
+            -backend-config='key=docker-terraform-${{ vars.DB_SCOPE_NAME }}.tfstate' \
+            -backend-config='dynamodb_table=${{ vars.BACKEND_DYNAMODB_TABLE }}' \
+            -backend-config='role_arn=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}'
+          working-directory: ./infrastructure
+
+      - name: TF destroy
+        shell: bash
+        run: |
+          set -eux
+          terraform destroy \
+            -var 'backend_repository_name=${{ vars.BACKEND_ECR_REPO_NAME }}' \
+            -var 'frontend_repository_name=${{ vars.FRONTEND_ECR_REPO_NAME }}' \
+            -var 'cypress_repository_name=${{ vars.CYPRESS_ECR_REPO_NAME }}' \
+            -var 'lifecycle_policy=./policy.json' \
+            -var 'iam_role=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}' \
+            -var 'aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}' \
+            -auto-approve
+          working-directory: ./infrastructure
 
             
   deploy-test:
