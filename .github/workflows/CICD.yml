@@ -1,10 +1,6 @@
 name: CI/CD
 
 on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
   workflow_dispatch:
 
 # concurrency required to avoid terraform lock contention during ECR provisioning
@@ -181,6 +177,21 @@ jobs:
           echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
           echo "image_tag=$IMAGE_TAG" 
           echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+  
+  teardown-dev:
+    name: Teardown Dev Env
+    needs: [deploy-dev]
+    runs-on: ubuntu-latest
+    environment: development
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Rest to be implemented
 
             
   deploy-test:
