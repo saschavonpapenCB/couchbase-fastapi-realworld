@@ -29,10 +29,14 @@ jobs:
     # NOTE: No outputs
 
     steps:
-      - name: Log BACKEND_DYNAMODB_TABLE
+      - name: Set BACKEND_DYNAMODB_TABLE
         run: |
           set -eux
           echo "BACKEND_DYNAMODB_TABLE=${{ vars.BACKEND_DYNAMODB_TABLE }}" >> "$GITHUB_ENV"
+
+      - name: Read BACKEND_DYNAMODB_TABLE
+        run: |
+          set -eux
           echo "BACKEND_DYNAMODB_TABLE is $BACKEND_DYNAMODB_TABLE"
 
 
