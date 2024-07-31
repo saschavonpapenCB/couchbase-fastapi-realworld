@@ -19,17 +19,20 @@ jobs:
         run: echo Starting pipeline!
 
 
-  deploy-dev:
+  prepare-dev-deployment:
     # NOTE: No name
+    runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     needs: [Start]
-    # NOTE: No environment
+    environment: development
     # NOTE: No permissions
     # NOTE: No outputs
-    uses: ./.github/workflows/deploy.yml
-    with:
-      environment: development
-      BACKEND_DYNAMODB_TABLE: ${{ vars.BACKEND_DYNAMODB_TABLE }}
+
+    steps:
+      - name: Log BACKEND_DYNAMODB_TABLE
+        run: |
+          echo "BACKEND_DYNAMODB_TABLE is ${{ vars.BACKEND_DYNAMODB_TABLE }}"
+
 
 
   deploy-testing:
