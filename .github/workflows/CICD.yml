@@ -24,6 +24,9 @@ jobs:
     environment: development
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Call deploy workflow for dev
         uses: ./.github/workflows/deploy.yml
         with:
@@ -34,6 +37,9 @@ jobs:
     environment: testing
         
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Call deploy workflow for test
         uses: ./.github/workflows/deploy.yml
         with:
@@ -44,6 +50,9 @@ jobs:
     environment: qa
         
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        
       - name: Call deploy workflow for qa
         uses: ./.github/workflows/deploy.yml
         with:
