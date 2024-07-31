@@ -29,7 +29,7 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       environment: development
-      AWS_REGION: ${{ vars.AWS_REGION }}
+      BACKEND_DYNAMODB_TABLE: ${{ vars.BACKEND_DYNAMODB_TABLE }}
 
 
   deploy-testing:
@@ -42,7 +42,7 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       environment: testing
-      AWS_REGION: ${{ vars.AWS_REGION }}
+      BACKEND_DYNAMODB_TABLE: ${{ vars.BACKEND_DYNAMODB_TABLE }}
 
 
   deploy-qa:
@@ -54,4 +54,4 @@ jobs:
     uses: ./.github/workflows/deploy.yml
     with:
       environment: qa
-      AWS_REGION: ${{ vars.AWS_REGION }}
+      BACKEND_DYNAMODB_TABLE: ${{ vars.BACKEND_DYNAMODB_TABLE }}

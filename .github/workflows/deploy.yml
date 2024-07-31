@@ -6,7 +6,7 @@ on:
       environment:
         required: true
         type: string
-      AWS_REGION:
+      BACKEND_DYNAMODB_TABLE:
         required: true
         type: string
 
@@ -17,6 +17,6 @@ jobs:
         name: ${{ inputs.environment }}
     steps:
 
-      - name: Log AWS_REGION
+      - name: Log BACKEND_DYNAMODB_TABLE
         run: |
-          echo "AWS_REGION for ${{ inputs.environment }} is ${{ inputs.AWS_REGION }}"
+          echo "BACKEND_DYNAMODB_TABLE for ${{ inputs.environment }} is ${{ inputs.BACKEND_DYNAMODB_TABLE }}"
