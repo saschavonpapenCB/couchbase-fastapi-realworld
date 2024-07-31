@@ -3,9 +3,12 @@ name: deploy
 on:
   workflow_call:
     inputs:
+      environment:
+        required: true
+        type: string
       AWS_REGION:
-          required: true
-          type: string
+        required: true
+        type: string
 
 jobs:
   deploy:
@@ -16,4 +19,4 @@ jobs:
 
       - name: Log AWS_REGION
         run: |
-          echo "AWS_REGION for ${{ inputs.environment }} is $AWS_REGION"
+          echo "AWS_REGION for ${{ inputs.environment }} is ${{ inputs.AWS_REGION }}"

@@ -22,16 +22,19 @@ jobs:
   deploy-dev:
     uses: ./.github/workflows/deploy.yml
     with:
+      environment: development
       AWS_REGION: ${{ vars.AWS_REGION }}
 
-      
+
   deploy-testing:
     uses: ./.github/workflows/deploy.yml
     with:
+      environment: testing
       AWS_REGION: ${{ vars.AWS_REGION }}
 
 
   deploy-qa:
     uses: ./.github/workflows/deploy.yml
     with:
+      environment: qa
       AWS_REGION: ${{ vars.AWS_REGION }}
