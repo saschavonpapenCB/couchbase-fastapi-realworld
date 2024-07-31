@@ -20,49 +20,18 @@ jobs:
 
 
   deploy-dev:
-    runs-on: ubuntu-latest
-    environment: development
+    uses: ./.github/workflows/deploy.yml
+    with:
+      AWS_REGION: ${{ vars.AWS_REGION }}
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: pwd
-        run: |
-          pwd
-          ls
-          cd .github
-          ls
-          cd workflows
-          ls
-
-      - name: Call deploy workflow for dev
-        uses: ./.github/workflows/deploy.yml
-        with:
-          environment: 'development'
-
+      
   deploy-testing:
-    runs-on: ubuntu-latest
-    environment: testing
-        
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    uses: ./.github/workflows/deploy.yml
+    with:
+      AWS_REGION: ${{ vars.AWS_REGION }}
 
-      - name: Call deploy workflow for test
-        uses: ./.github/workflows/deploy.yml
-        with:
-          environment: 'testing'
 
   deploy-qa:
-    runs-on: ubuntu-latest
-    environment: qa
-        
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-        
-      - name: Call deploy workflow for qa
-        uses: ./.github/workflows/deploy.yml
-        with:
-          environment: 'qa'
+    uses: ./.github/workflows/deploy.yml
+    with:
+      AWS_REGION: ${{ vars.AWS_REGION }}
