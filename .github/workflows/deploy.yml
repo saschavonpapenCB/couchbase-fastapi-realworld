@@ -17,11 +17,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-        # TO BE REMOVED
-      - name: Deploy to ${{ inputs.environment }}
-        run: echo environment input string is ${{ inputs.environment }}
-
-      - name: Log environment details
+      - name: Log AWS_REGION
         run: |
-          echo "Environment Variables:"
-          printenv
+          echo "AWS_REGION for ${{ inputs.environment }} is $AWS_REGION"
