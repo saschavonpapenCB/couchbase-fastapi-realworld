@@ -20,6 +20,12 @@ jobs:
 
 
   deploy-dev:
+    # NOTE: No name
+    if: github.event_name == 'pull_request'
+    needs: [Start]
+    # NOTE: No environment
+    # NOTE: No permissions
+    # NOTE: No outputs
     uses: ./.github/workflows/deploy.yml
     with:
       environment: development
@@ -27,6 +33,12 @@ jobs:
 
 
   deploy-testing:
+    # NOTE: No name
+    if: github.event.ref == 'refs/heads/master'
+    needs: [Start]
+    # NOTE: No environment
+    # NOTE: No permissions
+    # NOTE: No outputs
     uses: ./.github/workflows/deploy.yml
     with:
       environment: testing
@@ -34,6 +46,11 @@ jobs:
 
 
   deploy-qa:
+    # NOTE: No name
+    needs: [deploy-testing]
+    # NOTE: No environment
+    # NOTE: No permissions
+    # NOTE: No outputs
     uses: ./.github/workflows/deploy.yml
     with:
       environment: qa
