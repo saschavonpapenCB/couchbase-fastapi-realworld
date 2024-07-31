@@ -1,0 +1,19 @@
+name: deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+        name: ${{ inputs.environment }}
+    steps:
+
+      - name: Log AWS_REGION
+        run: |
+          echo "AWS_REGION for ${{ inputs.environment }} is $AWS_REGION"
