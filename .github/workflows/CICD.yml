@@ -20,17 +20,31 @@ jobs:
 
 
   deploy-dev:
-    uses: ./.github/workflows/deploy.yml
-    with:
-      environment: 'development'
+    runs-on: ubuntu-latest
+    environment: development
 
+    steps:
+      - name: Call deploy workflow for dev
+        uses: ./.github/workflows/deploy.yml
+        with:
+          environment: 'development'
 
   deploy-testing:
-    uses: ./.github/workflows/deploy.yml
-    with:
-      environment: 'testing'
+    runs-on: ubuntu-latest
+    environment: testing
+        
+    steps:
+      - name: Call deploy workflow for test
+        uses: ./.github/workflows/deploy.yml
+        with:
+          environment: 'testing'
 
   deploy-qa:
-    uses: ./.github/workflows/deploy.yml
-    with:
-      environment: 'qa'
+    runs-on: ubuntu-latest
+    environment: qa
+        
+    steps:
+      - name: Call deploy workflow for qa
+        uses: ./.github/workflows/deploy.yml
+        with:
+          environment: 'qa'
