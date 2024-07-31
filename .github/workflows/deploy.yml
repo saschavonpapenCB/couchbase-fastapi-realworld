@@ -14,9 +14,6 @@ jobs:
         name: ${{ inputs.environment }}
     steps:
 
-      - name: Checkout code
-        uses: actions/checkout@v3
-
       - name: Log AWS_REGION
         run: |
           echo "AWS_REGION for ${{ inputs.environment }} is $AWS_REGION"
