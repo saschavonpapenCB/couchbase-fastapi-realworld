@@ -38,6 +38,7 @@ jobs:
         run: |
           set -eux
           echo "BACKEND_DYNAMODB_TABLE is $BACKEND_DYNAMODB_TABLE"
+          echo "BACKEND_DYNAMODB_TABLE is ${{ env.BACKEND_DYNAMODB_TABLE }}"
 
 
 
