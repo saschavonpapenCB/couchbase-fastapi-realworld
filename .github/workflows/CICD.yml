@@ -12,56 +12,28 @@ concurrency: cicd-${{ github.repository }}-pipeline
 
 jobs:
 
-  Start:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Start Message
-        run: echo Starting pipeline!
-
-
-  prepare-dev-deployment:
+  deploy:
     # NOTE: No name
-    runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
-    needs: [Start]
-    environment: development
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        environment:
+          [development, testing, qa]
+
     # NOTE: No permissions
     # NOTE: No outputs
 
     steps:
-      - name: Set BACKEND_DYNAMODB_TABLE
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Log Environment Variable
         run: |
-          set -eux
-          echo "BACKEND_DYNAMODB_TABLE=${{ vars.BACKEND_DYNAMODB_TABLE }}" >> "$GITHUB_ENV"
-
-      - name: Read BACKEND_DYNAMODB_TABLE
-        run: |
-          set -eux
-          echo "BACKEND_DYNAMODB_TABLE is $BACKEND_DYNAMODB_TABLE"
-          echo "BACKEND_DYNAMODB_TABLE is ${{ env.BACKEND_DYNAMODB_TABLE }}"
-
-
-
-  deploy-testing:
-    # NOTE: No name
-    if: github.event.ref == 'refs/heads/master'
-    needs: [Start]
-    # NOTE: No environment
-    # NOTE: No permissions
-    # NOTE: No outputs
-    uses: ./.github/workflows/deploy.yml
-    with:
-      environment: testing
-      BACKEND_DYNAMODB_TABLE: ${{ vars.BACKEND_DYNAMODB_TABLE }}
-
-
-  deploy-qa:
-    # NOTE: No name
-    needs: [deploy-testing]
-    # NOTE: No environment
-    # NOTE: No permissions
-    # NOTE: No outputs
-    uses: ./.github/workflows/deploy.yml
-    with:
-      environment: qa
-      BACKEND_DYNAMODB_TABLE: ${{ vars.BACKEND_DYNAMODB_TABLE }}
+          echo "Environment: $ENVIRONMENT"
+        env:
+          ENVIRONMENT: ${{ matrix.environment }}
+          #DEV_SECRET: ${{ secrets.DEV_SECRET }}
+          #TESTING_SECRET: ${{ secrets.TESTING_SECRET }}
+          #QA_SECRET: ${{ secrets.QA_SECRET }}
