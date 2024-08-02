@@ -84,6 +84,25 @@ jobs:
             -backend-config='dynamodb_table=${{ vars.BACKEND_DYNAMODB_TABLE }}' \
             -backend-config='role_arn=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}'
         working-directory: ./infrastructure
+
+      - name: Delete images in ECR repositories
+        shell: bash
+        run: |
+          set -eux
+          repos=(
+            "${{ vars.BACKEND_ECR_REPO_NAME }}"
+            "${{ vars.FRONTEND_ECR_REPO_NAME }}"
+            "${{ vars.CYPRESS_ECR_REPO_NAME }}"
+          )
+          for repo in "${repos[@]}"; do
+            images=$(aws ecr list-images --repository-name "$repo" --query 'imageIds[*]' --output json)
+            if [ "$images" != "[]" ]; then
+              aws ecr batch-delete-image --repository-name "$repo" --image-ids "$images"
+              echo "Deleted images from $repo"
+            else
+              echo "No images to delete in $repo"
+            fi
+          done
     
       - name: TF destroy
         shell: bash
