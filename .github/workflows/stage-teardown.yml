@@ -1,4 +1,4 @@
-name: Stage Deployment Teardown
+name: Staging Deployment Teardown
 
 on:
   workflow_dispatch:
