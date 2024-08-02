@@ -164,7 +164,7 @@ jobs:
 
   deploy-prod:
     name: Deploy to Prod env
-    if: github.event_name == 'pull_request'
+    needs: [deploy-stage]
     runs-on: ubuntu-latest
     environment:
       name: production
