@@ -3,8 +3,6 @@ name: CD
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
   workflow_dispatch:
 
 # concurrency required to avoid terraform lock contention during ECR provisioning
