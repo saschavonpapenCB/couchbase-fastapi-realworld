@@ -5,7 +5,7 @@ on:
 
 jobs:
   stage-teardown:
-    name: Teardown Stage deployment
+    name: Tearing Stage deployment down
     runs-on: ubuntu-latest
     environment: staging
 
