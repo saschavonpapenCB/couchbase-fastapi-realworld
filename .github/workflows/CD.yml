@@ -162,7 +162,7 @@ jobs:
           echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
 
 
-deploy-prod:
+  deploy-prod:
     name: Deploy to Prod env
     if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
