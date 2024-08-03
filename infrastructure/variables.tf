@@ -4,28 +4,16 @@ variable "ecs_cluster_name" {
   
 }
 
-variable "cypress_service_name" {
-  description = "The name of the cypress service"
-  type        = string
-}
-
-variable "frontend_service_name" {
-  description = "The name of the frontend service"
-  type        = string
-}
-
-variable "backend_service_name" {
-  description = "The name of the backend service"
-  type        = string
-}
-
 variable "task_cpu" {
   description = "The CPU units to allocate for the tasks"
   type        = string
+  default     = "256"
 }
 
 variable "task_memory" {
   description = "The memory in MiB to allocate for the tasks"
+  type        = string
+  default     = "512"
 }
 
 variable "service_subnets" {

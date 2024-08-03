@@ -2,7 +2,7 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_ecs_service" "cypress" {
-  name            = var.cypress_service_name
+  name            = "cypress-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.cypress.arn
   desired_count   = 1
@@ -15,7 +15,7 @@ resource "aws_ecs_service" "cypress" {
 }
 
 resource "aws_ecs_service" "backend" {
-  name            = var.backend_service_name
+  name            = "backend-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.backend.arn
   desired_count   = 1
@@ -28,7 +28,7 @@ resource "aws_ecs_service" "backend" {
 }
 
 resource "aws_ecs_service" "frontend" {
-  name            = var.frontend_service_name
+  name            = "frontend-service"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.frontend.arn
   desired_count   = 1
