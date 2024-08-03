@@ -96,7 +96,7 @@ jobs:
             -backend-config='role_arn=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}'
         working-directory: ./infrastructure
   
-      - name: TF apply (Create ECR repo)
+      - name: TF apply
         shell: bash
         run: |
           set -eux
@@ -247,7 +247,7 @@ jobs:
             -backend-config='role_arn=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}'
         working-directory: ./infrastructure
   
-      - name: TF apply (Create ECR repo)
+      - name: TF apply
         shell: bash
         run: |
           set -eux
