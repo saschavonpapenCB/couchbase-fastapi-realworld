@@ -2,41 +2,41 @@
 data "aws_caller_identity" "current" {}
 
 resource "aws_ecs_service" "cypress" {
-  name            = "cypress-service"
+  name            = var.cypress_service_name
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.cypress.arn
-  desired_count   = var.cypress_desired_count
+  desired_count   = 1
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = var.subnets
-    security_groups = var.security_groups
+    subnets         = var.service_subnets
+    security_groups = var.service_security_groups
   }
 }
 
 resource "aws_ecs_service" "backend" {
-  name            = "backend-service"
+  name            = var.backend_service_name
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.backend.arn
-  desired_count   = var.backend_desired_count
+  desired_count   = 1
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = var.subnets
-    security_groups = var.security_groups
+    subnets         = var.service_subnets
+    security_groups = var.service_security_groups
   }
 }
 
 resource "aws_ecs_service" "frontend" {
-  name            = "frontend-service"
+  name            = var.frontend_service_name
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.frontend.arn
-  desired_count   = var.frontend_desired_count
+  desired_count   = 1
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = var.subnets
-    security_groups = var.security_groups
+    subnets         = var.service_subnets
+    security_groups = var.service_security_groups
   }
 }
 
@@ -44,8 +44,8 @@ resource "aws_ecs_task_definition" "backend" {
   family                = "backend-task"
   network_mode          = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                   = var.backend_task_cpu
-  memory                = var.backend_task_memory
+  cpu                   = var.task_cpu
+  memory                = var.task_memory
 
   container_definitions = jsonencode([
     {
@@ -54,8 +54,8 @@ resource "aws_ecs_task_definition" "backend" {
       essential = true
       portMappings = [
         {
-          containerPort = var.backend_container_port
-          hostPort      = var.backend_host_port
+          containerPort = 8000
+          hostPort      = 8000
         }
       ]
     }
@@ -66,8 +66,8 @@ resource "aws_ecs_task_definition" "frontend" {
   family                = "frontend-task"
   network_mode          = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                   = var.frontend_task_cpu
-  memory                = var.frontend_task_memory
+  cpu                   = var.task_cpu
+  memory                = var.task_memory
 
   container_definitions = jsonencode([
     {
@@ -76,8 +76,8 @@ resource "aws_ecs_task_definition" "frontend" {
       essential = true
       portMappings = [
         {
-          containerPort = var.frontend_container_port
-          hostPort      = var.frontend_host_port
+          containerPort = 80
+          hostPort      = 80
         }
       ]
     }
@@ -88,18 +88,30 @@ resource "aws_ecs_task_definition" "cypress" {
   family                = "cypress-task"
   network_mode          = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                   = var.cypress_task_cpu
-  memory                = var.cypress_task_memory
+  cpu                   = var.task_cpu
+  memory                = var.task_memory
 
   container_definitions = jsonencode([
     {
       name      = "cypress-container"
       image     = "${aws_ecr_repository.cypress.repository_url}:${var.cypress_image_tag}"
       essential = true
-      portMappings = [
+      dependsOn = [
         {
-          containerPort = var.cypress_container_port
-          hostPort      = var.cypress_host_port
+          containerName = "frontend-container"
+          condition     = "START"
+        },
+        {
+          containerName = "backend-container"
+          condition     = "START"
+        }
+      ]
+      volumes = [
+        {
+          host = {
+            sourcePath = "/frontend"
+          }
+          containerPath = "/e2e"
         }
       ]
     }
