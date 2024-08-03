@@ -1,6 +1,47 @@
 
 data "aws_caller_identity" "current" {}
 
+resource "aws_vpc" "main" {
+  cidr_block = "10.0.0.0/16"
+}
+
+resource "aws_subnet" "subnet_a" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.1.0/24"
+  availability_zone = "ap-southeast-2a"
+}
+
+resource "aws_subnet" "subnet_b" {
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = "10.0.2.0/24"
+  availability_zone = "ap-southeast-2b"
+}
+
+resource "aws_security_group" "ecs_sg" {
+  vpc_id = aws_vpc.main.id
+
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  ingress {
+    from_port   = 8000
+    to_port     = 8000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
 resource "aws_ecs_service" "cypress" {
   name            = "cypress-service"
   cluster         = aws_ecs_cluster.main.id
@@ -9,8 +50,8 @@ resource "aws_ecs_service" "cypress" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = var.service_subnets
-    security_groups = var.service_security_groups
+    subnets         = [aws_subnet.subnet_a.id, aws_subnet.subnet_b.id]
+    security_groups = [aws_security_group.ecs_sg.id]
   }
 }
 
@@ -22,8 +63,8 @@ resource "aws_ecs_service" "backend" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = var.service_subnets
-    security_groups = var.service_security_groups
+    subnets         = [aws_subnet.subnet_a.id, aws_subnet.subnet_b.id]
+    security_groups = [aws_security_group.ecs_sg.id]
   }
 }
 
@@ -35,8 +76,8 @@ resource "aws_ecs_service" "frontend" {
   launch_type     = "FARGATE"
 
   network_configuration {
-    subnets         = var.service_subnets
-    security_groups = var.service_security_groups
+    subnets         = [aws_subnet.subnet_a.id, aws_subnet.subnet_b.id]
+    security_groups = [aws_security_group.ecs_sg.id]
   }
 }
 

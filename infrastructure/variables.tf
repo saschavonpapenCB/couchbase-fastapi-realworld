@@ -16,16 +16,6 @@ variable "task_memory" {
   default     = "512"
 }
 
-variable "service_subnets" {
-  description = "The subnets to deploy the ECS services into"
-  type        = list(string)
-}
-
-variable "service_security_groups" {
-  description = "The security groups to assign to the ECS services"
-  type        = list(string)
-}
-
 variable "cypress_image_tag" {
   description = "The tag of the testing image to deploy"
 }
