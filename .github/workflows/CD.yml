@@ -104,7 +104,7 @@ jobs:
             -var 'backend_repository_name=${{ vars.BACKEND_ECR_REPO_NAME }}' \
             -var 'frontend_repository_name=${{ vars.FRONTEND_ECR_REPO_NAME }}' \
             -var 'cypress_repository_name=${{ vars.CYPRESS_ECR_REPO_NAME }}' \
-            -var 'ecs_cluster_name=${{ vars.ECS_CLUSTER_NAME }}'
+            -var 'ecs_cluster_name=${{ vars.ECS_CLUSTER_NAME }}' \
             -var 'backend_image_tag=${{ vars.BACKEND_IMAGE_TAG }}' \
             -var 'frontend_image_tag=${{ vars.FRONTEND_IMAGE_TAG }}' \
             -var 'cypress_image_tag=${{ vars.CYPRESS_IMAGE_TAG }}' \
