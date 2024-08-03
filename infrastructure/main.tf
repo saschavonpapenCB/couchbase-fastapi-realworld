@@ -85,6 +85,7 @@ resource "aws_ecs_task_definition" "backend" {
   family                = "backend-task"
   network_mode          = "awsvpc"
   requires_compatibilities = ["FARGATE"]
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   cpu                   = var.task_cpu
   memory                = var.task_memory
 
@@ -107,6 +108,7 @@ resource "aws_ecs_task_definition" "frontend" {
   family                = "frontend-task"
   network_mode          = "awsvpc"
   requires_compatibilities = ["FARGATE"]
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   cpu                   = var.task_cpu
   memory                = var.task_memory
 
@@ -129,6 +131,7 @@ resource "aws_ecs_task_definition" "cypress" {
   family                = "cypress-task"
   network_mode          = "awsvpc"
   requires_compatibilities = ["FARGATE"]
+  execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   cpu                   = var.task_cpu
   memory                = var.task_memory
 
@@ -137,16 +140,6 @@ resource "aws_ecs_task_definition" "cypress" {
       name      = "cypress-container"
       image     = "${aws_ecr_repository.cypress.repository_url}:${var.cypress_image_tag}"
       essential = true
-      dependsOn = [
-        {
-          containerName = "frontend-container"
-          condition     = "START"
-        },
-        {
-          containerName = "backend-container"
-          condition     = "START"
-        }
-      ]
       volumes = [
         {
           host = {
@@ -157,6 +150,27 @@ resource "aws_ecs_task_definition" "cypress" {
       ]
     }
   ])
+}
+
+resource "aws_iam_role" "ecs_task_execution_role" {
+  name = "ecsTaskExecutionRole"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Principal = {
+          Service = "ecs-tasks.amazonaws.com"
+        },
+        Action = "sts:AssumeRole"
+      }
+    ]
+  })
+
+  managed_policy_arns = [
+    "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
+  ]
 }
 
 resource "aws_ecs_cluster" "main" {
