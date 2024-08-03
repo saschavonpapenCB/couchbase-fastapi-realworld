@@ -108,6 +108,8 @@ jobs:
             -var 'backend_image_tag=${{ vars.BACKEND_IMAGE_TAG }}' \
             -var 'frontend_image_tag=${{ vars.FRONTEND_IMAGE_TAG }}' \
             -var 'cypress_image_tag=${{ vars.CYPRESS_IMAGE_TAG }}' \
+            -var 'service_subnets=${{ secrets.SERVICE_SUBNETS }}' \
+            -var 'service_security_groups=${{ secrets.SERVICE_SECURITY_GROUPS }}' \
             -var 'lifecycle_policy=./policy.json' \
             -var 'iam_role=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}' \
             -var 'aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}' \
