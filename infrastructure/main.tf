@@ -4,7 +4,7 @@ data "aws_caller_identity" "current" {}
 # tfsec:ignore:aws-ecr-repository-customer-key
 resource "aws_ecr_repository" "backend" {
   name                 = var.backend_repository_name
-  image_tag_mutability = "IMMUTABLE"
+  image_tag_mutability = "MUTABLE"
   image_scanning_configuration {
     scan_on_push = true
   }
@@ -16,7 +16,7 @@ resource "aws_ecr_repository" "backend" {
 
 resource "aws_ecr_repository" "frontend" {
   name                 = var.frontend_repository_name
-  image_tag_mutability = "IMMUTABLE"
+  image_tag_mutability = "MUTABLE"
   image_scanning_configuration {
     scan_on_push = true
   }
@@ -28,7 +28,7 @@ resource "aws_ecr_repository" "frontend" {
 
 resource "aws_ecr_repository" "cypress" {
   name                 = var.cypress_repository_name
-  image_tag_mutability = "IMMUTABLE"
+  image_tag_mutability = "MUTABLE"
   image_scanning_configuration {
     scan_on_push = true
   }
