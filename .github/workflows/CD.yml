@@ -158,6 +158,27 @@ jobs:
           echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
           echo "image_tag=$IMAGE_TAG" 
           echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+      
+      - name: Update ECS Service with new backend image
+        id: update-ecs-backend
+        shell: bash
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_NAME }} --service ${{ vars.ECS_BACKEND_SERVICE_NAME }} --force-new-deployment
+          echo "ECS backend service updated with new image"
+  
+      - name: Update ECS Service with new frontend image
+        id: update-ecs-frontend
+        shell: bash
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_NAME }} --service ${{ vars.ECS_FRONTEND_SERVICE_NAME }} --force-new-deployment
+          echo "ECS frontend service updated with new image"
+      
+      - name: Update ECS Service with new cypress image
+        id: update-ecs-cypress
+        shell: bash
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_NAME }} --service ${{ vars.ECS_CYPRESS_SERVICE_NAME }} --force-new-deployment
+          echo "ECS cypress service updated with new image"
 
 
   deploy-prod:
@@ -309,3 +330,24 @@ jobs:
           echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
           echo "image_tag=$IMAGE_TAG" 
           echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+      
+      - name: Update ECS Service with new backend image
+        id: update-ecs-backend
+        shell: bash
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_NAME }} --service ${{ vars.ECS_BACKEND_SERVICE_NAME }} --force-new-deployment
+          echo "ECS backend service updated with new image"
+    
+      - name: Update ECS Service with new frontend image
+        id: update-ecs-frontend
+        shell: bash
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_NAME }} --service ${{ vars.ECS_FRONTEND_SERVICE_NAME }} --force-new-deployment
+          echo "ECS frontend service updated with new image"
+        
+      - name: Update ECS Service with new cypress image
+        id: update-ecs-cypress
+        shell: bash
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_NAME }} --service ${{ vars.ECS_CYPRESS_SERVICE_NAME }} --force-new-deployment
+          echo "ECS cypress service updated with new image"
