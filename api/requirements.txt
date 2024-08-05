@@ -10,5 +10,5 @@ pytest==8.3.2
 python-jose==3.3.0
 setuptools==72.1.0
 starlette==0.36.3
-uvicorn==0.30.3
+uvicorn==0.30.5
 wheel==0.43.0
