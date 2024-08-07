@@ -95,12 +95,16 @@ jobs:
             "${{ vars.CYPRESS_ECR_REPO_NAME }}"
           )
           for repo in "${repos[@]}"; do
-            images=$(aws ecr list-images --repository-name "$repo" --query 'imageIds[*]' --output json)
-            if [ "$images" != "[]" ]; then
-              aws ecr batch-delete-image --repository-name "$repo" --image-ids "$images"
-              echo "Deleted images from $repo"
+            if aws ecr describe-repositories --repository-names "$repo" &>/dev/null; then
+              images=$(aws ecr list-images --repository-name "$repo" --query 'imageIds[*]' --output json)
+              if [ "$images" != "[]" ]; then
+                aws ecr batch-delete-image --repository-name "$repo" --image-ids "$images"
+                echo "Deleted images from $repo"
+              else
+                echo "No images to delete in $repo"
+              fi
             else
-              echo "No images to delete in $repo"
+              echo "Repository $repo does not exist"
             fi
           done
     
