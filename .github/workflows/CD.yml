@@ -104,6 +104,10 @@ jobs:
             -var 'backend_repository_name=${{ vars.BACKEND_ECR_REPO_NAME }}' \
             -var 'frontend_repository_name=${{ vars.FRONTEND_ECR_REPO_NAME }}' \
             -var 'cypress_repository_name=${{ vars.CYPRESS_ECR_REPO_NAME }}' \
+            -var 'ecs_cluster_name=${{ vars.ECS_CLUSTER_NAME }}' \
+            -var 'backend_image_tag=${{ vars.BACKEND_IMAGE_TAG }}' \
+            -var 'frontend_image_tag=${{ vars.FRONTEND_IMAGE_TAG }}' \
+            -var 'cypress_image_tag=${{ vars.CYPRESS_IMAGE_TAG }}' \
             -var 'lifecycle_policy=./policy.json' \
             -var 'iam_role=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}' \
             -var 'aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}' \
@@ -158,6 +162,27 @@ jobs:
           echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
           echo "image_tag=$IMAGE_TAG" 
           echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+      
+      - name: Update ECS Service with new backend image
+        id: update-ecs-backend
+        shell: bash
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_NAME }} --service ${{ vars.ECS_BACKEND_SERVICE_NAME }} --force-new-deployment
+          echo "ECS backend service updated with new image"
+  
+      - name: Update ECS Service with new frontend image
+        id: update-ecs-frontend
+        shell: bash
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_NAME }} --service ${{ vars.ECS_FRONTEND_SERVICE_NAME }} --force-new-deployment
+          echo "ECS frontend service updated with new image"
+      
+      - name: Update ECS Service with new cypress image
+        id: update-ecs-cypress
+        shell: bash
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_NAME }} --service ${{ vars.ECS_CYPRESS_SERVICE_NAME }} --force-new-deployment
+          echo "ECS cypress service updated with new image"
 
 
   deploy-prod:
@@ -255,6 +280,10 @@ jobs:
             -var 'backend_repository_name=${{ vars.BACKEND_ECR_REPO_NAME }}' \
             -var 'frontend_repository_name=${{ vars.FRONTEND_ECR_REPO_NAME }}' \
             -var 'cypress_repository_name=${{ vars.CYPRESS_ECR_REPO_NAME }}' \
+            -var 'ecs_cluster_name=${{ vars.ECS_CLUSTER_NAME }}' \
+            -var 'backend_image_tag=${{ vars.BACKEND_IMAGE_TAG }}' \
+            -var 'frontend_image_tag=${{ vars.FRONTEND_IMAGE_TAG }}' \
+            -var 'cypress_image_tag=${{ vars.CYPRESS_IMAGE_TAG }}' \
             -var 'lifecycle_policy=./policy.json' \
             -var 'iam_role=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}' \
             -var 'aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}' \
@@ -309,3 +338,24 @@ jobs:
           echo "IMAGE $IMAGE_TAG is pushed to $ECR_REGISTRY/$ECR_REPOSITORY"
           echo "image_tag=$IMAGE_TAG" 
           echo "full_image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+      
+      - name: Update ECS Service with new backend image
+        id: update-ecs-backend
+        shell: bash
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_NAME }} --service ${{ vars.ECS_BACKEND_SERVICE_NAME }} --force-new-deployment
+          echo "ECS backend service updated with new image"
+    
+      - name: Update ECS Service with new frontend image
+        id: update-ecs-frontend
+        shell: bash
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_NAME }} --service ${{ vars.ECS_FRONTEND_SERVICE_NAME }} --force-new-deployment
+          echo "ECS frontend service updated with new image"
+        
+      - name: Update ECS Service with new cypress image
+        id: update-ecs-cypress
+        shell: bash
+        run: |
+          aws ecs update-service --cluster ${{ vars.ECS_CLUSTER_NAME }} --service ${{ vars.ECS_CYPRESS_SERVICE_NAME }} --force-new-deployment
+          echo "ECS cypress service updated with new image"

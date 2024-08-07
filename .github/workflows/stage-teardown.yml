@@ -95,12 +95,16 @@ jobs:
             "${{ vars.CYPRESS_ECR_REPO_NAME }}"
           )
           for repo in "${repos[@]}"; do
-            images=$(aws ecr list-images --repository-name "$repo" --query 'imageIds[*]' --output json)
-            if [ "$images" != "[]" ]; then
-              aws ecr batch-delete-image --repository-name "$repo" --image-ids "$images"
-              echo "Deleted images from $repo"
+            if aws ecr describe-repositories --repository-names "$repo" &>/dev/null; then
+              images=$(aws ecr list-images --repository-name "$repo" --query 'imageIds[*]' --output json)
+              if [ "$images" != "[]" ]; then
+                aws ecr batch-delete-image --repository-name "$repo" --image-ids "$images"
+                echo "Deleted images from $repo"
+              else
+                echo "No images to delete in $repo"
+              fi
             else
-              echo "No images to delete in $repo"
+              echo "Repository $repo does not exist"
             fi
           done
     
@@ -109,11 +113,15 @@ jobs:
         run: |
           set -eux
           terraform destroy \
-            -var 'backend_repository_name=${{ vars.BACKEND_ECR_REPO_NAME }}' \
-            -var 'frontend_repository_name=${{ vars.FRONTEND_ECR_REPO_NAME }}' \
-            -var 'cypress_repository_name=${{ vars.CYPRESS_ECR_REPO_NAME }}' \
-            -var 'lifecycle_policy=./policy.json' \
-            -var 'iam_role=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}' \
-            -var 'aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}' \
-            -auto-approve
+          -var 'backend_repository_name=${{ vars.BACKEND_ECR_REPO_NAME }}' \
+          -var 'frontend_repository_name=${{ vars.FRONTEND_ECR_REPO_NAME }}' \
+          -var 'cypress_repository_name=${{ vars.CYPRESS_ECR_REPO_NAME }}' \
+          -var 'ecs_cluster_name=${{ vars.ECS_CLUSTER_NAME }}' \
+          -var 'backend_image_tag=${{ vars.BACKEND_IMAGE_TAG }}' \
+          -var 'frontend_image_tag=${{ vars.FRONTEND_IMAGE_TAG }}' \
+          -var 'cypress_image_tag=${{ vars.CYPRESS_IMAGE_TAG }}' \
+          -var 'lifecycle_policy=./policy.json' \
+          -var 'iam_role=${{ secrets.AWS_BACKEND_ACCESS_ROLE }}' \
+          -var 'aws_account_id=${{ secrets.AWS_ACCOUNT_ID }}' \
+          -auto-approve
         working-directory: ./infrastructure
