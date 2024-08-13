@@ -1,6 +1,6 @@
 #!/bin/bash
 
-REQUIREMENTS_FILE="./requirements.txt"
+REQUIREMENTS_FILE="./api/requirements.txt"
 
 if [ ! -f "$REQUIREMENTS_FILE" ]; then
     echo "Error: $REQUIREMENTS_FILE not found."
