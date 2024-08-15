@@ -25,7 +25,7 @@ router = APIRouter(
     tags=["users"],
     responses={404: {"description": "Not found"}},
 )
-USER_COLLECTION = "client"
+USER_COLLECTION = "user"
 
 
 @router.post("/users", response_model=UserResponseSchema)

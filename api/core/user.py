@@ -14,11 +14,11 @@ async def query_users_db(
     """Query db for user instance by ID or username and returns instance."""
     if id is not None:
         query = """
-            SELECT client.* FROM client WHERE client.id=$id;
+            SELECT `user`.* FROM `user` WHERE `user`.id=$id;
         """
     elif username is not None:
         query = """
-            SELECT client.* FROM client WHERE client.username=$username;
+            SELECT `user`.* FROM `user` WHERE `user`.username=$username;
         """
     else:
         raise HTTPException(

@@ -73,11 +73,11 @@ async def get_user_instance(
     """Queries db for user instance by email or username and returns user instance or none."""
     if username is not None:
         query = """
-            SELECT client.* FROM client WHERE client.username=$username;
+            SELECT `user`.* FROM `user` WHERE `user`.username=$username;
         """
     elif email is not None:
         query = """
-            SELECT client.* FROM client WHERE client.email=$email;
+            SELECT `user`.* FROM `user` WHERE `user`.email=$email;
         """
     else:
         return None
