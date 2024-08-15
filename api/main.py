@@ -26,10 +26,10 @@ async def lifespan(app: FastAPI):
 
 
 api = FastAPI(
-    title="Couchbase FastAPI RealWorld",
+    title="FastAPI & Capella Conduit API",
     version="1.0.0",
     description="""
-    RealWorld backend built with FastAPI and Couchbase Capella.
+    RealWorld Conduit API built with FastAPI and Couchbase Capella.
     """,
     lifespan=lifespan,
 )
