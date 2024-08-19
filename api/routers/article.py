@@ -8,7 +8,7 @@ from fastapi.encoders import jsonable_encoder
 from ..core.article import query_articles_by_slug
 from ..core.exceptions import NotArticleAuthorException
 from ..database import get_db
-from ..models.article import ArticleModel
+from ..models.article import ArticleModel, CommentModel
 from ..models.user import UserModel
 from ..schemas.article import (
     ArticleResponseSchema,
@@ -28,6 +28,7 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 ARTICLE_COLLECTION = "article"
+COMMENT_COLLECTION = "comment"
 
 
 async def build_query(filter_type: str, limit: int, offset: int) -> str:
@@ -49,7 +50,7 @@ async def build_query(filter_type: str, limit: int, offset: int) -> str:
     elif filter_type == "favorited":
         return f"""SELECT article.*
             FROM article
-            WHERE $favoritedId IN article.favoritedUserIds
+            WHERE $favoritedId IN article.favoritedUserIDs
             ORDER BY article.createdAt
             LIMIT {limit}
             OFFSET {offset};
@@ -85,6 +86,24 @@ async def get_article_filter_type(
 async def get_favorited_id(db, favorited: Union[str, None] = None):
     favorited_user = await get_user_instance(db, username=favorited)
     return favorited_user.id if favorited_user else None
+
+
+async def get_comments_by_ids(db, comment_ids):
+    if not comment_ids:
+        return []
+    query = f"""
+        SELECT comment.*
+        FROM {COMMENT_COLLECTION} AS comment
+        WHERE comment.id IN $comment_ids;
+    """
+    try:
+        query_result = db.query(query, comment_ids=comment_ids)
+        return [CommentModel(**r) for r in query_result]
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to retrieve comments: {e}",
+        )
 
 
 @router.get("/articles", response_model=MultipleArticlesResponseSchema)
@@ -252,11 +271,11 @@ async def favorite_article(
     current_user: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
-    """Queries db for article instance by slug, adds user ID to favoritedUserIds, upserts instance to db and returns \
+    """Queries db for article instance by slug, adds user ID to favoritedUserIDs, upserts instance to db and returns \
         article schema."""
     article = await query_articles_by_slug(slug, db)
-    favorited_set = {*article.favoritedUserIds, current_user.id}
-    article.favoritedUserIds = tuple(favorited_set)
+    favorited_set = {*article.favoritedUserIDs, current_user.id}
+    article.favoritedUserIDs = tuple(favorited_set)
     try:
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
         return ArticleResponseSchema.from_article_instance(article, current_user)
@@ -277,11 +296,11 @@ async def unfavorite_article(
     current_user: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
-    """Queries db for article instance by slug, removes user ID from favoritedUserIds, upserts instance to db and \
+    """Queries db for article instance by slug, removes user ID from favoritedUserIDs, upserts instance to db and \
         returns article schema."""
     article = await query_articles_by_slug(slug, db)
-    favorited_set = {*article.favoritedUserIds} - {current_user.id}
-    article.favoritedUserIds = tuple(favorited_set)
+    favorited_set = {*article.favoritedUserIDs} - {current_user.id}
+    article.favoritedUserIDs = tuple(favorited_set)
     try:
         db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
         return ArticleResponseSchema.from_article_instance(article, current_user)

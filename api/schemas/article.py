@@ -39,11 +39,11 @@ class ArticleSchema(BaseSchema):
         if user is None:
             favorited = False
         else:
-            favorited = user.id in article.favoritedUserIds
+            favorited = user.id in article.favoritedUserIDs
 
         return cls(
             favorited=favorited,
-            favoritesCount=len(article.favoritedUserIds),
+            favoritesCount=len(article.favoritedUserIDs),
             **article.model_dump()
         )
 
