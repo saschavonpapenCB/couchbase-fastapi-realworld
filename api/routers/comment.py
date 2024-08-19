@@ -7,7 +7,7 @@ from ..core.user import query_users_db
 from ..database import get_db
 from ..models.article import CommentModel
 from ..models.user import UserModel
-from ..routers.article import ARTICLE_COLLECTION
+from ..routers.article import ARTICLE_COLLECTION, COMMENT_COLLECTION
 from ..schemas.comment import (
     CommentSchema,
     CreateCommentSchema,
@@ -22,7 +22,7 @@ router = APIRouter(
     tags=["comments"],
     responses={404: {"description": "Not found"}},
 )
-COMMENT_COLLECTION = "comment"
+
 
 
 @router.post("/articles/{slug}/comments", response_model=SingleCommentResponseSchema)
@@ -36,9 +36,18 @@ async def add_article_comment(
         to article instance, upserts article instance and returns comment schema."""
     article = await query_articles_by_slug(slug, db)
     comment_instance = CommentModel(authorId=user_instance.id, **comment.model_dump())
-    article.comments = article.comments + (comment_instance,)
     try:
-        db.upsert_document(ARTICLE_COLLECTION, article.slug, jsonable_encoder(article))
+        db.insert_document(
+            COMMENT_COLLECTION,
+            comment_instance.id,
+            jsonable_encoder(comment_instance)
+        )
+        article.commentIDs = article.commentIDs + (comment_instance.id,)
+        db.upsert_document(
+            ARTICLE_COLLECTION,
+            article.slug,
+            jsonable_encoder(article)
+        )
         return SingleCommentResponseSchema(
             comment=CommentSchema(
                 author=ProfileSchema(**user_instance.model_dump()),
@@ -61,11 +70,31 @@ async def get_article_comments(slug: str, db=Depends(get_db)):
     """Queries db for article instance by slug, queries db for user instances by id of article comments, creates \
         comment schemas and returns multiple comments schema."""
     article = await query_articles_by_slug(slug, db)
-    comments = [comment for comment in article.comments]
-    data = [
-        (comment, await query_users_db(db, id=comment.authorId)) for comment in comments
-    ]
-    return MultipleCommentsResponseSchema.from_comments_and_authors(data)
+    comment_ids = article.commentIDs
+    if not comment_ids:
+        return []
+    
+    query = """
+            SELECT comment.*
+            FROM comment
+            WHERE comment.id IN $comment_ids;
+        """
+    try:
+        queryResult = db.query(query, comment_ids=comment_ids)
+        comments = [CommentModel(**r) for r in queryResult]
+        data = [
+            (comment, await query_users_db(db, id=comment.authorId)) for comment in comments
+        ]
+        return MultipleCommentsResponseSchema.from_comments_and_authors(data)
+    except TimeoutError:
+        raise HTTPException(
+            status_code=status.HTTP_408_REQUEST_TIMEOUT, detail="Request timeout"
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error: {e}",
+        )
 
 
 @router.delete("/articles/{slug}/comments/{id}")
@@ -79,16 +108,9 @@ async def delete_article_comment(
         article instance and upserts article instance to db."""
     try:
         article = await query_articles_by_slug(slug, db)
-        comment = next(
-            (
-                c
-                for c in article.comments
-                if c.id == id and c.authorId == user_instance.id
-            ),
-            None,
-        )
-        if comment:
-            article.comments = tuple(c for c in article.comments if c.id != id)
+        if id in article.commentIDs:
+            article.commentIDs = [cid for cid in article.commentIDs if cid != id]
+            db.delete_document(COMMENT_COLLECTION, id)
             db.upsert_document(
                 ARTICLE_COLLECTION, article.slug, jsonable_encoder(article)
             )
