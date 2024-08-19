@@ -1,2 +1,2 @@
 #!/bin/bash
-docker build -t realworld-frontend -f Dockerfile.frontend .
+docker build -t conduit-frontend -f ./angular-conduit-signals/Dockerfile.frontend angular-conduit-signals
