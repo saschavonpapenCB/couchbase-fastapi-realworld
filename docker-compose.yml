@@ -11,8 +11,8 @@ services:
 
   frontend:
     build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      context: ./angular-conduit-signals
+      dockerfile: Dockerfile.frontend
     ports:
       - "80:80"
     networks:
@@ -20,15 +20,15 @@ services:
 
   cypress:
     build:
-      context: ./frontend/cypress
-      dockerfile: Dockerfile
+      context: ./angular-conduit-signals/cypress
+      dockerfile: Dockerfile.cypress
     depends_on:
       - frontend
       - backend
     environment:
       - CYPRESS_BASE_URL=http://frontend
     volumes:
-      - ./frontend:/e2e
+      - ./angular-conduit-signals:/e2e
     networks:
       - real-world-network
 
