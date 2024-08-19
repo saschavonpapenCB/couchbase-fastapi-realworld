@@ -26,8 +26,8 @@ class ArticleModel(BaseModel):
     createdAt: datetime = Field(default_factory=datetime.utcnow)
     updatedAt: datetime = Field(default_factory=datetime.utcnow)
     author: UserModel
-    favoritedUserIds: Tuple[str, ...] = ()
-    comments: Tuple[CommentModel, ...] = ()
+    favoritedUserIDs: Tuple[str, ...] = ()
+    commentIDs: Tuple[str, ...] = ()
 
     @root_validator(pre=True)
     def generate_slug(cls, values):
