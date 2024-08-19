@@ -4,3 +4,6 @@
 [submodule "angular-conduit-signals"]
 	path = angular-conduit-signals
 	url = https://github.com/AndyT2503/angular-conduit-signals
+[submodule "frontend/angular-conduit-signals"]
+	path = frontend/angular-conduit-signals
+	url = https://github.com/saschavonpapenCB/angular-conduit-signals
