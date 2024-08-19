@@ -72,7 +72,7 @@ async def get_article_comments(slug: str, db=Depends(get_db)):
     article = await query_articles_by_slug(slug, db)
     comment_ids = article.commentIDs
     if not comment_ids:
-        return []
+        return MultipleCommentsResponseSchema(comments=[])
     
     query = """
             SELECT comment.*
