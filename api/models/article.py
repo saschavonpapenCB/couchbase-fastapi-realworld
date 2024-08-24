@@ -12,7 +12,7 @@ class CommentModel(BaseModel):
     body: str
     createdAt: datetime = Field(default_factory=datetime.utcnow)
     updatedAt: datetime = Field(default_factory=datetime.utcnow)
-    authorId: str
+    author: UserModel
 
 
 class ArticleModel(BaseModel):

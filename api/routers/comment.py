@@ -35,7 +35,7 @@ async def add_article_comment(
     """Queries db for article instance by slug, creates comment instance from create schema, adds comment instance \
         to article instance, upserts article instance and returns comment schema."""
     article = await query_articles_by_slug(slug, db)
-    comment_instance = CommentModel(authorId=user_instance.id, **comment.model_dump())
+    comment_instance = CommentModel(author=user_instance, **comment.model_dump())
     try:
         db.insert_document(
             COMMENT_COLLECTION,
@@ -83,7 +83,7 @@ async def get_article_comments(slug: str, db=Depends(get_db)):
         queryResult = db.query(query, comment_ids=comment_ids)
         comments = [CommentModel(**r) for r in queryResult]
         data = [
-            (comment, await query_users_db(db, id=comment.authorId)) for comment in comments
+            (comment, await query_users_db(db, id=comment.author.id)) for comment in comments
         ]
         return MultipleCommentsResponseSchema.from_comments_and_authors(data)
     except TimeoutError:
