@@ -48,10 +48,10 @@ async def add_article_comment(
             article.slug,
             jsonable_encoder(article)
         )
-        comment = CommentSchema(**comment_instance.model_dump())
+        comment_instance.author = ProfileSchema(**user_instance.model_dump())
         return SingleCommentResponseSchema(
             comment=CommentSchema(
-                author=ProfileSchema(**user_instance.model_dump()),
+                **comment_instance.model_dump(),
             )
         )
     except TimeoutError:
