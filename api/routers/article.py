@@ -166,7 +166,7 @@ async def get_feed_articles(
     try:
         queryResult = db.query(
             query,
-            users_followed=user_instance.following_ids,
+            users_followed=user_instance.followingIds,
             limit=limit,
             offset=offset,
         )

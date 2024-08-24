@@ -12,4 +12,4 @@ class UserModel(BaseModel):
     hashed_password: str
     bio: Union[str, None] = None
     image: Union[str, None] = None
-    following_ids: Tuple[str, ...] = ()
+    followingIds: Tuple[str, ...] = ()

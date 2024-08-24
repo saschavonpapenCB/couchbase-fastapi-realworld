@@ -27,7 +27,7 @@ async def get_profile(
 ):
     """Queries db for user instance by username and returns profile schema."""
     user = await query_users_db(db, username=username)
-    following = logged_user is not None and user.id in logged_user.following_ids
+    following = logged_user is not None and user.id in logged_user.followingIds
     return ProfileResponseSchema(
         profile=ProfileSchema(following=following, **user.model_dump())
     )
@@ -39,11 +39,11 @@ async def follow_user(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
-    """Queries db for user instance by username, adds current user ID to instance's following_ids, upserts instance \
+    """Queries db for user instance by username, adds current user ID to instance's followingIds, upserts instance \
         to db and returns profile schema."""
     user_to_follow = await query_users_db(db, username=username)
-    following_set = set(user_instance.following_ids) | set((user_to_follow.id,))
-    user_instance.following_ids = tuple(following_set)
+    following_set = set(user_instance.followingIds) | set((user_to_follow.id,))
+    user_instance.followingIds = tuple(following_set)
     try:
         db.upsert_document(
             USER_COLLECTION, user_instance.id, user_instance.model_dump()
@@ -68,11 +68,11 @@ async def unfollow_user(
     user_instance: UserModel = Depends(get_current_user_instance),
     db=Depends(get_db),
 ):
-    """Queries db for user instance by username, removes current user ID from instance's following_ids, upserts \
+    """Queries db for user instance by username, removes current user ID from instance's followingIds, upserts \
         instance to db and returns profile schema."""
     user_to_unfollow = await query_users_db(db, username=username)
-    following_set = set(user_instance.following_ids) - set((user_to_unfollow.id,))
-    user_instance.following_ids = tuple(following_set)
+    following_set = set(user_instance.followingIds) - set((user_to_unfollow.id,))
+    user_instance.followingIds = tuple(following_set)
     try:
         db.upsert_document(
             USER_COLLECTION, user_instance.id, user_instance.model_dump()
