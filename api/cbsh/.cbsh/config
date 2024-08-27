@@ -1,8 +1,0 @@
-version = 1
-
-[[cluster]]
-identifier = "capella"
-connstr = "couchbases://cb.z3y6avlnz--oqzmz.cloud.couchbase.com"
-user-display-name = "Sascha von Papen"
-username = "Administrator"
-password = "RealWorld2024!"
