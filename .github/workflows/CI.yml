@@ -112,6 +112,7 @@ jobs:
           sleep 1;
         done
         echo "Frontend ready."
+      working-directory: angular-conduit-signals/
         
     - name: Run E2E tests
       run: npm run e2e
