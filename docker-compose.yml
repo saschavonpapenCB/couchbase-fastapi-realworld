@@ -1,9 +1,9 @@
 version: '3'
 services:
-  backend:
+  api:
     build:
       context: ./api
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.api
     ports:
       - "8000:8000"
     networks:
@@ -23,7 +23,7 @@ services:
       context: ./angular-conduit-signals/cypress
       dockerfile: Dockerfile.cypress
     depends_on:
-      - frontend
+      - api
       - backend
     environment:
       - CYPRESS_BASE_URL=http://frontend
