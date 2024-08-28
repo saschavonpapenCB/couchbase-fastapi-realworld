@@ -77,6 +77,47 @@ jobs:
         env:
           APIURL: http://localhost:8000
 
+  e2e_tests:
+    name: Run E2E tests
+    runs-on: ubuntu-latest
+    environment: development
+    needs: api_tests
+    env:
+      DB_CONN_STR: ${{ vars.DB_CONN_STR }}
+      DB_BUCKET_NAME: ${{ vars.DB_BUCKET_NAME }}
+      DB_SCOPE_NAME: ${{ vars.DB_SCOPE_NAME }}
+      DB_USERNAME: ${{ vars.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+        
+    steps:
+    - uses: actions/checkout@v1
+      with:
+        submodules: recursive
+        
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+        
+    - name: Install dependencies
+      run: npm install
+      working-directory: angular-conduit-signals/
+        
+    - name: Start the Angular frontend
+      run: |
+        npm run start &
+        # Wait for the frontend to be available
+        while ! curl "http://localhost:4200" > /dev/null 2>&1
+        do
+          sleep 1;
+        done
+        echo "Frontend ready."
+        
+    - name: Run E2E tests
+      run: npm run e2e
+      working-directory: frontend/
+
 
   super_linter:
     name: Lint code base
