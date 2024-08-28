@@ -132,7 +132,7 @@ jobs:
         
     - name: Run E2E tests
       run: npx cypress run
-      working-directory: frontend/
+      working-directory: angular-conduit-signals/
 
 
   super_linter:
