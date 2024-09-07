@@ -24,7 +24,7 @@ services:
       dockerfile: Dockerfile.cypress
     depends_on:
       - api
-      - backend
+      - frontend
     environment:
       - CYPRESS_BASE_URL=http://frontend
     volumes:
