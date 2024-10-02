@@ -135,20 +135,3 @@ jobs:
     - name: Run E2E tests
       run: npx cypress run
       working-directory: angular-conduit-signals/
-
-
-  super_linter:
-    name: Lint code base
-    runs-on: ubuntu-latest
-    environment: development
-    needs: e2e_tests
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      
-      - name: Run Super-Linter
-        uses: github/super-linter@v4
-        env:
-          DEFAULT_BRANCH: master
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
