@@ -41,7 +41,7 @@ jobs:
     name: Run realworld api tests
     runs-on: ubuntu-latest
     environment: development
-    needs: unit_tests
+    #needs: unit_tests
     env:
       DB_CONN_STR: ${{ vars.DB_CONN_STR }}
       DB_BUCKET_NAME: ${{ vars.DB_BUCKET_NAME }}
@@ -82,7 +82,7 @@ jobs:
     name: Run E2E tests
     runs-on: ubuntu-latest
     environment: development
-    needs: api_tests
+    #needs: api_tests
     env:
       DB_CONN_STR: ${{ vars.DB_CONN_STR }}
       DB_BUCKET_NAME: ${{ vars.DB_BUCKET_NAME }}
